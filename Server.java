@@ -1,40 +1,93 @@
-// A Java program for a Server 
-import java.net.*; 
+// Java implementation of  Server side 
+// It contains two classes : Server and ClientHandler 
+// Save file as Server.java 
+
+package cs425;
+
 import java.io.*; 
+import java.text.*; 
+import java.util.*; 
+import java.net.*; 
   
-public class Server 
+// Server class 
+public class Server  
 { 
-    //initialize socket and input stream 
-    private Socket          socket   = null; 
-    private ServerSocket    server   = null; 
-    private DataInputStream in       =  null; 
-  
-    // constructor with port 
-    public Server(int port) 
+    public static void main(String[] args) throws IOException  
     { 
-        // starts server and waits for a connection 
-        try
+        // server is listening on port 5000 
+        ServerSocket ss = new ServerSocket(5000); 
+        Integer noOfClientsConnected = 0;
+          
+        // running infinite loop for getting 
+        // client request 
+        while (true)  
         { 
-            server = new ServerSocket(port); 
-            System.out.println("Server started"); 
+            Socket s = null; 
+              
+            try 
+            { 
+                System.out.println("No of clients connected so far: " + noOfClientsConnected + ". Waiting for more connections.");
+
+                // socket object to receive incoming client requests 
+                s = ss.accept(); 
+                  
+                noOfClientsConnected += 1;
+                System.out.println("A new client is connected : " + s); 
+                  
+                // obtaining input and out streams 
+                DataInputStream dis = new DataInputStream(s.getInputStream()); 
+                DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
+                  
+                System.out.println("Assigning new thread for this client"); 
   
-            System.out.println("Waiting for a client ..."); 
+                // create a new thread object 
+                Thread t = new ClientHandler(s, dis, dos); 
   
-            socket = server.accept(); 
-            System.out.println("Client accepted"); 
+                // Invoking the start() method 
+                t.start(); 
+                  
+            } 
+            catch (Exception e){
+                e.printStackTrace(); 
+            } 
+        }
+    } 
+} 
   
-            // takes input from the client socket 
-            in = new DataInputStream( 
-                new BufferedInputStream(socket.getInputStream())); 
+// ClientHandler class 
+class ClientHandler extends Thread  
+{ 
+    final DataInputStream dis; 
+    final DataOutputStream dos; 
+    final Socket s; 
+      
   
-            String line = ""; 
+    // Constructor 
+    public ClientHandler(Socket s, DataInputStream dis, DataOutputStream dos)  
+    { 
+        this.s = s; 
+        this.dis = dis; 
+        this.dos = dos; 
+    } 
+  
+    @Override
+    public void run()  
+    { 
+        System.out.println("Server started serving client: " + s); 
+         
+        String received; 
+        String toreturn; 
+        while (true)  
+        { 
+            try {                  
+                String line = ""; 
   
             // reads message from client until "Over" is sent 
             while (!line.equals("Over")) 
             { 
                 try
                 { 
-                    line = in.readUTF(); 
+                    line = dis.readUTF(); 
                     System.out.println(line); 
   
                 } 
@@ -44,19 +97,22 @@ public class Server
                 } 
             } 
             System.out.println("Closing connection"); 
+            break;
   
-            // close connection 
-            socket.close(); 
-            in.close(); 
+            } catch (Exception e) { 
+                e.printStackTrace(); 
+            } 
         } 
-        catch(IOException i) 
+          
+        try
         { 
-            System.out.println(i); 
+            // closing resources 
+            this.dis.close(); 
+            this.dos.close();
+            this.s.close();
+              
+        }catch(IOException e){ 
+            e.printStackTrace(); 
         } 
-    } 
-  
-    public static void main(String args[]) 
-    { 
-        Server server = new Server(5000); 
     } 
 } 
