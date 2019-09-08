@@ -18,38 +18,44 @@ public class Server
         ServerSocket ss = new ServerSocket(5000); 
         Integer noOfClientsConnected = 0;
           
-        // running infinite loop for getting 
-        // client request 
-        while (true)  
-        { 
-            Socket s = null; 
-              
-            try 
-            { 
-                System.out.println("No of clients connected so far: " + noOfClientsConnected + ". Waiting for more connections.");
+        try
+        {
 
-                // socket object to receive incoming client requests 
-                s = ss.accept(); 
-                  
-                noOfClientsConnected += 1;
-                System.out.println("A new client is connected : " + s); 
-                  
-                // obtaining input and out streams 
-                DataInputStream dis = new DataInputStream(s.getInputStream()); 
-                DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
-                  
-                System.out.println("Assigning new thread for this client"); 
-  
-                // create a new thread object 
-                Thread t = new ClientHandler(s, dis, dos); 
-  
-                // Invoking the start() method 
-                t.start(); 
-                  
-            } 
-            catch (Exception e){
-                e.printStackTrace(); 
-            } 
+            while (true)  
+            { 
+                Socket s = null; 
+                
+                try 
+                { 
+                    System.out.println("No of clients connected so far: " + noOfClientsConnected + ". Waiting for more connections.");
+
+                    // socket object to receive incoming client requests 
+                    s = ss.accept(); 
+                    
+                    noOfClientsConnected += 1;
+                    System.out.println("A new client is connected : " + s); 
+                    
+                    // obtaining input and out streams 
+                    DataInputStream dis = new DataInputStream(s.getInputStream()); 
+                    DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
+                    
+                    System.out.println("Assigning new thread for this client"); 
+    
+                    // create a new thread object 
+                    Thread t = new ClientHandler(s, dis, dos); 
+    
+                    // Invoking the start() method 
+                    t.start(); 
+                    
+                } 
+                catch (Exception e){
+                    e.printStackTrace(); 
+                } 
+            }
+        }
+        finally
+        {
+            ss.close();
         }
     } 
 } 
