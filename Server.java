@@ -89,8 +89,8 @@ class ClientHandler extends Thread
                 String line = ""; 
   
             // reads message from client until "Over" is sent 
-            while (!line.equals("Over")) 
-            { 
+    //        while (!line.equals("Over")) 
+      //      { 
                 try
                 { 
                     line = dis.readUTF(); 
@@ -101,7 +101,7 @@ class ClientHandler extends Thread
                 { 
                     System.out.println(i); 
                 } 
-            } 
+           // } 
             System.out.println("Closing connection"); 
             break;
   
