@@ -6,7 +6,7 @@ public class Client
 { 
     // initialize socket and input output streams 
     // private Socket socket            = null; 
-    private DataInputStream  input   = null; 
+    private String  input   = null; 
     private DataOutputStream out     = null; 
     private String address = null;
     private int port;
@@ -21,13 +21,14 @@ public class Client
     public void create_thread() {
     //   try{
         // establish a connection 
-        while(true) {
+   //     while(true) {
         try
         { 
             Socket socket = new Socket(address, port); 
             System.out.println("Connected"); 
              // takes input from terminal 
-             input  = new DataInputStream(System.in); 
+             //
+             input  = "Hello there"; 
   
              // sends output to the socket 
              out    = new DataOutputStream(socket.getOutputStream()); 
@@ -39,19 +40,20 @@ public class Client
         { 
             System.out.println(e); 
         } 
-    }
+    //}
 }
 }
 // ClientThread class 
+@SuppressWarnings("deprecation")
 class ClientThread extends Thread  
 { 
-    private DataInputStream input = null; 
+    private String input = ""; 
     private DataOutputStream out = null; 
     private Socket socket = null; 
       
   
     // Constructor 
-    public ClientThread(Socket socket, DataInputStream input, DataOutputStream out)  
+    public ClientThread(Socket socket, String input, DataOutputStream out)  
     { 
         this.socket = socket; 
         this.input = input; 
@@ -65,26 +67,26 @@ class ClientThread extends Thread
 
 
         // string to read message from input 
-        String line = ""; 
+       String line = ""; 
   
         // keep reading until "Over" is input 
-        while (!line.equals("Over")) 
-        { 
+         
+         
             try
             { 
-                line = this.input.readLine(); 
+                line = this.input; 
                 this.out.writeUTF(line); 
             } 
             catch(IOException i) 
             { 
                 System.out.println(i); 
             } 
-        } 
+        
   
         // close the connection 
         try
         { 
-            this.input.close(); 
+         //   this.input.close(); 
             this.out.close(); 
             this.socket.close(); 
         } 
