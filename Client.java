@@ -28,7 +28,7 @@ public class Client
              
             // takes input from terminal 
             System.out.println("enter grep");
-            input = "-e [*y*]";
+            input = "-e ^[0-9]*[a-z]{5}";
               
             // sends output to the socket 
             in = new DataInputStream(socket.getInputStream());

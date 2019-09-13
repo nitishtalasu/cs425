@@ -111,14 +111,15 @@ class ClientHandler extends Thread
                 // printStream(proc.getErrorStream());
                 String line;
                 line = dis.readUTF();
-                //Runtime rt = Runtime.getRuntime();
-                String[] cmd = { "grep", line , "F:\\STUDIES\\Grad\\Distributed Systems(CS425)\\MP\\cs425\\vm1.log"}; 
-                System.out.println(Arrays.toString(cmd));
-                Process proc = rt.exec(cmd);    
-                //Process proc = new ProcessBuilder("grep",line, "F:\\STUDIES\\Grad\\Distributed Systems(CS425)\\MP\\cs425\\Test.txt").start();
-                //ProcessBuilder pb = new ProcessBuilder("grep", line, "F:\\STUDIES\\Grad\\Distributed Systems(CS425)\\MP\\cs425\\vm1.log");
-                //System.out.println(pb.command());
-                //Process proc = pb.start();
+                String command = "";
+                command = command.concat("grep ");
+                System.out.println(command);
+                
+                command = command.concat(line + " /home/chagari2/Mp1/cs425/vm1.log");
+                
+                System.out.println(command);
+                Process proc = rt.exec(command);    
+                
                 BufferedReader is = new BufferedReader(new InputStreamReader(proc.getInputStream())); 
                 String oLine;
                 while ((oLine = is.readLine()) != null)
