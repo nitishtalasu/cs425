@@ -115,7 +115,7 @@ class ClientHandler extends Thread
                 command = command.concat("grep ");
                 System.out.println(command);
                 
-                command = command.concat(line + " /Users/prateeth/Desktop/Fall19/DS/cs425/vm1.log");
+                command = command.concat(line + " /home/chagari2/Mp1/cs425/vm1.log");
                 
                 System.out.println(command);
                 Process proc = rt.exec(command);    
