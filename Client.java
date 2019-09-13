@@ -1,71 +1,105 @@
-package cs425;
 
-import java.net.*; 
 import java.io.*; 
-  
+import java.text.*; 
+import java.util.*; 
+import java.net.*; 
+@SuppressWarnings("deprecation")
 public class Client 
 { 
-    // initialize socket and input output streams 
-    private Socket socket            = null; 
-    private DataInputStream  input   = null; 
+    // initialize input output streams 
+    private String input   = null; 
     private DataOutputStream out     = null; 
-  
+    private DataInputStream in    = null; 
+    private String address = null;
+    private int port;
+
     // constructor to put ip address and port 
     public Client(String address, int port) 
-    { 
-        // establish a connection 
+    {   
+        this.address =  address;
+        this.port = port;
+       
+    }
+    public void create_thread() {
         try
         { 
-            socket = new Socket(address, port); 
+            Socket socket = new Socket(address, port); 
             System.out.println("Connected"); 
-  
+             
             // takes input from terminal 
-            input  = new DataInputStream(System.in); 
-  
+            System.out.println("enter grep");
+            input = "-e [*y*]";
+              
             // sends output to the socket 
+            in = new DataInputStream(socket.getInputStream());
+            
             out    = new DataOutputStream(socket.getOutputStream()); 
-        } 
-        catch(UnknownHostException u) 
+            Thread t = new ClientThread(socket, input, in, out);
+
+            t.start(); 
+        }
+        catch(Exception e) 
         { 
-            System.out.println(u); 
-        } 
-        catch(IOException i) 
-        { 
-            System.out.println(i); 
-        } 
+            System.out.println(e); 
+        }   
+    }
+}
+// ClientThread class 
+@SuppressWarnings("deprecation")
+class ClientThread extends Thread  
+{ 
+    private String input = ""; 
+    private DataOutputStream out = null; 
+    private Socket socket = null; 
+    private DataInputStream in = null; 
+      
+    // Constructor 
+    public ClientThread(Socket socket, String input, DataInputStream in, DataOutputStream out)  
+    { 
+        this.socket = socket; 
+        this.input = input; 
+        this.out = out; 
+        this.in = in;
+    } 
   
+    @Override
+    public void run()  
+    { 
+        System.out.println("Client thread started: " + socket); 
+
         // string to read message from input 
         String line = ""; 
-  
-        // keep reading until "Over" is input 
-        while (!line.equals("Over")) 
-        { 
+        String line2 = "";
+
             try
             { 
-                line = input.readLine(); 
-                out.writeUTF(line); 
+                line = this.input; 
+                this.out.writeUTF(line); 
+
+                boolean eof = false;
+                while (!eof) {
+                    try {
+                        line2 = this.in.readUTF();
+                        System.out.println(line2);
+                    } catch (EOFException e) {
+                        eof = true;
+                    }
+                }   
             } 
             catch(IOException i) 
             { 
                 System.out.println(i); 
             } 
-        } 
-  
-        // close the connection 
         try
         { 
-            input.close(); 
-            out.close(); 
-            socket.close(); 
+            this.in.close(); 
+            this.out.close(); 
+            this.socket.close(); 
         } 
         catch(IOException i) 
         { 
             System.out.println(i); 
         } 
-    } 
-  
-    public static void main(String args[]) 
-    { 
-        Client client = new Client("192.168.0.12", 5000); 
-    } 
-} 
+    }
+}
+

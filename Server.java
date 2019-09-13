@@ -2,7 +2,6 @@
 // It contains two classes : Server and ClientHandler 
 // Save file as Server.java 
 
-package cs425;
 
 import java.io.*; 
 import java.text.*; 
@@ -10,13 +9,14 @@ import java.util.*;
 import java.net.*; 
   
 // Server class 
+@SuppressWarnings("deprecation")
 public class Server  
 { 
     public static void main(String[] args) throws IOException  
     { 
         // server is listening on port 5000 
         ServerSocket ss = new ServerSocket(5000); 
-        Integer noOfClientsConnected = 0;
+        int noOfClientsConnected = 0;
           
         try
         {
