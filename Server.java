@@ -86,22 +86,52 @@ class ClientHandler extends Thread
         while (true)  
         { 
             try {                  
-                String line = ""; 
+                //String line = ""; 
   
             // reads message from client until "Over" is sent 
-            while (!line.equals("Over")) 
-            { 
-                try
-                { 
-                    line = dis.readUTF(); 
-                    System.out.println(line); 
+            // while (!line.equals("Over")) 
+            // { 
+            //     try
+            //     { 
+            //         line = dis.readUTF(); 
+            //         System.out.println(line); 
   
-                } 
-                catch(IOException i) 
-                { 
-                    System.out.println(i); 
-                } 
-            } 
+            //     } 
+            //     catch(IOException i) 
+            //     { 
+            //         System.out.println(i); 
+            //     } 
+            // } 
+            try {
+                Runtime rt = Runtime.getRuntime();
+                // String[] cmd = {"/bin/sh", "-c", "grep 'Report Process started' server.log|wc -l"};
+                // Process proc = rt.exec(cmd);
+                // printStream(proc.getInputStream());
+                // System.out.println("Error : ");
+                // printStream(proc.getErrorStream());
+                String line;
+                line = dis.readUTF();
+                //Runtime rt = Runtime.getRuntime();
+                String[] cmd = { "grep", line , "F:\\STUDIES\\Grad\\Distributed Systems(CS425)\\MP\\cs425\\vm1.log"}; 
+                System.out.println(Arrays.toString(cmd));
+                Process proc = rt.exec(cmd);    
+                //Process proc = new ProcessBuilder("grep",line, "F:\\STUDIES\\Grad\\Distributed Systems(CS425)\\MP\\cs425\\Test.txt").start();
+                //ProcessBuilder pb = new ProcessBuilder("grep", line, "F:\\STUDIES\\Grad\\Distributed Systems(CS425)\\MP\\cs425\\vm1.log");
+                //System.out.println(pb.command());
+                //Process proc = pb.start();
+                BufferedReader is = new BufferedReader(new InputStreamReader(proc.getInputStream())); 
+                String oLine;
+                while ((oLine = is.readLine()) != null)
+                {
+                         System.out.println(oLine);
+                         dos.writeUTF(oLine);
+                }
+                
+                System.out.println("Done");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
             System.out.println("Closing connection"); 
             break;
   
