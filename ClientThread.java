@@ -20,6 +20,7 @@ class ClientThread extends Thread
         this.outputStream = outputStream; 
         this.inputStream = inputStream;
         this.vmId = vmId;
+	
     } 
   
     @Override
@@ -35,7 +36,7 @@ class ClientThread extends Thread
             { 
                 this.outputStream.writeUTF(this.clientInput);
                 this.outputStream.writeUTF(this.vmId);
-                String filepath = vmId + " _output";
+                String filepath = "output_"+vmId;
                 clientLog = new FileWriter(filepath);
                 boolean eof = false;
                 while (!eof) {
@@ -58,7 +59,8 @@ class ClientThread extends Thread
             this.outputStream.close(); 
             long endTime = System.currentTimeMillis();
             System.out.println("thread runtime: " + (endTime - startTime));
-            this.socket.close(); 
+            this.clientLog.close();
+	    this.socket.close(); 
         } 
         catch(IOException i) 
         { 
