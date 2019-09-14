@@ -35,7 +35,6 @@ public class Client
             // sends output to the socket 
             inputStream = new DataInputStream(socket.getInputStream());
             outputStream = new DataOutputStream(socket.getOutputStream()); 
-
             //clientInput = "-c -E ^[0-9]*[a-z]{5}"            
             Thread t = new ClientThread(socket, clientInput, inputStream, outputStream, vmId);
             t.start(); 

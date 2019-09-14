@@ -10,6 +10,7 @@ class ClientThread extends Thread
     private Socket socket = null; 
     private DataInputStream inputStream = null; 
     private String vmId = "";
+    private FileWriter clientLog = null;
       
     // Constructor 
     public ClientThread(Socket socket, String clientInput, DataInputStream inputStream, DataOutputStream outputStream, String vmId)  
@@ -34,13 +35,14 @@ class ClientThread extends Thread
             { 
                 this.outputStream.writeUTF(this.clientInput);
                 this.outputStream.writeUTF(this.vmId);
-
+                String filepath = vmId + " _output";
+                clientLog = new FileWriter(filepath);
                 boolean eof = false;
                 while (!eof) {
                     try {
                         lineOutputs = this.inputStream.readUTF();
-                        System.out.println(lineOutputs);
-                        //clientLog.write(line2);
+                        //System.out.println(lineOutputs);
+                        clientLog.write(lineOutputs);
                     } catch (EOFException e) {
                         eof = true;
                     }
