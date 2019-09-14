@@ -59,15 +59,21 @@ public class ClientRequestHandler extends Thread
             try 
             {
                 // Clients sending the log file name.
-                String vmLogName = this.socketInputStream.readUTF();
-                System.out.println(vmLogName);
-
+                String vmLogFileName = this.socketInputStream.readUTF();
+                System.out.println(vmLogFileName);
+                File logFile = new File(vmLogFileName);
+                if (!logFile.exists())
+                {
+                    this.socketOutputStream.writeUTF("Please check file name.");
+                    break;
+                }
+                
+                String fileAbsPath = logFile.getAbsolutePath();
                 // Reads the command line from client from the socket input stream channel.
-                String line = this.socketInputStream.readUTF();
-                String userDir = System.getProperty("user.dir");        
+                String line = this.socketInputStream.readUTF();        
                 String command = "";// = "grep " + line + " F:\\STUDIES\\Grad\\Distributed Systems(CS425)\\MP\\cs425\\vm1.log";
                 command = command.concat("grep ");                
-                command = command.concat(line + " " + userDir + "\\" + vmLogName);
+                command = command.concat(line + " " + fileAbsPath);
                 
                 // Creating the process with given client command.
                 System.out.println("[Server] Server executing the process with command: " + command);
