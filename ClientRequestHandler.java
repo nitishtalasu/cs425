@@ -44,7 +44,7 @@ public class ClientRequestHandler extends Thread
     @Override
     public void run()  
     { 
-        System.out.println("Server started serving client: " + this.socket); 
+        System.out.println("[Server] Server started serving client: " + this.socket); 
         
         /**
          * Server serves client requests as follows:
@@ -64,14 +64,14 @@ public class ClientRequestHandler extends Thread
                 File logFile = new File(vmLogFileName);
                 if (!logFile.exists())
                 {
-                    this.socketOutputStream.writeUTF("Please check file name.");
+                    this.socketOutputStream.writeUTF(vmLogFileName + " Please check file name.");
                     break;
                 }
                 
                 String fileAbsPath = logFile.getAbsolutePath();
                 // Reads the command line from client from the socket input stream channel.
                 String line = this.socketInputStream.readUTF();        
-                String command = "";// = "grep " + line + " F:\\STUDIES\\Grad\\Distributed Systems(CS425)\\MP\\cs425\\vm1.log";
+                String command = "";
                 command = command.concat("grep ");                
                 command = command.concat(line + " " + fileAbsPath);
                 
@@ -89,22 +89,21 @@ public class ClientRequestHandler extends Thread
                 String outputLine;
                 while ((outputLine = processOutputReader.readLine()) != null)
                 {
-                         System.out.println(outputLine);
-                         this.socketOutputStream.writeUTF(outputLine);
+                    this.socketOutputStream.writeUTF(vmLogFileName + " " + outputLine);
                 }
                 
-                System.out.println("Client request has been served.");
+                System.out.println("[Server] Client request has been served.");
             } 
             catch (Exception ex) 
             {
-                System.out.println("Client requested operation failed with:");
+                System.out.println("[Server] Client requested operation failed with:");
                 ex.printStackTrace();
             }
 
             break;
         }
         
-        System.out.println("Closing connection"); 
+        System.out.println("[Server] Closing connection"); 
         this.closeSocket();
     } 
 
@@ -120,7 +119,7 @@ public class ClientRequestHandler extends Thread
         } 
         catch (IOException e)
         {
-            System.out.println("Stream initializations failed:");
+            System.out.println("[Server] Stream initializations failed:");
             e.printStackTrace();
         }
     }
@@ -137,7 +136,7 @@ public class ClientRequestHandler extends Thread
             this.socket.close();
         }
         catch(IOException e){ 
-            System.out.println("Failed in closing resources with message:");
+            System.out.println("[Server] Failed in closing resources with message:");
             e.printStackTrace(); 
         } 
 	}

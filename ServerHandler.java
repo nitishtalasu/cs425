@@ -69,7 +69,7 @@ public class ServerHandler
 
             while (true)  
             { 
-                System.out.println("No of clients serverd so far: " + noOfClientsServed + 
+                System.out.println("[Server] No of clients serverd so far: " + noOfClientsServed + 
                     ". Waiting for more connections.");
 
                 // Server waiting for the client connection.
@@ -108,14 +108,14 @@ public class ServerHandler
         }
         catch(IOException e)
         {
-            System.out.println("Server socket creation failed with exception:");
+            System.out.println("[Server] Server socket creation failed with exception:");
             e.printStackTrace();
             throw e;
         }
         catch(IllegalArgumentException e)
         {
-            System.out.println("The port is outside the specified range of valid port values. " +
-                "Exception stack trace:");
+            System.out.println("[Server] The port is outside the specified range of valid port " +
+            "   values.Exception stack trace:");
             e.printStackTrace();
             throw e;
         }
@@ -140,7 +140,7 @@ public class ServerHandler
         }
         catch(IOException e)
         {
-            System.out.println("Server socket creation failed with exception:");
+            System.out.println("[Server] Server socket creation failed with exception:");
             e.printStackTrace();
         }
     }
