@@ -1,8 +1,2 @@
-ClientRequestHandler.class
-ServerHandler.class
-Server1.class
-ClientThread.class
-.vscode/launch.json
-.vscode/settings.json
-ClientMain.class
-Client.class
+*.class
+*.json

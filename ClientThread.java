@@ -34,8 +34,9 @@ class ClientThread extends Thread
 
             try
             { 
-                this.outputStream.writeUTF(this.clientInput);
                 this.outputStream.writeUTF(this.vmId);
+                this.outputStream.writeUTF(this.clientInput);
+                
                 String filepath = "output_"+vmId;
                 clientLog = new FileWriter(filepath);
                 boolean eof = false;
@@ -44,6 +45,7 @@ class ClientThread extends Thread
                         lineOutputs = this.inputStream.readUTF();
                         //System.out.println(lineOutputs);
                         clientLog.write(lineOutputs);
+                        clientLog.newLine();
                     } catch (EOFException e) {
                         eof = true;
                     }

@@ -4,7 +4,8 @@
   */
 
 import java.io.*; 
-import java.net.Socket; 
+import java.net.Socket;
+import java.util.Properties;
 import java.util.Scanner;
 @SuppressWarnings("deprecation")
 public class Client 
@@ -47,16 +48,27 @@ public class Client
 
     public static void main(String args[]) 
     { 
-        String addresses[] = {"172.22.154.195","172.22.156.195","172.22.152.200","172.22.154.196","172.22.156.196","172.22.152.201","172.22.154.197","172.22.156.197","172.22.152.202","172.22.154.198"};
-        String vmIds[] = {"vm1.log", "vm2.log", "vm3.log", "vm4.log", "vm5.log", "vm6.log", "vm7.log", "vm8.log", "vm9.log", "vm10.log"};
-    
+        String addresses[]=null, vmIds[]=null;
+        try{
+            InputStream input = new FileInputStream("server_parameters.properties");
+            Properties prop = new Properties();
+            prop.load(input);
+
+            // get the property value and print it out
+            addresses = prop.getProperty("IP_address").split(",");
+            vmIds = prop.getProperty("VM_ID").split(",");
+        }
+        catch(Exception e) {
+            System.out.println(e);
+        }
+
         Scanner sc = new Scanner(System.in);
         System.out.println("Type grep command and press enter");
         System.out.println("For example: -c -E ^[0-9]*[a-z]{5}");
         String clientInput = sc.nextLine();
         sc.close();
 
-        for(int i=0; i<addresses.length; i++) {
+        for(int i=0; i < addresses.length; i++) {
             Client client = new Client(addresses[i], clientInput, vmIds[i], 5000); 
             client.create_thread();
         }
