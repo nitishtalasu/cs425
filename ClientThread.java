@@ -58,7 +58,7 @@ class ClientThread extends Thread
             this.inputStream.close(); 
             this.outputStream.close(); 
             long endTime = System.currentTimeMillis();
-            System.out.println("thread runtime: " + (endTime - startTime));
+            System.out.println("thread runtime for  "+this.vmId+": " + (endTime - startTime));
             this.clientLog.close();
 	    this.socket.close(); 
         } 
