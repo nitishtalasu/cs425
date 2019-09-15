@@ -6,6 +6,10 @@
 
 import java.io.*; 
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Class handles the client requests.
@@ -31,6 +35,12 @@ public class GrepRequestHandler extends Thread
      * Logger instance.
      */
     private GrepLogger logger;
+
+    /**
+     * Regex pattern to tokenize the user input.
+     */
+    private static Pattern regexPattern = 
+        Pattern.compile("\".*?(?<!\\\\)\"|'.*?(?<!\\\\)'|-*[A-Za-z]+");
   
     /**
      * Constructor for the class GrepRequestHandler
@@ -76,16 +86,28 @@ public class GrepRequestHandler extends Thread
                 
                 String fileAbsPath = logFile.getAbsolutePath();
                 // Reads the command line from client from the socket input stream channel.
-                String line = this.socketInputStream.readUTF();        
-                String command = "";
-                command = command.concat("grep ");                
-                command = command.concat(line + " " + fileAbsPath);
+                String line = this.socketInputStream.readUTF();   
+                
+                // Tokenising the client input based on the regex.
+                List<String> regexPatternMatchingList = new ArrayList<String>();
+                Matcher regexMatcher = regexPattern.matcher(line);
+                while (regexMatcher.find()) {
+                    regexPatternMatchingList.add(regexMatcher.group());
+                }
+
+                List<String> commandArgs = new ArrayList<String>();
+                commandArgs.add("grep");
+                for (String match : regexPatternMatchingList) {
+                    commandArgs.add(match);
+                }
+                commandArgs.add(fileAbsPath);
                 
                 // Creating the process with given client command.
-                logger.LogInfo("[Server] Server executing the process with command: " + command);
-                ProcessBuilder processBuilder = new ProcessBuilder(command);
+                logger.LogInfo("[Server] Server executing the process with command: " + commandArgs);
+                ProcessBuilder processBuilder = new ProcessBuilder(commandArgs);
                 Runtime rt = Runtime.getRuntime();
-                Process process = rt.exec(command);
+                //Process process = rt.exec(commandArgs);
+                Process process = processBuilder.start();
                 
                 // Buffer for reading the ouput from stream. 
                 BufferedReader processOutputReader =

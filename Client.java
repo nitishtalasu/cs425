@@ -73,7 +73,7 @@ public class Client {
             t.start();
 
         } catch (Exception e) {
-            logger.LogException("Connection to "+address+" accessing " +vmId+" failed due to:", e);
+            logger.LogWarning("Connection failed to "+address+" of " +vmId+" .Skipping this VM.");
         }
     }
 
