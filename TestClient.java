@@ -131,7 +131,7 @@ public class TestClient {
         // variable to store name of each logfile whose values are obtained from .properties file
         String[] logfile = new String[addresses.length];
         for (int i = 0; i < addresses.length; i++) {
-            logfile[i] = vmIds[i];
+            logfile[i] = "dummy_"+vmIds[i];
             // invoke Client.main() thread that invokes each server with (server address, test pattern, logfileID, port)
             Client client = new Client(addresses[i], testProps.getProperty(addresses[i]), logfile[i], 5500);
             client.create_thread(logGeneratorThreadGroup);
