@@ -5,22 +5,24 @@
  */
 
 import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
  * Class to handle the server side operations.
  */
-public class ServerHandler
-{ 
+public class ServerHandler {
     /**
      * Singleton object of ServerHandler type class.
      */
     private static ServerHandler handler = null;
 
     /**
-     * A server socket waits for client requests to come in over the network. 
-     * It performs operations based on the client request and then returns a result to the requester.
+     * A server socket waits for client requests to come in over the network. It
+     * performs operations based on the client request and then returns a result to
+     * the requester.
      */
     private ServerSocket server;
 
@@ -30,22 +32,58 @@ public class ServerHandler
     private final int port;
 
     /**
-     * Private constructor of ServerHandler type class.
-     * @param portNumber Port on which server is listening.
+     * Handler which the server uses to request client operations.
      */
-    private ServerHandler(int portNumber)
+    private final Class<?> requestHandler;
+
+    /**
+     * Private constructor of ServerHandler type class.
+     * 
+     * @param portNumber Port on which server is listening.
+     * @param handler    Handler that the server would be using to serve the clients.
+     */
+    private ServerHandler(int portNumber, Class<?> handler) 
     {
         this.port = portNumber;
+        requestHandler = handler;
     }
- 
+
+    /**
+     * Private constructor of ServerHandler type class.
+     * 
+     * @param portNumber Port on which server is listening.
+     */
+    private ServerHandler(int portNumber) 
+    {
+        this(portNumber, GrepRequestHandler.class);
+    }
+
     /**
      * Returns the singleton object of ServerHandler class.
+     * 
+     * @param portNumber Port on which server is listening.
+     * @param typeOfHandler Handler that the server would be using to serve the clients.
+     * @return ServerHandler class object.
+     */
+    public static ServerHandler getInstance(int portNumber, Class<?> typeOfhandler) 
+    {
+        if (handler == null) 
+        {
+            handler = new ServerHandler(portNumber, typeOfhandler);
+        }
+
+        return handler;
+    }
+
+    /**
+     * Returns the singleton object of ServerHandler class.
+     * 
      * @param portNumber Port on which server is listening.
      * @return ServerHandler class object.
      */
-    public static ServerHandler getInstance(int portNumber)
+    public static ServerHandler getInstance(int portNumber) 
     {
-        if (handler == null)
+        if (handler == null) 
         {
             handler = new ServerHandler(portNumber);
         }
@@ -55,38 +93,38 @@ public class ServerHandler
 
     /**
      * Run the server.
-     * @throws IOException if I/O error occurs.
+     * 
+     * @throws IOException              if I/O error occurs.
      * @throws IllegalArgumentException if any illegal arguments are passed.
      */
-    public void run() throws IOException, IllegalArgumentException
+    public void run() throws IOException, IllegalArgumentException 
     {
         this.setupServer();
 
         int noOfClientsServed = 0;
-          
-        try
-        {
 
-            while (true)  
-            { 
-                System.out.println("[Server] No of clients serverd so far: " + noOfClientsServed + 
-                    ". Waiting for more connections.");
+        try {
+
+            while (true) {
+                System.out.println("[Server] No of clients serverd so far: " + noOfClientsServed
+                        + ". Waiting for more connections.");
 
                 // Server waiting for the client connection.
-                Socket client = this.server.accept();                   
+                Socket client = this.server.accept();
                 noOfClientsServed += 1;
-                
-                // Creates a client handler to perform the client requested operations.
-                ClientRequestHandler clientRequestHandler = new ClientRequestHandler(client);
 
-                clientRequestHandler.start();           
+                // Creates a client handler to perform the client requested operations.
+                Thread clientRequestHandler = (Thread)this.getObjectofClientRequestHandler(client);
+
+                clientRequestHandler.start();
             }
-        }
-        catch(Exception e)
+        } 
+        catch (Exception e) 
         {
+            System.err.println("[Server] Server operation failed with exception:");
             e.printStackTrace();
-        }
-        finally
+        } 
+        finally 
         {
             this.closeServer();
         }
@@ -94,28 +132,28 @@ public class ServerHandler
 
     /**
      * Setups the server on the port.
+     * 
      * @throws IOException if I/O error occurs in creating socket.
      * @throws IllegalArgumentException if port is out of range.
      */
-    private void setupServer() throws IOException, IllegalArgumentException
+    private void setupServer() throws IOException, IllegalArgumentException 
     {
-        try
+        try 
         {
             this.server = new ServerSocket(this.port);
-            System.out.println("[Server] Server started at Socket : " +
-                this.server.getInetAddress() + " Port : " +
-                this.server.getLocalPort());
-        }
-        catch(IOException e)
+            System.out.println("[Server] Server started at Socket : " + this.server.getInetAddress() + " Port : "
+                    + this.server.getLocalPort());
+        } 
+        catch (IOException e) 
         {
-            System.out.println("[Server] Server socket creation failed with exception:");
+            System.err.println("[Server] Server socket creation failed with exception:");
             e.printStackTrace();
             throw e;
         }
-        catch(IllegalArgumentException e)
+        catch (IllegalArgumentException e) 
         {
-            System.out.println("[Server] The port is outside the specified range of valid port " +
-            "   values.Exception stack trace:");
+            System.err.println("[Server] The port is outside the specified range of valid port "
+                    + "   values.Exception stack trace:");
             e.printStackTrace();
             throw e;
         }
@@ -124,24 +162,47 @@ public class ServerHandler
     /**
      * Closes the running server.
      */
-    private void closeServer()
+    private void closeServer() 
     {
-        if (this.server.isClosed())
-        {
-            return;         /* Early return as server socket already closed */
+        if (this.server.isClosed()) {
+            return; /* Early return as server socket already closed */
         }
 
-        try
+        try 
         {
-            if (!this.server.isClosed())
+            if (!this.server.isClosed()) 
             {
                 this.server.close();
             }
         }
-        catch(IOException e)
+        catch (IOException e) 
         {
-            System.out.println("[Server] Server socket creation failed with exception:");
+            System.err.println("[Server] Server socket creation failed with exception:");
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Creates an object of type T.
+     * @param <T> Type of class which the server uses to request client operations.
+     * @param client Socket for the server and client connection.
+     * @return Object of type T class.
+     * @throws Exception If any error occurs in creating object.
+     */
+    private <T> T getObjectofClientRequestHandler(Socket client) throws Exception 
+    {
+        try
+        {
+            Constructor<?> constructor = requestHandler.getConstructor(Socket.class);
+            Object clientRequestHandler = constructor.newInstance(new Object[]{ client });
+
+            return (T)clientRequestHandler;
+        }
+        catch (Exception e)
+        {
+            System.err.println("[Server] Server initilization failed.");
+            e.printStackTrace();
+            throw e;
         }
     }
 }

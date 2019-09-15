@@ -7,19 +7,19 @@
  /**
   * Main class for server.
   */
-public class Server1
+public class Server
 { 
     public static void main(String[] args)  
     { 
         try
         {
             int serverPort = getPortNumber(args);
-            System.out.println("Starting the server on port: " + serverPort);
+            System.out.println("[Server] Starting the server on port: " + serverPort);
             ServerHandler.getInstance(serverPort).run();
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
     }
 
@@ -40,13 +40,13 @@ public class Server1
             }
             catch (NumberFormatException e) 
             {
-                System.err.println("First argument" + args[0] + " must be an integer. " +
+                System.err.println("[Server] First argument" + args[0] + " must be an integer. " +
                     "Exiting the application");
                 System.exit(-1);
             }
         }
 
-        System.out.println("As port was not passed. Setting port to default value 5000.");
+        System.out.println("[Server] As port was not passed. Setting port to default value 5000.");
         return 5000;
     }
 } 

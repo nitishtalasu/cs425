@@ -10,7 +10,7 @@ import java.net.Socket;
 /**
  * Class handles the client requests.
  */
-public class ClientRequestHandler extends Thread
+public class GrepRequestHandler extends Thread
 {
     /**
      * Client socket.
@@ -28,10 +28,10 @@ public class ClientRequestHandler extends Thread
     private DataOutputStream socketOutputStream;
   
     /**
-     * Constructor for the class ClientRequestHandler
+     * Constructor for the class GrepRequestHandler
      * @param socket Socket of the client and server connection.
      */
-    public ClientRequestHandler(Socket socket)  
+    public GrepRequestHandler(Socket socket)  
     { 
         this.socket = socket;
         this.initializeStreams();   
@@ -87,16 +87,20 @@ public class ClientRequestHandler extends Thread
                 
                 // Reads from buffer and sends back to the client in socket output stream.
                 String outputLine;
+                int matchedLinescount = 0;
                 while ((outputLine = processOutputReader.readLine()) != null)
                 {
                     this.socketOutputStream.writeUTF(vmLogFileName + " " + outputLine);
+                    matchedLinescount++;
                 }
-                
+
+                // Writing the matched lines count to the stream.
+                this.socketOutputStream.writeUTF(vmLogFileName + ":" + matchedLinescount);            
                 System.out.println("[Server] Client request has been served.");
             } 
             catch (Exception ex) 
             {
-                System.out.println("[Server] Client requested operation failed with:");
+                System.err.println("[Server] Client requested operation failed with:");
                 ex.printStackTrace();
             }
 
@@ -119,7 +123,7 @@ public class ClientRequestHandler extends Thread
         } 
         catch (IOException e)
         {
-            System.out.println("[Server] Stream initializations failed:");
+            System.err.println("[Server] Stream initializations failed:");
             e.printStackTrace();
         }
     }
@@ -135,8 +139,9 @@ public class ClientRequestHandler extends Thread
             this.socketOutputStream.close();
             this.socket.close();
         }
-        catch(IOException e){ 
-            System.out.println("[Server] Failed in closing resources with message:");
+        catch(IOException e)
+        { 
+            System.err.println("[Server] Failed in closing resources with message:");
             e.printStackTrace(); 
         } 
 	}
