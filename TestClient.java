@@ -82,16 +82,16 @@ public class TestClient {
         int option = Integer.parseInt(br.readLine());
         switch(option){
             case 1: {
-                // run the grep command for frequent pattern
-                String frequentPattern = "this is log for VM2";
-                logger.LogInfo("Running test for frequent pattern");
-                run_server(threadGroup, pass, frequentPattern, patterns.valueOf("infrequent").ordinal());
+                // run the grep command for infrequent pattern
+                String infrequentPattern = "this is log for VM2";
+                logger.LogInfo("Running test for infrequent pattern");
+                run_server(threadGroup, pass, infrequentPattern, patterns.valueOf("infrequent").ordinal());
                 break;
             }
             case 2: {
-                // run the grep command for infrequent pattern
-                String infrequentPattern = "this is log for VM1";
-                run_server(threadGroup, pass, infrequentPattern, patterns.valueOf("frequent").ordinal());
+                // run the grep command for frequent pattern
+                String frequentPattern = "frequentpattern hello123";
+                run_server(threadGroup, pass, frequentPattern, patterns.valueOf("frequent").ordinal());
                 break;
             }
             case 3: {
