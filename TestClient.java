@@ -43,7 +43,7 @@ public class TestClient {
     */ 
     static Properties testProps;
     static Properties serverProps;
-    static enum patterns {frequent, infrequent, regex;}
+    static enum patterns {infrequent, frequent, regex;}
     static int pass = 0, count, vm_count;
 
     /**
@@ -76,24 +76,39 @@ public class TestClient {
         // calls the log generator method and returns number of log files generated (one for each server)
         int pass = log_generator(threadGroup);
 
-        // run the grep command for frequent pattern
-        String frequentPattern = "this is log for VM1";
-	    logger.LogInfo("Running test for frequent pattern");
-        run_server(threadGroup,pass, frequentPattern, patterns.valueOf("frequent").ordinal());
-
-        // run the grep command for infrequent pattern
-       // String infrequentPattern = "sdasdasd";
-       // run_server(pass, infrequentPattern, "infrequent pattern", false);
-
-        // run the grep command for regex pattern
-        // String regexPattern = "Dasds";
-        // run_server(pass, regexPattern, "regex", false);
-
-        // run the grep command to return just count for frequent pattern
-        //String patternCount = "-c sdfsdfsdfsd";
-        //run_server(pass, patternCount, "frequent pattern for count", true);
-    
-        waitForThreadsToComplete(threadGroup);
+        // input the test to be run
+        System.out.println("Enter 1 for infrequent pattern test, 2 for frequent, 3 for regex, 4 for failure");
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int option = Integer.parseInt(br.readLine());
+        switch(option){
+            case 1: {
+                // run the grep command for infrequent pattern
+                String infrequentPattern = "this is log for VM2";
+                logger.LogInfo("Running test for infrequent pattern");
+                run_server(threadGroup, pass, infrequentPattern, patterns.valueOf("infrequent").ordinal());
+                break;
+            }
+            case 2: {
+                // run the grep command for frequent pattern
+                String frequentPattern = "frequentpattern hello123";
+                run_server(threadGroup, pass, frequentPattern, patterns.valueOf("frequent").ordinal());
+                break;
+            }
+            case 3: {
+                // run the grep command for regex pattern
+                String regexPattern = "-E '^{0-9}*[a-z]{3}'";
+                run_server(threadGroup, pass, regexPattern, patterns.valueOf("regex").ordinal());
+                break;
+            }
+            case 4: {
+                // run the grep command for infrequent pattern and compare against expected frequentvalue
+                String frequentPattern = "this is log for VM2";
+                logger.LogInfo("Running test for failure case");
+                run_server(threadGroup, pass, frequentPattern, patterns.valueOf("frequent").ordinal());
+                break;
+            }
+        }
+        ThreadCount.waitForThreadsToComplete(threadGroup, logger);
     }
     /**
      * Method to generate a log file in each server
@@ -110,27 +125,19 @@ public class TestClient {
             logger.LogException("Error in reading properties.", e);
         }
 
+        // creates a thread group that waits for all threads to end before proceeding further
         ThreadGroup logGeneratorThreadGroup = new ThreadGroup(parentThreadGroup, "LogGenerator");
 	
         // variable to store name of each logfile whose values are obtained from .properties file
         String[] logfile = new String[addresses.length];
         for (int i = 0; i < addresses.length; i++) {
-            logfile[i] = vmIds[i];
+            logfile[i] = "dummy_"+vmIds[i];
             // invoke Client.main() thread that invokes each server with (server address, test pattern, logfileID, port)
             Client client = new Client(addresses[i], testProps.getProperty(addresses[i]), logfile[i], 5500);
             client.create_thread(logGeneratorThreadGroup);
         }
 
-        // wait for all client threads to finish execution
-        // try {
-        //     Thread.sleep(100000);
-        // }
-        // catch (Exception e){
-        //     logger.LogException("Thread timed out while running test", e);
-        //     System.exit(1);
-        // }
-
-        waitForThreadsToComplete(logGeneratorThreadGroup);
+        ThreadCount.waitForThreadsToComplete(logGeneratorThreadGroup, logger);
 
         // checks if the expected number of files have been generated
         for (int i=0; i < logfile.length; i++) {
@@ -175,35 +182,18 @@ public class TestClient {
                 Client client = new Client(addresses[i], clientInput, logfile[i], 5000);
                 client.create_thread(grepTestGroup);   
             }
-            // // wait for all threads to complete execution	
-            // try {	
-            // 	Thread.sleep(300000);	
-            // }	
-            // catch (Exception e){	
-            //     System.out.println("Thread timed out while running test");	
-            //     System.exit(1);	
-            // }	
 
-            waitForThreadsToComplete(grepTestGroup);
+            ThreadCount.waitForThreadsToComplete(grepTestGroup, logger);
 
             pass_local = 0;
             for (int i=0; i < addresses.length; i++) {
                 try {
                         // read lines from newly generated local log files
                         BufferedReader br = new BufferedReader(new FileReader("output_"+logfile[i]));
-                       // String splitter;
-                        // if server returns only one line indicating linecount, read firstline 
-                        //if(checkCount) 
-                         //   output = br.readLine();
-
-                        // if server returns all the expected logs, read last line containing linecount
-                        //else {
-                            String temp;
-                            while ((temp = br.readLine()) != null) {
-                                output = temp;
-                            }
-                        //}
-                        logger.LogInfo(output);
+                        String temp;
+                        while ((temp = br.readLine()) != null) {
+                            output = temp;
+                        }
 
                         // obtain linecount from output which is in the form <fileName> <linecount>
                         split_output = output.split(" ");
@@ -230,29 +220,11 @@ public class TestClient {
                         }
                     }
                 catch(Exception e) {
-                    logger.LogException("Test failed while running tests", e);
+                    logger.LogException("Test failed while running tests: ", e);
                     System.exit(1);
                 }
             }
         } 
         logger.LogInfo("Test passed");  
-    }
-
-    private static void waitForThreadsToComplete(ThreadGroup threadGroup)
-    {	     
-        while(threadGroup.activeCount() > 0)
-        {
-            logger.LogInfo("Waiting for " + threadGroup.activeCount() +	
-                " threads to Complete");	
-            try 	
-            {	
-                Thread.sleep(500);	
-            }	
-            catch (Exception e)	
-            {	
-                logger.LogError("Thread timed out while running test");	
-                System.exit(1);	
-            }
-        }
     }
 }

@@ -79,6 +79,7 @@ public class Client {
 
     public static void main(String args[]) {
         String addresses[] = null, vmIds[] = null;
+        //long startTime = System.currentTimeMillis();
         try {
 
             // reads the server related properties from a given file
@@ -100,13 +101,18 @@ public class Client {
         logger.LogInfo("For example: -c -E ^[0-9]*[a-z]{5}");
         String clientInput = sc.nextLine();
         sc.close();
-
+	
         ThreadGroup threadGroup = new ThreadGroup("grepClient");
 
-        // creates a separate thread for each server connection
+        long startTime = System.currentTimeMillis();
+	// creates a separate thread for each server connection
         for (int i = 0; i < addresses.length; i++) {
             Client client = new Client(addresses[i], clientInput, vmIds[i], 5000);
             client.create_thread(threadGroup);
         }
+        ThreadCount.waitForThreadsToComplete(threadGroup, logger);
+        long endTime = System.currentTimeMillis();
+        System.out.println("Total runtime: "+(endTime - startTime));
+        
     }
 }
