@@ -47,9 +47,9 @@ public class TestClient {
     static int pass = 0, count, vm_count;
 
     /**
-     * Thread group used to monitor the threads.
+     * Logger instance.
      */
-    static ThreadGroup threadGroup = new ThreadGroup("TestClient");
+    private static GrepLogger logger = GrepLogger.initialize("TestClient", "TestClient.log");
 
     /**
      * default constructor for TestClient.
@@ -73,7 +73,7 @@ public class TestClient {
 
         // run the grep command for frequent pattern
         String frequentPattern = "this is log for VM1";
-	    System.out.println("Running test for frequent pattern");
+	logger.LogInfo("Running test for frequent pattern");
         run_server(pass, frequentPattern, patterns.valueOf("frequent").ordinal());
 
         // run the grep command for infrequent pattern
@@ -83,11 +83,15 @@ public class TestClient {
         // run the grep command for regex pattern
         // String regexPattern = "Dasds";
         // run_server(pass, regexPattern, "regex", false);
+
+        // run the grep command to return just count for frequent pattern
+        //String patternCount = "-c sdfsdfsdfsd";
+        //run_server(pass, patternCount, "frequent pattern for count", true);
 	try{
 		Thread.sleep(500000);
 	}
 	catch(Exception e){}
-        System.out.println("All tests passed");
+        logger.LogError("All tests passed");
     }
 
     /**
@@ -101,10 +105,8 @@ public class TestClient {
             vmIds = serverProps.getProperty("VM_ID").split(",");
         } 
         catch (Exception e) {
-            System.out.println(e);
+            logger.LogException("Error in reading properties.", e);
         }
-
-        ThreadGroup logGeneratorThreadGroup = new ThreadGroup("LogGenerator");
 	
         // variable to store name of each logfile whose values are obtained from .properties file
         String[] logfile = new String[addresses.length];
@@ -112,19 +114,17 @@ public class TestClient {
             logfile[i] = vmIds[i];
             // invoke Client.main() thread that invokes each server with (server address, test pattern, logfileID, port)
             Client client = new Client(addresses[i], testProps.getProperty(addresses[i]), logfile[i], 5500);
-            client.create_thread(logGeneratorThreadGroup);
+            client.create_thread();
         }
 
         // wait for all client threads to finish execution
-        // try {
-        //     Thread.sleep(100000);
-        // }
-        // catch (Exception e){
-        //     System.out.println("Thread timed out while running test");
-        //     System.exit(1);
-        // }
-
-        waitForThreadsToComplete(logGeneratorThreadGroup);
+        try {
+            Thread.sleep(100000);
+        }
+        catch (Exception e){
+            logger.LogException("Thread timed out while running test", e);
+            System.exit(1);
+        }
 
         // checks if the expected number of files have been generated
         for (int i=0; i < logfile.length; i++) {
@@ -136,45 +136,24 @@ public class TestClient {
                     pass++;
             }
             catch(FileNotFoundException e) {
-                System.out.println("The logfile generation for "+ logfile[i]+" did not succeed");
-                System.out.println("Test failed");
+                logger.LogException("The logfile generation for "+ logfile[i]+" did not succeed", e);
+                logger.LogError("Test failed");
                 System.exit(1);
             }
         }
         return pass;
     }
         
-    private static void waitForThreadsToComplete(ThreadGroup threadGroup)
-    {
-        while(threadGroup.activeCount() > 0)
-        {
-            System.out.println("Waiting for " + threadGroup.activeCount() +
-                " threads to Complete");
-            try 
-            {
-                Thread.sleep(500);
-            }
-            catch (Exception e)
-            {
-                System.out.println("Thread timed out while running test");
-                System.exit(1);
-            }
-        }
-    }
-
-    /**
-     * Method to run each server
-     * 
-     * @param pass        count indicating number of logfiles successfully created
+     /**
+     * Method to run each server 
+     * @param pass count indicating number of logfiles successfully created
      * @param clientInput input against which grep is tested
-     * @param pattern     indicates whether input is frequent pattern, infrequent
-     *                    pattern or regex(only for printing)
+     * @param pattern indicates whether input is frequent pattern, infrequent pattern or regex(only for printing)
      * 
      */
     public static void run_server(int pass, String clientInput, int pattern) throws IOException {
         int pass_local = pass;
         String[] logfile = new String[addresses.length];
-        ThreadGroup grepTestGroup = new ThreadGroup("GrepTest");
 
         /**
         * checks if number of server addresses provided in test.properties 
@@ -186,18 +165,15 @@ public class TestClient {
             for (int i = 0; i < addresses.length; i++) {
                 logfile[i] = vmIds[i];
                 Client client = new Client(addresses[i], clientInput, logfile[i], 5000);
-                client.create_thread(grepTestGroup);   
+                client.create_thread();   
             }
-            // // wait for all threads to complete execution
-            // try {
-            // 	Thread.sleep(300000);
-            // }
-            // catch (Exception e){
-            //     System.out.println("Thread timed out while running test");
-            //     System.exit(1);
-            // }
-
-            waitForThreadsToComplete(grepTestGroup);
+            // wait for all threads to complete execution
+            try {
+            	Thread.sleep(300000);
+            }
+            catch (Exception e){
+                logger.LogException("Thread timed out while running test", e);
+            }
 
             pass_local = 0;
             for (int i=0; i < addresses.length; i++) {
@@ -216,7 +192,7 @@ public class TestClient {
                                 output = temp;
                             }
                         //}
-                        System.out.println(output);
+                        logger.LogInfo(output);
 
                         // obtain linecount from output which is in the form <fileName> <linecount>
                         split_output = output.split(" ");
@@ -233,9 +209,9 @@ public class TestClient {
 
                         // compares if returned count matched expected line count
                         if (count != vm_count) {
-                            System.out.println("obtained:"+count);
-                            System.out.println("expected:"+vm_count);
-                            System.out.println("Line count does not match. Test failed.");
+                            logger.LogInfo("obtained:"+count);
+                            logger.LogInfo("expected:"+vm_count);
+                            logger.LogError("Line count does not match. Test failed.");
                             System.exit(1);
                         }
                         else {
@@ -243,11 +219,11 @@ public class TestClient {
                         }
                     }
                 catch(Exception e) {
-                    System.out.println("Test failed while running tests");
+                    logger.LogException("Test failed while running tests", e);
                     System.exit(1);
                 }
             }
         } 
-        System.out.println("Test passed");  
+        logger.LogInfo("Test passed");  
     }
 }

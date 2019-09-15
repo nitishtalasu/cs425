@@ -6,16 +6,18 @@
 
 public class LogGenerator
 {
+    private static GrepLogger logger =
+        GrepLogger.initialize("LogGenerator", "LogGenerator.log");
     public static void main(String[] args)
     {
         try
         {
-            System.out.println("[LogGenerator] Starting the server on port 5500.");
+            logger.LogInfo("[LogGenerator] Starting the server on port 5500.");
             ServerHandler.getInstance(5500, LogGeneratorHandler.class).run();
         }
         catch(Exception e)
         {
-            System.err.println(e.getMessage());
+            logger.LogException("[LogGenerator] Log Generator crashed.", e);
         }
     }
 }

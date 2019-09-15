@@ -26,6 +26,11 @@ public class GrepRequestHandler extends Thread
      * Output stream of the socket.
      */
     private DataOutputStream socketOutputStream;
+
+    /**
+     * Logger instance.
+     */
+    private GrepLogger logger;
   
     /**
      * Constructor for the class GrepRequestHandler
@@ -35,6 +40,7 @@ public class GrepRequestHandler extends Thread
     { 
         this.socket = socket;
         this.initializeStreams();   
+        logger = GrepLogger.getInstance();
     }
 
     /**
@@ -44,7 +50,7 @@ public class GrepRequestHandler extends Thread
     @Override
     public void run()  
     { 
-        System.out.println("[Server] Server started serving client: " + this.socket); 
+        logger.LogInfo("[Server] Server started serving client: " + this.socket); 
         
         /**
          * Server serves client requests as follows:
@@ -60,7 +66,7 @@ public class GrepRequestHandler extends Thread
             {
                 // Clients sending the log file name.
                 String vmLogFileName = this.socketInputStream.readUTF();
-                System.out.println(vmLogFileName);
+                logger.LogInfo(vmLogFileName);
                 File logFile = new File(vmLogFileName);
                 if (!logFile.exists())
                 {
@@ -76,7 +82,7 @@ public class GrepRequestHandler extends Thread
                 command = command.concat(line + " " + fileAbsPath);
                 
                 // Creating the process with given client command.
-                System.out.println("[Server] Server executing the process with command: " + command);
+                logger.LogInfo("[Server] Server executing the process with command: " + command);
                 ProcessBuilder processBuilder = new ProcessBuilder(command);
                 Runtime rt = Runtime.getRuntime();
                 Process process = rt.exec(command);
@@ -96,18 +102,17 @@ public class GrepRequestHandler extends Thread
 
                 // Writing the matched lines count to the stream.
                 this.socketOutputStream.writeUTF(vmLogFileName + " " + matchedLinescount);            
-                System.out.println("[Server] Client request has been served.");
+                logger.LogInfo("[Server] Client request has been served.");
             } 
             catch (Exception ex) 
             {
-                System.err.println("[Server] Client requested operation failed with:");
-                ex.printStackTrace();
+                logger.LogException("[Server] Client requested operation failed with:", ex);
             }
 
             break;
         }
         
-        System.out.println("[Server] Closing connection"); 
+        logger.LogInfo("[Server] Closing connection"); 
         this.closeSocket();
     } 
 
@@ -123,8 +128,7 @@ public class GrepRequestHandler extends Thread
         } 
         catch (IOException e)
         {
-            System.err.println("[Server] Stream initializations failed:");
-            e.printStackTrace();
+            logger.LogException("[Server] Stream initializations failed:", e);
         }
     }
 
@@ -141,8 +145,7 @@ public class GrepRequestHandler extends Thread
         }
         catch(IOException e)
         { 
-            System.err.println("[Server] Failed in closing resources with message:");
-            e.printStackTrace(); 
+            logger.LogException("[Server] Failed in closing resources with message:", e); 
         } 
 	}
 }

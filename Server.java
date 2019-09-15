@@ -7,20 +7,25 @@
  /**
   * Main class for server.
   */
-
 public class Server
 { 
+    /**
+     * Logger instance.
+     */
+    public static GrepLogger logger =
+        GrepLogger.initialize("GrepServer", "GrepServer.log");
+
     public static void main(String[] args)  
     { 
         try
         {
             int serverPort = getPortNumber(args);
-            System.out.println("[Server] Starting the server on port: " + serverPort);
+            logger.LogInfo("[Server] Starting the server on port: " + serverPort);
             ServerHandler.getInstance(serverPort).run();
         }
         catch(Exception e)
         {
-            System.err.println(e.getMessage());
+            logger.LogError(e.getMessage());
         }
     }
 
@@ -41,13 +46,13 @@ public class Server
             }
             catch (NumberFormatException e) 
             {
-                System.err.println("[Server] First argument" + args[0] + " must be an integer. " +
+                logger.LogError("[Server] First argument" + args[0] + " must be an integer. " +
                     "Exiting the application");
                 System.exit(-1);
             }
         }
 
-        System.out.println("[Server] As port was not passed. Setting port to default value 5000.");
+        logger.LogInfo("[Server] As port was not passed. Setting port to default value 5000.");
         return 5000;
     }
 } 

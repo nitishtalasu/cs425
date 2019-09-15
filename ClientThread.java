@@ -14,32 +14,29 @@ class ClientThread extends Thread
     private DataInputStream inputStream = null; 
     private String vmId = "";
     private FileWriter clientLog = null;
+
+    /**
+     * Logger instance.
+     */
+    private GrepLogger logger;
       
     /**
      * constructor of ClientThread type class.
      * 
-     * @param threadGroup Parent thread group.
      * @param socket Socket connection.
      * @param clientInput Grep input given by user.
+     * @param inputStream input stream to receive data from server.
+     * @param outputStream output stream to send data to server.
      * @param vmId the associated vm log file id.
      */
-    public ClientThread(ThreadGroup threadGroup, Socket socket, String clientInput, String vmId)  throws Exception
+    public ClientThread(Socket socket, String clientInput, DataInputStream inputStream, DataOutputStream outputStream, String vmId)  
     { 
-        super(threadGroup, vmId);
         this.socket = socket; 
         this.clientInput = clientInput; 
+        this.outputStream = outputStream; 
+        this.inputStream = inputStream;
         this.vmId = vmId;
-        try
-        {
-            this.inputStream = new DataInputStream(socket.getInputStream());
-            this.outputStream = new DataOutputStream(socket.getOutputStream());	
-        }
-        catch(Exception e)
-        {
-            System.err.println("Failed to get stream for the connected socket.");
-            e.printStackTrace();
-            throw e;
-        }
+        this.logger = GrepLogger.getInstance();
     } 
   
     /**
@@ -51,7 +48,7 @@ class ClientThread extends Thread
     @Override
     public void run()  
     { 
-        System.out.println("Client thread started: " + socket); 
+        logger.LogInfo("Client thread started: " + socket); 
         //time at which thread starts
         long startTime = System.currentTimeMillis();
 
@@ -78,13 +75,13 @@ class ClientThread extends Thread
                         clientLog.write(System.getProperty("line.separator"));
                     } catch (EOFException e) {
                         eof = true;
-                        System.out.println("Completed writing logs to file: "+filepath);
+                        logger.LogInfo("Completed writing logs to file: "+filepath);
                     }
                 }   
             } 
             catch(IOException i) 
             { 
-                System.out.println(i); 
+                logger.LogException("[Client] Client grep query faield.", i); 
             } 
         try
         { 
@@ -93,14 +90,13 @@ class ClientThread extends Thread
             this.outputStream.close(); 
             //calculating time at which thread ends
             long endTime = System.currentTimeMillis();
-            System.out.println("thread runtime for  "+this.vmId+": " + (endTime - startTime));
+            logger.LogInfo("thread runtime for  "+this.vmId+": " + (endTime - startTime));
             this.clientLog.close();
 	        this.socket.close(); 
         } 
         catch(IOException i) 
         { 
-            System.out.println("[Client] Exception in establishing socket:");
-            System.out.println(i); 
+            logger.LogException("[Client] Exception in establishing socket:", i);
         } 
     }
 }

@@ -37,6 +37,11 @@ public class Client {
     private int port;
 
     /**
+     * Logger instance.
+     */
+    private static GrepLogger logger = GrepLogger.initialize("GrepClient", "GrepClient.log");
+
+    /**
      * Constructor for the class ClientRequestHandler
      * @param address Server address to connect to.
      * @param clientInput Grep command provided by client.
@@ -52,25 +57,29 @@ public class Client {
     }
 
     /**
-     * Method to create a thread that connects to each server.
-     * @param threadGroup Parent thread group used to manage the threads. 
+     * Method to create a thread that connects to each server 
      */
-    public void create_thread(ThreadGroup threadGroup) {
+    public void create_thread() {
         try {
             /**
              * creates a client socket.
             */
             Socket socket = new Socket(address, port);
             socket.setSoTimeout(100000);
-            System.out.println("Connected to "+address);
+            logger.LogInfo("Connected to "+address);
+
+            // creates an input stream that allows reading data sent by server
+            inputStream = new DataInputStream(socket.getInputStream());
+
+            // creates an output stream that allows writing data to a server
+            outputStream = new DataOutputStream(socket.getOutputStream());
             
             // creates a thread process for given input
-            Thread t = new ClientThread(threadGroup, socket, clientInput, vmId);
+            Thread t = new ClientThread(socket, clientInput, inputStream, outputStream, vmId);
             t.start();
 
         } catch (Exception e) {
-            System.out.println("Connection to "+address+" accessing " +vmId+" failed due to:");
-            System.out.println(e);
+            logger.LogException("Connection to "+address+" accessing " +vmId+" failed due to:", e);
         }
     }
 
@@ -88,23 +97,20 @@ public class Client {
             vmIds = prop.getProperty("VM_ID").split(",");
 
         } catch (Exception e) {
-            System.out.println("[Client] Exception in handling property files:");
-            System.out.println(e);
+            logger.LogException("[Client] Exception in handling property files:", e);
         }
 
         // reads user input for grep command
         Scanner sc = new Scanner(System.in);
-        System.out.println("Type grep command and press enter");
-        System.out.println("For example: -c -E ^[0-9]*[a-z]{5}");
+        logger.LogInfo("Type grep command and press enter");
+        logger.LogInfo("For example: -c -E ^[0-9]*[a-z]{5}");
         String clientInput = sc.nextLine();
         sc.close();
-
-        ThreadGroup threadGroup = new ThreadGroup("grepClient");
 
         // creates a separate thread for each server connection
         for (int i = 0; i < addresses.length; i++) {
             Client client = new Client(addresses[i], clientInput, vmIds[i], 5000);
-            client.create_thread(threadGroup);
+            client.create_thread();
         }
     }
 }

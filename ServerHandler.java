@@ -6,7 +6,6 @@
 
 import java.io.*;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -37,6 +36,11 @@ public class ServerHandler {
     private final Class<?> requestHandler;
 
     /**
+     * Logger instance.
+     */
+    private GrepLogger logger;
+
+    /**
      * Private constructor of ServerHandler type class.
      * 
      * @param portNumber Port on which server is listening.
@@ -46,6 +50,7 @@ public class ServerHandler {
     {
         this.port = portNumber;
         requestHandler = handler;
+        logger = GrepLogger.getInstance();
     }
 
     /**
@@ -106,7 +111,7 @@ public class ServerHandler {
         try {
 
             while (true) {
-                System.out.println("[Server] No of clients serverd so far: " + noOfClientsServed
+                logger.LogInfo("[Server] No of clients serverd so far: " + noOfClientsServed
                         + ". Waiting for more connections.");
 
                 // Server waiting for the client connection.
@@ -121,8 +126,7 @@ public class ServerHandler {
         } 
         catch (Exception e) 
         {
-            System.err.println("[Server] Server operation failed with exception:");
-            e.printStackTrace();
+            logger.LogException("[Server] Server running operation occurred error.", e);
         } 
         finally 
         {
@@ -141,20 +145,18 @@ public class ServerHandler {
         try 
         {
             this.server = new ServerSocket(this.port);
-            System.out.println("[Server] Server started at Socket : " + this.server.getInetAddress() + " Port : "
+            logger.LogInfo("[Server] Server started at Socket : " + this.server.getInetAddress() + " Port : "
                     + this.server.getLocalPort());
         } 
         catch (IOException e) 
         {
-            System.err.println("[Server] Server socket creation failed with exception:");
-            e.printStackTrace();
+            logger.LogException("[Server] Server socket creation failed.", e);
             throw e;
         }
         catch (IllegalArgumentException e) 
         {
-            System.err.println("[Server] The port is outside the specified range of valid port "
-                    + "   values.Exception stack trace:");
-            e.printStackTrace();
+            logger.LogException("[Server] The port is outside the specified range of valid port "
+                    + "   values.Exception stack trace:", e);
             throw e;
         }
     }
@@ -177,8 +179,7 @@ public class ServerHandler {
         }
         catch (IOException e) 
         {
-            System.err.println("[Server] Server socket creation failed with exception:");
-            e.printStackTrace();
+            logger.LogException("[Server] Server socket creation failed with exception:", e);
         }
     }
 
@@ -200,8 +201,7 @@ public class ServerHandler {
         }
         catch (Exception e)
         {
-            System.err.println("[Server] Server initilization failed.");
-            e.printStackTrace();
+            logger.LogException("[Server] Server initilization failed.", e);
             throw e;
         }
     }
