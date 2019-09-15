@@ -55,7 +55,8 @@ public class LogGeneratorHandler extends Thread
         
         /**
          * Server serves client requests as follows:
-         * 1) Reads the json file having information related to patterns via socket input stream.
+         * 1) Reads the patterns serialized string(format has been shared by both client and server) 
+         *    via socket input stream.
          * 2) Generates the log file.
          * 3) Closes all the resources used in serving the client.
          */
