@@ -23,20 +23,30 @@ class ClientThread extends Thread
     /**
      * constructor of ClientThread type class.
      * 
+     * @param threadGroup Parent thread group.
      * @param socket Socket connection.
      * @param clientInput Grep input given by user.
-     * @param inputStream input stream to receive data from server.
-     * @param outputStream output stream to send data to server.
      * @param vmId the associated vm log file id.
      */
-    public ClientThread(Socket socket, String clientInput, DataInputStream inputStream, DataOutputStream outputStream, String vmId)  
+    public ClientThread(ThreadGroup threadGroup, Socket socket, String clientInput, String vmId)
+    throws Exception  
     { 
+        super(threadGroup, vmId);
         this.socket = socket; 
         this.clientInput = clientInput; 
-        this.outputStream = outputStream; 
-        this.inputStream = inputStream;
         this.vmId = vmId;
         this.logger = GrepLogger.getInstance();
+
+        try
+        {	
+            this.inputStream = new DataInputStream(socket.getInputStream());	
+            this.outputStream = new DataOutputStream(socket.getOutputStream());		
+        }	
+        catch(Exception e)	
+        {	
+            logger.LogException("Failed to get stream for the connected socket.", e);
+            throw e;	
+        }
     } 
   
     /**

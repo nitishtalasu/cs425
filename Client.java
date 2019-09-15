@@ -59,7 +59,7 @@ public class Client {
     /**
      * Method to create a thread that connects to each server 
      */
-    public void create_thread() {
+    public void create_thread(ThreadGroup threadGroup) {
         try {
             /**
              * creates a client socket.
@@ -67,15 +67,9 @@ public class Client {
             Socket socket = new Socket(address, port);
             socket.setSoTimeout(100000);
             logger.LogInfo("Connected to "+address);
-
-            // creates an input stream that allows reading data sent by server
-            inputStream = new DataInputStream(socket.getInputStream());
-
-            // creates an output stream that allows writing data to a server
-            outputStream = new DataOutputStream(socket.getOutputStream());
             
             // creates a thread process for given input
-            Thread t = new ClientThread(socket, clientInput, inputStream, outputStream, vmId);
+            Thread t = new ClientThread(threadGroup, socket, clientInput, vmId);
             t.start();
 
         } catch (Exception e) {
@@ -107,10 +101,12 @@ public class Client {
         String clientInput = sc.nextLine();
         sc.close();
 
+        ThreadGroup threadGroup = new ThreadGroup("grepClient");
+
         // creates a separate thread for each server connection
         for (int i = 0; i < addresses.length; i++) {
             Client client = new Client(addresses[i], clientInput, vmIds[i], 5000);
-            client.create_thread();
+            client.create_thread(threadGroup);
         }
     }
 }
