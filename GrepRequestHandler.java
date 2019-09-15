@@ -95,7 +95,7 @@ public class GrepRequestHandler extends Thread
                 }
 
                 // Writing the matched lines count to the stream.
-                this.socketOutputStream.writeUTF(vmLogFileName + ":" + matchedLinescount);            
+                this.socketOutputStream.writeUTF(vmLogFileName + " " + matchedLinescount);            
                 System.out.println("[Server] Client request has been served.");
             } 
             catch (Exception ex) 
