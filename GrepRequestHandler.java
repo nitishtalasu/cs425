@@ -98,6 +98,9 @@ public class GrepRequestHandler extends Thread
                 List<String> commandArgs = new ArrayList<String>();
                 commandArgs.add("grep");
                 for (String match : regexPatternMatchingList) {
+                    if(match.charAt(0) == '\"' && match.charAt((match.length()-1)) == '\"') {
+                        match = match.substring(1, match.length()-1);
+                    }
                     commandArgs.add(match);
                 }
                 commandArgs.add(fileAbsPath);
