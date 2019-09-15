@@ -47,6 +47,11 @@ public class TestClient {
     static int pass = 0, count, vm_count;
 
     /**
+     * Thread group used to monitor the threads.
+     */
+    static ThreadGroup threadGroup = new ThreadGroup("TestClient");
+
+    /**
      * default constructor for TestClient.
      * 
      */
@@ -68,7 +73,7 @@ public class TestClient {
 
         // run the grep command for frequent pattern
         String frequentPattern = "this is log for VM1";
-	System.out.println("Running test for frequent pattern");
+	    System.out.println("Running test for frequent pattern");
         run_server(pass, frequentPattern, patterns.valueOf("frequent").ordinal());
 
         // run the grep command for infrequent pattern
@@ -78,10 +83,6 @@ public class TestClient {
         // run the grep command for regex pattern
         // String regexPattern = "Dasds";
         // run_server(pass, regexPattern, "regex", false);
-
-        // run the grep command to return just count for frequent pattern
-        //String patternCount = "-c sdfsdfsdfsd";
-        //run_server(pass, patternCount, "frequent pattern for count", true);
 	try{
 		Thread.sleep(500000);
 	}
@@ -102,6 +103,8 @@ public class TestClient {
         catch (Exception e) {
             System.out.println(e);
         }
+
+        ThreadGroup logGeneratorThreadGroup = new ThreadGroup("LogGenerator");
 	
         // variable to store name of each logfile whose values are obtained from .properties file
         String[] logfile = new String[addresses.length];
@@ -109,17 +112,19 @@ public class TestClient {
             logfile[i] = vmIds[i];
             // invoke Client.main() thread that invokes each server with (server address, test pattern, logfileID, port)
             Client client = new Client(addresses[i], testProps.getProperty(addresses[i]), logfile[i], 5500);
-            client.create_thread();
+            client.create_thread(logGeneratorThreadGroup);
         }
 
         // wait for all client threads to finish execution
-        try {
-            Thread.sleep(100000);
-        }
-        catch (Exception e){
-            System.out.println("Thread timed out while running test");
-            System.exit(1);
-        }
+        // try {
+        //     Thread.sleep(100000);
+        // }
+        // catch (Exception e){
+        //     System.out.println("Thread timed out while running test");
+        //     System.exit(1);
+        // }
+
+        waitForThreadsToComplete(logGeneratorThreadGroup);
 
         // checks if the expected number of files have been generated
         for (int i=0; i < logfile.length; i++) {
@@ -139,16 +144,37 @@ public class TestClient {
         return pass;
     }
         
-     /**
-     * Method to run each server 
-     * @param pass count indicating number of logfiles successfully created
+    private static void waitForThreadsToComplete(ThreadGroup threadGroup)
+    {
+        while(threadGroup.activeCount() > 0)
+        {
+            System.out.println("Waiting for " + threadGroup.activeCount() +
+                " threads to Complete");
+            try 
+            {
+                Thread.sleep(500);
+            }
+            catch (Exception e)
+            {
+                System.out.println("Thread timed out while running test");
+                System.exit(1);
+            }
+        }
+    }
+
+    /**
+     * Method to run each server
+     * 
+     * @param pass        count indicating number of logfiles successfully created
      * @param clientInput input against which grep is tested
-     * @param pattern indicates whether input is frequent pattern, infrequent pattern or regex(only for printing)
+     * @param pattern     indicates whether input is frequent pattern, infrequent
+     *                    pattern or regex(only for printing)
      * 
      */
     public static void run_server(int pass, String clientInput, int pattern) throws IOException {
         int pass_local = pass;
         String[] logfile = new String[addresses.length];
+        ThreadGroup grepTestGroup = new ThreadGroup("GrepTest");
 
         /**
         * checks if number of server addresses provided in test.properties 
@@ -160,16 +186,18 @@ public class TestClient {
             for (int i = 0; i < addresses.length; i++) {
                 logfile[i] = vmIds[i];
                 Client client = new Client(addresses[i], clientInput, logfile[i], 5000);
-                client.create_thread();   
+                client.create_thread(grepTestGroup);   
             }
-            // wait for all threads to complete execution
-            try {
-            	Thread.sleep(300000);
-            }
-            catch (Exception e){
-                System.out.println("Thread timed out while running test");
-                System.exit(1);
-            }
+            // // wait for all threads to complete execution
+            // try {
+            // 	Thread.sleep(300000);
+            // }
+            // catch (Exception e){
+            //     System.out.println("Thread timed out while running test");
+            //     System.exit(1);
+            // }
+
+            waitForThreadsToComplete(grepTestGroup);
 
             pass_local = 0;
             for (int i=0; i < addresses.length; i++) {
@@ -205,8 +233,8 @@ public class TestClient {
 
                         // compares if returned count matched expected line count
                         if (count != vm_count) {
-			    System.out.println("obtained:"+count);
-			    System.out.println("expected:"+vm_count);
+                            System.out.println("obtained:"+count);
+                            System.out.println("expected:"+vm_count);
                             System.out.println("Line count does not match. Test failed.");
                             System.exit(1);
                         }
