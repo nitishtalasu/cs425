@@ -75,21 +75,33 @@ public class TestClient {
         
         // calls the log generator method and returns number of log files generated (one for each server)
         int pass = log_generator(threadGroup);
-
+	System.out.println("Enter 1 for frequent pattern test, 2 for infrequent, 3 for regex");
+	BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+	int option = Integer.parseInt(br.readLine());
+	switch(option){
+	case 1: {
         // run the grep command for frequent pattern
-        String frequentPattern = "this is log for VM1";
-	    logger.LogInfo("Running test for frequent pattern");
-        run_server(threadGroup,pass, frequentPattern, patterns.valueOf("frequent").ordinal());
+        	String frequentPattern = "this is log for VM1";
+	        logger.LogInfo("Running test for frequent pattern");
+	        run_server(threadGroup, pass, frequentPattern, patterns.valueOf("frequent").ordinal());
+		break;
+	}
+	case 2: {
 
-        // run the grep command for infrequent pattern
-       // String infrequentPattern = "sdasdasd";
-       // run_server(pass, infrequentPattern, "infrequent pattern", false);
+  	      // run the grep command for infrequent pattern
+        	String infrequentPattern = "this is log for VM1";
+        	run_server(threadGroup, pass, infrequentPattern, patterns.valueOf("infrequent").ordinal());
+		break;
+	}
+	case 3: {
 
-        // run the grep command for regex pattern
-        // String regexPattern = "Dasds";
-        // run_server(pass, regexPattern, "regex", false);
-
-        // run the grep command to return just count for frequent pattern
+	        // run the grep command for regex pattern
+       		 String regexPattern = "-E '^{0-9}*[a-z]{3}'";
+        	run_server(threadGroup, pass, regexPattern, patterns.valueOf("regex").ordinal());
+		break;
+	}
+	}
+        // run the grep command for partial pattern
         //String patternCount = "-c sdfsdfsdfsd";
         //run_server(pass, patternCount, "frequent pattern for count", true);
     
