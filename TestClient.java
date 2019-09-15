@@ -43,7 +43,7 @@ public class TestClient {
     */ 
     static Properties testProps;
     static Properties serverProps;
-
+    static enum patterns {frequent, infrequent, regex;}
     static int pass = 0, count, vm_count;
 
     /**
@@ -67,21 +67,25 @@ public class TestClient {
         int pass = log_generator();
 
         // run the grep command for frequent pattern
-        String frequentPattern = "sdfsdfsdfsd";
-        run_server(pass, frequentPattern, "frequent pattern", false);
+        String frequentPattern = "this is log for VM1";
+	System.out.println("Running test for frequent pattern");
+        run_server(pass, frequentPattern, patterns.valueOf("frequent").ordinal());
 
         // run the grep command for infrequent pattern
-        // String infrequentPattern = "sdasdasd";
-        // run_server(pass, infrequentPattern, "infrequent pattern", false);
+       // String infrequentPattern = "sdasdasd";
+       // run_server(pass, infrequentPattern, "infrequent pattern", false);
 
         // run the grep command for regex pattern
         // String regexPattern = "Dasds";
         // run_server(pass, regexPattern, "regex", false);
 
         // run the grep command to return just count for frequent pattern
-        String patternCount = "-c sdfsdfsdfsd";
-        run_server(pass, patternCount, "frequent pattern for count", true);
-
+        //String patternCount = "-c sdfsdfsdfsd";
+        //run_server(pass, patternCount, "frequent pattern for count", true);
+	try{
+		Thread.sleep(500000);
+	}
+	catch(Exception e){}
         System.out.println("All tests passed");
     }
 
@@ -98,7 +102,7 @@ public class TestClient {
         catch (Exception e) {
             System.out.println(e);
         }
-
+	
         // variable to store name of each logfile whose values are obtained from .properties file
         String[] logfile = new String[addresses.length];
         for (int i = 0; i < addresses.length; i++) {
@@ -110,7 +114,7 @@ public class TestClient {
 
         // wait for all client threads to finish execution
         try {
-            Thread.sleep(20000);
+            Thread.sleep(100000);
         }
         catch (Exception e){
             System.out.println("Thread timed out while running test");
@@ -140,9 +144,9 @@ public class TestClient {
      * @param pass count indicating number of logfiles successfully created
      * @param clientInput input against which grep is tested
      * @param pattern indicates whether input is frequent pattern, infrequent pattern or regex(only for printing)
-     * @param checkCount boolean to indicate if the server returns only line count
+     * 
      */
-    public static void run_server(int pass, String clientInput, String pattern, Boolean checkCount) throws IOException {
+    public static void run_server(int pass, String clientInput, int pattern) throws IOException {
         int pass_local = pass;
         String[] logfile = new String[addresses.length];
 
@@ -156,14 +160,14 @@ public class TestClient {
             for (int i = 0; i < addresses.length; i++) {
                 logfile[i] = vmIds[i];
                 Client client = new Client(addresses[i], clientInput, logfile[i], 5000);
-                client.create_thread();
+                client.create_thread();   
             }
             // wait for all threads to complete execution
             try {
-                Thread.sleep(20000);
+            	Thread.sleep(300000);
             }
             catch (Exception e){
-                System.out.println("Thread timed out while running test on "+pattern);
+                System.out.println("Thread timed out while running test");
                 System.exit(1);
             }
 
@@ -172,18 +176,18 @@ public class TestClient {
                 try {
                         // read lines from newly generated local log files
                         BufferedReader br = new BufferedReader(new FileReader("output_"+logfile[i]));
-                        String splitter;
+                       // String splitter;
                         // if server returns only one line indicating linecount, read firstline 
-                        if(checkCount) 
-                            output = br.readLine();
+                        //if(checkCount) 
+                         //   output = br.readLine();
 
                         // if server returns all the expected logs, read last line containing linecount
-                        else {
+                        //else {
                             String temp;
                             while ((temp = br.readLine()) != null) {
                                 output = temp;
                             }
-                        }
+                        //}
                         System.out.println(output);
 
                         // obtain linecount from output which is in the form <fileName> <linecount>
@@ -194,12 +198,15 @@ public class TestClient {
 
                         // extracts the VM patterns provided in test.properties for each server address
                         vm_patterns = testProps.getProperty(addresses[i]).split(",");
-
+			
                         // further extracts the line count provided for each pattern (in test.properties) 
-                        vm_count = Integer.parseInt((vm_patterns[i].split("="))[1]);
+                        
+                        vm_count = Integer.parseInt((vm_patterns[pattern].split("="))[1]);
 
                         // compares if returned count matched expected line count
                         if (count != vm_count) {
+			    System.out.println("obtained:"+count);
+			    System.out.println("expected:"+vm_count);
                             System.out.println("Line count does not match. Test failed.");
                             System.exit(1);
                         }
@@ -208,11 +215,11 @@ public class TestClient {
                         }
                     }
                 catch(Exception e) {
-                    System.out.println("Test failed while running tests for "+pattern);
+                    System.out.println("Test failed while running tests");
                     System.exit(1);
                 }
             }
         } 
-        System.out.println("Test passed for "+pattern);  
+        System.out.println("Test passed");  
     }
 }
