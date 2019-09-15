@@ -108,7 +108,7 @@ public class TestClient {
                 break;
             }
         }
-        waitForThreadsToComplete(threadGroup);
+        ThreadCount.waitForThreadsToComplete(threadGroup, logger);
     }
     /**
      * Method to generate a log file in each server
@@ -137,7 +137,7 @@ public class TestClient {
             client.create_thread(logGeneratorThreadGroup);
         }
 
-        waitForThreadsToComplete(logGeneratorThreadGroup);
+        ThreadCount.waitForThreadsToComplete(logGeneratorThreadGroup, logger);
 
         // checks if the expected number of files have been generated
         for (int i=0; i < logfile.length; i++) {
@@ -183,7 +183,7 @@ public class TestClient {
                 client.create_thread(grepTestGroup);   
             }
 
-            waitForThreadsToComplete(grepTestGroup);
+            ThreadCount.waitForThreadsToComplete(grepTestGroup, logger);
 
             pass_local = 0;
             for (int i=0; i < addresses.length; i++) {
@@ -226,25 +226,5 @@ public class TestClient {
             }
         } 
         logger.LogInfo("Test passed");  
-    }
-
-    // waits for all threads of a thread group to complete, by checking the count of active threads
-    private static void waitForThreadsToComplete(ThreadGroup threadGroup)
-    {	     
-        while(threadGroup.activeCount() > 0)
-        {
-            logger.LogInfo("Waiting for " + threadGroup.activeCount() +	
-                " threads to Complete");	
-            try 	
-            {	
-                // waits 500 milliseconds before checking count each time
-                Thread.sleep(500);	
-            }	
-            catch (Exception e)	
-            {	
-                logger.LogError("Thread timed out while running test");	
-                System.exit(1);	
-            }
-        }
     }
 }

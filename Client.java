@@ -79,6 +79,7 @@ public class Client {
 
     public static void main(String args[]) {
         String addresses[] = null, vmIds[] = null;
+        long startTime = System.currentTimeMillis();
         try {
 
             // reads the server related properties from a given file
@@ -108,5 +109,9 @@ public class Client {
             Client client = new Client(addresses[i], clientInput, vmIds[i], 5000);
             client.create_thread(threadGroup);
         }
+        ThreadCount.waitForThreadsToComplete(threadGroup, logger);
+        long endTime = System.currentTimeMillis();
+        System.out.println("Total runtime: "+(endTime - startTime));
+        
     }
 }
