@@ -75,7 +75,7 @@ public class TestClient {
         
         // calls the log generator method and returns number of log files generated (one for each server)
         int pass = log_generator(threadGroup);
-
+	
         // input the test to be run
         System.out.println("Enter 1 for infrequent pattern test, 2 for frequent, 3 for regex, 4 for failure");
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -85,26 +85,26 @@ public class TestClient {
                 // run the grep command for infrequent pattern
                 String infrequentPattern = "this is log for VM2";
                 logger.LogInfo("Running test for infrequent pattern");
-                run_server(threadGroup, pass, infrequentPattern, patterns.valueOf("infrequent").ordinal());
+                run_server(threadGroup, pass, infrequentPattern, 1);
                 break;
             }
             case 2: {
                 // run the grep command for frequent pattern
                 String frequentPattern = "frequentpattern hello123";
-                run_server(threadGroup, pass, frequentPattern, patterns.valueOf("frequent").ordinal());
+                run_server(threadGroup, pass, frequentPattern, 2);
                 break;
             }
             case 3: {
                 // run the grep command for regex pattern
-                String regexPattern = "-E '^{0-9}*[a-z]{3}'";
-                run_server(threadGroup, pass, regexPattern, patterns.valueOf("regex").ordinal());
+                String regexPattern = "-E \"a*bb*a*\"";
+                run_server(threadGroup, pass, regexPattern, 3);
                 break;
             }
             case 4: {
                 // run the grep command for infrequent pattern and compare against expected frequentvalue
-                String frequentPattern = "this is log for VM2";
+                String infrequentPattern = "this is log for VM2";
                 logger.LogInfo("Running test for failure case");
-                run_server(threadGroup, pass, frequentPattern, patterns.valueOf("frequent").ordinal());
+                run_server(threadGroup, pass, infrequentPattern, 2);
                 break;
             }
         }
@@ -132,7 +132,7 @@ public class TestClient {
         String[] logfile = new String[addresses.length];
         for (int i = 0; i < addresses.length; i++) {
             logfile[i] = "dummy_"+vmIds[i];
-            // invoke Client.main() thread that invokes each server with (server address, test pattern, logfileID, port)
+	     // invoke Client.main() thread that invokes each server with (server address, test pattern, logfileID, port)
             Client client = new Client(addresses[i], testProps.getProperty(addresses[i]), logfile[i], 5500);
             client.create_thread(logGeneratorThreadGroup);
         }
@@ -178,7 +178,8 @@ public class TestClient {
             
             // generate a client thread each to talk to one server
             for (int i = 0; i < addresses.length; i++) {
-                logfile[i] = vmIds[i];
+                logfile[i] = "dummy_"+vmIds[i];
+		
                 Client client = new Client(addresses[i], clientInput, logfile[i], 5000);
                 client.create_thread(grepTestGroup);   
             }
@@ -203,11 +204,10 @@ public class TestClient {
 
                         // extracts the VM patterns provided in test.properties for each server address
                         vm_patterns = testProps.getProperty(addresses[i]).split(",");
-			
-                        // further extracts the line count provided for each pattern (in test.properties) 
                         
-                        vm_count = Integer.parseInt((vm_patterns[pattern].split("="))[1]);
-
+			// further extracts the line count provided for each pattern (in test.properties) 
+       	                vm_count = Integer.parseInt((vm_patterns[pattern-1].split("="))[1]);
+				
                         // compares if returned count matched expected line count
                         if (count != vm_count) {
                             logger.LogInfo("obtained:"+count);

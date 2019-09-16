@@ -98,7 +98,7 @@ public class Client {
         // reads user input for grep command
         Scanner sc = new Scanner(System.in);
         logger.LogInfo("Type grep command and press enter");
-        logger.LogInfo("For example: -c -E ^[0-9]*[a-z]{5}");
+        logger.LogInfo("For example: -c -E \"^[0-9]*[a-z]{5}\"");
         String clientInput = sc.nextLine();
         sc.close();
 	
