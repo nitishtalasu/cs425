@@ -1,105 +1,118 @@
+/**
+ * Main class for client.
+ * 
+ * @author Prateeth Reddy Chagari (chagari2@illinois.edu)
+ */
 
-import java.io.*; 
-import java.text.*; 
-import java.util.*; 
-import java.net.*; 
+import java.io.*;
+import java.net.Socket;
+import java.util.Properties;
+import java.util.Scanner;
+
 @SuppressWarnings("deprecation")
-public class Client 
-{ 
-    // initialize input output streams 
-    private String input   = null; 
-    private DataOutputStream out     = null; 
-    private DataInputStream in    = null; 
+public class Client {
+    /**
+     * User input for grep.
+     */
+    private String clientInput = null;
+    /**
+     * Output stream of the socket.
+     */
+    private DataOutputStream outputStream = null;
+    /**
+    * Input stream of the socket.
+    */
+    private DataInputStream inputStream = null;
+    /**
+     * Server address.
+     */
     private String address = null;
+    /**
+     * VM log ID.
+     */
+    private String vmId = null;
+    /**
+     * port number
+     */
     private int port;
 
-    // constructor to put ip address and port 
-    public Client(String address, int port) 
-    {   
-        this.address =  address;
+    /**
+     * Logger instance.
+     */
+    private static GrepLogger logger = GrepLogger.initialize("GrepClient", "GrepClient.log");
+
+    /**
+     * Constructor for the class ClientRequestHandler
+     * @param address Server address to connect to.
+     * @param clientInput Grep command provided by client.
+     * @param vmId log file ID of a particular server.
+     * @param port server port number.
+     */
+    public Client(String address, String clientInput, String vmId, int port) {
+        this.address = address;
+        this.clientInput = clientInput;
+        this.vmId = vmId;
         this.port = port;
-       
+
     }
-    public void create_thread() {
-        try
-        { 
-            Socket socket = new Socket(address, port); 
-            System.out.println("Connected"); 
-             
-            // takes input from terminal 
-            System.out.println("enter grep");
-            input = "-e ^[0-9]*[a-z]{5}";
-              
-            // sends output to the socket 
-            in = new DataInputStream(socket.getInputStream());
+
+    /**
+     * Method to create a thread that connects to each server 
+     */
+    public void create_thread(ThreadGroup threadGroup) {
+        try {
+            /**
+             * creates a client socket.
+            */
+            Socket socket = new Socket(address, port);
+            socket.setSoTimeout(100000);
+            logger.LogInfo("Connected to "+address);
             
-            out    = new DataOutputStream(socket.getOutputStream()); 
-            Thread t = new ClientThread(socket, input, in, out);
+            // creates a thread process for given input
+            Thread t = new ClientThread(threadGroup, socket, clientInput, vmId);
+            t.start();
 
-            t.start(); 
+        } catch (Exception e) {
+            logger.LogWarning("Connection failed to "+address+" of " +vmId+" .Skipping this VM.");
         }
-        catch(Exception e) 
-        { 
-            System.out.println(e); 
-        }   
+    }
+
+    public static void main(String args[]) {
+        String addresses[] = null, vmIds[] = null;
+        //long startTime = System.currentTimeMillis();
+        try {
+
+            // reads the server related properties from a given file
+            InputStream input = new FileInputStream("server_parameters.properties");
+            Properties prop = new Properties();
+            prop.load(input);
+
+            // gets the corresponding property value separated by delimiter ','
+            addresses = prop.getProperty("IP_address").split(",");
+            vmIds = prop.getProperty("VM_ID").split(",");
+
+        } catch (Exception e) {
+            logger.LogException("[Client] Exception in handling property files:", e);
+        }
+
+        // reads user input for grep command
+        Scanner sc = new Scanner(System.in);
+        logger.LogInfo("Type grep command and press enter");
+        logger.LogInfo("For example: -c -E \"^[0-9]*[a-z]{5}\"");
+        String clientInput = sc.nextLine();
+        sc.close();
+	
+        ThreadGroup threadGroup = new ThreadGroup("grepClient");
+
+        long startTime = System.currentTimeMillis();
+	// creates a separate thread for each server connection
+        for (int i = 0; i < addresses.length; i++) {
+            Client client = new Client(addresses[i], clientInput, vmIds[i], 5000);
+            client.create_thread(threadGroup);
+        }
+        ThreadCount.waitForThreadsToComplete(threadGroup, logger);
+        long endTime = System.currentTimeMillis();
+        System.out.println("Total runtime: "+(endTime - startTime));
+        
     }
 }
-// ClientThread class 
-@SuppressWarnings("deprecation")
-class ClientThread extends Thread  
-{ 
-    private String input = ""; 
-    private DataOutputStream out = null; 
-    private Socket socket = null; 
-    private DataInputStream in = null; 
-      
-    // Constructor 
-    public ClientThread(Socket socket, String input, DataInputStream in, DataOutputStream out)  
-    { 
-        this.socket = socket; 
-        this.input = input; 
-        this.out = out; 
-        this.in = in;
-    } 
-  
-    @Override
-    public void run()  
-    { 
-        System.out.println("Client thread started: " + socket); 
-
-        // string to read message from input 
-        String line = ""; 
-        String line2 = "";
-
-            try
-            { 
-                line = this.input; 
-                this.out.writeUTF(line); 
-
-                boolean eof = false;
-                while (!eof) {
-                    try {
-                        line2 = this.in.readUTF();
-                        System.out.println(line2);
-                    } catch (EOFException e) {
-                        eof = true;
-                    }
-                }   
-            } 
-            catch(IOException i) 
-            { 
-                System.out.println(i); 
-            } 
-        try
-        { 
-            this.in.close(); 
-            this.out.close(); 
-            this.socket.close(); 
-        } 
-        catch(IOException i) 
-        { 
-            System.out.println(i); 
-        } 
-    }
-}
-
