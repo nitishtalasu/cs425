@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -5,7 +8,12 @@ public class Message
 {
     public MessageType type;
 
-    public Node[] nodes;
+    public List<Node> nodes;
+
+    public Message()
+    {
+        nodes = new ArrayList<Node>();
+    }
 
     public static Message getMessageObject(String jsonString)
     {     
@@ -41,7 +49,7 @@ public class Message
     {
         public String id;
 
-        public String count;
+        public int count;
 
         @Override
         public String toString()

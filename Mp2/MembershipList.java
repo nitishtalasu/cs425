@@ -1,3 +1,4 @@
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,24 +24,38 @@ public class MembershipList
         return membershipList;
     }
 
-    public static void addNode(MembershipNode node)
+    public static void addNode(Message.Node node)
     {
-        if(!nodes.contains(node))
+        MembershipNode newNode = 
+            new MembershipNode(
+                node.id,
+                getIpAddress(node.id),
+                (long)node.count,
+                LocalDateTime.now(),
+                MembershipNode.Status.RUNNING);
+
+        if(!nodes.contains(newNode))
         {
-            nodes.add(node);
+            nodes.add(newNode);
         }
 
         Collections.sort(nodes);
     }
 
-    public static void deleteNode(String nodeId)
+    private static String getIpAddress(String id) 
+    {
+        String ipAddress = id.split("_")[0];
+        return ipAddress;
+    }
+
+    public static void deleteNode(Message.Node node)
     {
         int nodeIndex = -1;
-        for (MembershipNode node : nodes) 
+        for (MembershipNode var : nodes) 
         {
-            if (node.id.compareToIgnoreCase(nodeId) == 0)
+            if (var.id.compareToIgnoreCase(node.id) == 0)
             {
-                nodeIndex = nodes.indexOf(node);
+                nodeIndex = nodes.indexOf(var);
                 break;
             }
         }
@@ -51,15 +66,33 @@ public class MembershipList
         }
     }
 
-    public static void changeNodeStatus(String nodeId, MembershipNode.Status newStatus)
+    public static void changeNodeStatus(Message.Node node, MembershipNode.Status newStatus)
     {
-        for (MembershipNode node : nodes) 
+        for (MembershipNode var : nodes) 
         {
-            if (node.id.compareToIgnoreCase(nodeId) == 0)
+            if (var.id.compareToIgnoreCase(node.id) == 0)
             {
-                node.nodeStatus = newStatus;
+                var.nodeStatus = newStatus;
                 break;
             }
         }
     }
+
+    public static void updateNodeStatus(List<Message.Node> hbNodes) 
+    {
+        for (Message.Node hbNode : hbNodes) 
+        {
+            for (MembershipNode membershipNode : nodes) 
+            {
+                if (hbNode.id.equals(membershipNode.id))
+                {
+                    if (hbNode.count > membershipNode.count)
+                    {
+                        membershipNode.count = hbNode.count;
+                        membershipNode.lastHeartbeatReceived = LocalDateTime.now();
+                    }
+                }
+            }    
+        }
+	}
 }

@@ -1,3 +1,4 @@
+
 /**
  * This class handles the operations requested by the clients.
  * 
@@ -40,17 +41,17 @@ public class MessageHandler extends Thread
             {
                 case JOIN:
                 {
-                    newMemberJoined();
+                    newMemberJoined(msg);
                     break;
                 }
                 case HEARTBEAT:
                 {
-                    processHeartBeat();
+                    processHeartBeat(msg);
                     break;
                 }
                 case LEAVE:
                 {
-                    memberLeaving();
+                    memberLeaving(msg);
                     break;
                 }
                 default:
@@ -65,18 +66,36 @@ public class MessageHandler extends Thread
         }
     }
 
-    private void memberLeaving() 
+    private void memberLeaving(Message msg) 
     {
+        if (msg.nodes.size() !=  1)
+        {
+            logger.LogWarning("More nodes are being passed in message. So dropping the message.");
+            return;
+        }
 
+        MembershipList.changeNodeStatus(msg.nodes.get(0), MembershipNode.Status.LEFT);
     }
 
-    private void processHeartBeat() 
+    private void processHeartBeat(Message msg) 
     {
+        if (msg.nodes.size() ==  0)
+        {
+            logger.LogWarning("Nodes hearbeat is zero. So dropping the message.");
+            return;
+        }
 
+        MembershipList.updateNodeStatus(msg.nodes);
     }
 
-    private void newMemberJoined() 
+    private void newMemberJoined(Message msg) 
     {
-        
+        if (msg.nodes.size() !=  1)
+        {
+            logger.LogWarning("More nodes are being passed in message. So dropping the message.");
+            return;
+        }
+
+        MembershipList.addNode(msg.nodes.get(0));
     }
 }
