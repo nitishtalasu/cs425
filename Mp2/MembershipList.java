@@ -2,6 +2,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class MembershipList
 {
@@ -94,5 +95,14 @@ public class MembershipList
                 }
             }    
         }
-	}
+    }
+    
+    public static void printMembershipList()
+    {
+        GrepLogger logger = GrepLogger.getInstance();
+        for (MembershipNode node : nodes) 
+        {
+            logger.LogInfo(node.toString());
+        }
+    }
 }
