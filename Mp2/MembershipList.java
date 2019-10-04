@@ -119,28 +119,4 @@ public class MembershipList
 
         return msgNodes;
     }
-
-    public static List<MembershipNode> getNeighbors(String id) {
-
-        int count = 0;
-        List<MembershipNode> neighborList = new ArrayList<MembershipNode>();
-        for(MembershipNode mNode : nodes) {
-            count ++;
-            if (id.equals(mNode.id)) {
-                pos = count;
-                break;
-            
-            }
-        }
-        
-        int len = mList.size();
-        count = 0;
-        for(MembershipNode node: nodes) {
-            count ++;
-            if (count == (pos-1)%len || count == (pos+1)%len || count == (pos+2)%len) {
-                neighborList.add(node);
-            }
-        }
-        return neighborList;
-    
-    }
+}
