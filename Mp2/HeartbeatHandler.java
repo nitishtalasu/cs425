@@ -19,19 +19,24 @@ public class HeartbeatHandler {
            
             
             MembershipList mList = getMembershipList();
-            
+            MembershipNode node = new MembershipNode();
             int pos;
             // for all its neighbors
             while(true) {
 
                 int port = 5000; 
-
+            
+                for (mNode: mList) {
+                    if (hostIP.equals(mNode.id)) {
+                        node = mNode;
+                    }
+                }
                 Message msg = new Message(MessageType.HEARTBEAT, node);
                 
                 byte[] message = msg.toJson().getByteArray();
                 
 
-                List<MembershipNode> neighborList = mList.getNeighbors();
+                List<MembershipNode> neighborList = mList.getNeighbors(node);
 
                 for(neighbor: neighborList) {
                     String address = neighbor.ipAddress;
