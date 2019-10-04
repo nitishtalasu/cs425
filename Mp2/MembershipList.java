@@ -120,13 +120,13 @@ public class MembershipList
         return msgNodes;
     }
 
-    public static List<MembershipNode> getNeighbors(String id) {
+    public static List<MembershipNode> getNeighbors(MembershipNode node) {
 
         int count = 0;
         List<MembershipNode> neighborList = new ArrayList<MembershipNode>();
         for(MembershipNode mNode : nodes) {
             count ++;
-            if (id.equals(mNode.id)) {
+            if ((node.id).equals(mNode.id)) {
                 pos = count;
                 break;
             
@@ -135,12 +135,13 @@ public class MembershipList
         
         int len = mList.size();
         count = 0;
-        for(MembershipNode node: nodes) {
+        for(MembershipNode mNode: nodes) {
             count ++;
             if (count == (pos-1)%len || count == (pos+1)%len || count == (pos+2)%len) {
-                neighborList.add(node);
+                neighborList.add(mNode);
             }
         }
         return neighborList;
     
     }
+}
