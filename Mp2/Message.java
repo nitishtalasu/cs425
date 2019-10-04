@@ -49,7 +49,13 @@ public class Message
     {
         public String id;
 
-        public int count;
+        public long count;
+
+        public Node(String id, long count)
+        {
+            this.id = id;
+            this.count = count;
+        }
 
         @Override
         public String toString()

@@ -105,4 +105,18 @@ public class MembershipList
             logger.LogInfo(node.toString());
         }
     }
+
+    public static List<Message.Node> getMsgNodes()
+    {
+        List<Message.Node> msgNodes = new ArrayList<Message.Node>();
+        Message newmsg = new Message();
+
+        for (MembershipNode node : nodes) 
+        {
+            Message.Node newNode = newmsg.new Node(node.id, node.count);
+            msgNodes.add(newNode);
+        }
+
+        return msgNodes;
+    }
 }
