@@ -37,7 +37,7 @@ public class Message
         return sb.toString();
     }
 
-    private class Node
+    public class Node
     {
         public String id;
 

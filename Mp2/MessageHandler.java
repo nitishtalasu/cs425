@@ -65,12 +65,18 @@ public class MessageHandler extends Thread
         }
     }
 
-    private void memberLeaving() {
+    private void memberLeaving() 
+    {
+
     }
 
-    private void processHeartBeat() {
+    private void processHeartBeat() 
+    {
+
     }
 
-    private void newMemberJoined() {
+    private void newMemberJoined() 
+    {
+        
     }
 }
