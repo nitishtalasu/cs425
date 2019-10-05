@@ -172,59 +172,66 @@ public class MembershipList {
     }
     public static List<MembershipNode> getNeighbors() {
 
-        Message.Node node = getSelfNode();
-        int count = 0, pos = 0, neighborCount = 0;
-        List<MembershipNode> neighborList = new ArrayList<MembershipNode>();
-        
-        pos = nodes.indexOf(node);
-        int len = nodes.size();
-        count = 0;
+        List<MembershipNode> neighbors = new ArrayList<MembershipNode>();
+        neighbors.add(getPredecessor());
+        List<MembershipNode> successorList = getSuccessors();
+        for(MembershipNode node: successorList)
+            neighbors.add(node);
+        return neighbors;
 
-        for(MembershipNode mNode: nodes) {
-            count ++;
-            if (count == (pos-1)%len || count == (pos+1)%len || count == (pos+2)%len) {
-                
-                if (mNode.nodeStatus == MembershipNode.Status.RUNNING)
-                    neighborList.add(mNode);
-               
-            }
-        }
-        return neighborList;
     }
 
-    public static List<MembershipNode> getSuccessor() {
-        List<MembershipNode> successorList;
-        pos = nodes.indexOf(node);
+    public static List<MembershipNode> getSuccessors() {
+        List<MembershipNode> successorList = null;
+        Message.Node node = MembershipList.getSelfNode();
+        int pos = 0;
+        for(MembershipNode mNode: nodes) {
+            pos++;
+            if (mNode.id.equals(node.id))
+                break;
+        }
         int len = nodes.size();
-        
+        int cur = pos + 1;
+        int neighborCount = 0;
         do {
+            if(cur == len-1) {
+                cur = 0;
+            }
             if(nodes.get(cur).nodeStatus == MembershipNode.Status.RUNNING) {
                 successorList.add(nodes.get(cur));
                 neighborCount++;
             }
+            
             if(neighborCount == 2)
                 break;
-            if(cur == len-1) {
-                cur = 0;
-            }
+            cur++;
+
         } while (cur < len);
         
         return successorList;
     }
 
     public static MembershipNode getPredecessor() {
-        MembershipNode predecessorNode;
-        pos = nodes.indexOf(node);
+        MembershipNode predecessorNode = null;
+        Message.Node node = MembershipList.getSelfNode();
+        int pos = 0;
+        for(MembershipNode mNode: nodes) {
+            pos++;
+            if (mNode.id.equals(node.id))
+                break;
+        }
         int len = nodes.size();
         int cur = pos - 1;
         do {
+            if(cur == 0) {
+                cur = len - 1;
+            }
+
             if(nodes.get(cur).nodeStatus == MembershipNode.Status.RUNNING) {
                 predecessorNode = nodes.get(cur);
                 break;
             }
-            if(cur == 0) {
-                cur = len - 1;
-            }
+            cur--;
         } while (cur > 0);
     
         return predecessorNode;
