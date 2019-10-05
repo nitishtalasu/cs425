@@ -182,7 +182,7 @@ public class MembershipList {
     }
 
     public static List<MembershipNode> getSuccessors() {
-        List<MembershipNode> successorList = null;
+        List<MembershipNode> successorList = new ArrayList<MembershipNode>();
         Message.Node node = MembershipList.getSelfNode();
         int pos = 0;
         for(MembershipNode mNode: nodes) {

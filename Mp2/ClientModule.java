@@ -71,11 +71,11 @@ class ClientModule extends Thread
                         continue;
                     }
                     else {
-                        logger.log(Level.WARNING, "Wrong command");
+                        logger.LogWarning("Wrong command");
                         continue;
                     }
                 
-                    this.buffer = msg.toJson().getByteArray();   
+                    this.buffer = Message.toJson(msg).getBytes();   
                     
                     if (str.equalsIgnoreCase("JOIN")) {
                         String introducer_address = Introducer.IPADDRESS.getValue();
@@ -107,14 +107,16 @@ class ClientModule extends Thread
                     }
                     this.buffer = new byte[1024]; 
                 }
-            }
-            sc.close();
-           
+            }          
         } 
         catch(Exception e) 
         { 
             logger.LogException("[Client] User request failed", e); 
         } 
+        finally
+        {
+            sc.close();
+        }
     }
 }
 

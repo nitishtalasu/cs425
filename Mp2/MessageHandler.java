@@ -1,3 +1,6 @@
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 
 /**
  * This class handles the operations requested by the clients.
@@ -101,18 +104,25 @@ public class MessageHandler extends Thread
         
         MembershipList.addNode(msg.nodes.get(0));
 
-        Message ack = new Message(MessageType.HEARTBEAT, MembershipList.getMsgNodes());
+        try
+        {
+            Message ack = new Message(MessageType.HEARTBEAT, MembershipList.getMsgNodes());
                     
-        buffer = ack.toJson().getByteArray(); 
+            buffer = Message.toJson(ack).getBytes(); 
 
-        String address = MembershipList.getIpAddress(ack.nodes.get(0).id);
-        InetAddress neighborAddress = InetAddress.getByName(address);
-        DatagramSocket hb = new DatagramSocket(this.port, neighborAddress);
-        DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, neighborAddress, this.port); 
-        
-        hb.connect(neighborAddress, this.port); 
-        hb.send(dp); 
-        hb.close();
+            String address = MembershipList.getIpAddress(ack.nodes.get(0).id);
+            InetAddress neighborAddress = InetAddress.getByName(address);
+            DatagramSocket hb = new DatagramSocket(5000, neighborAddress);
+            DatagramPacket dp = new DatagramPacket(buffer, buffer.length, neighborAddress, 5000); 
+            
+            hb.connect(neighborAddress, 5000); 
+            hb.send(dp); 
+            hb.close();
+        }
+        catch(Exception e)
+        {
+            logger.LogException("Failed in sending ack. ", e);
+        }
         
     }
 }

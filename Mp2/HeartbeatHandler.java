@@ -41,7 +41,7 @@ public class HeartbeatHandler {
                     
                     Message msg = new Message(MessageType.HEARTBEAT, MembershipList.getMsgNodes());
                     
-                    this.buffer = msg.toJson().getByteArray();   
+                    this.buffer = Message.toJson(msg).getBytes();   
 
                     List<MembershipNode> neighborList = MembershipList.getNeighbors();
 
