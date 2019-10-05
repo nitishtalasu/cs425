@@ -65,8 +65,9 @@ class ClientModule extends Thread
         //time at which thread starts
         long startTime = System.currentTimeMillis();
         String str = "";
-
-
+        InetAddress address = InetAddress.getLocalHost(); 
+        String hostIP = address.getHostAddress();
+           
         try
         {   
             while(true) {
