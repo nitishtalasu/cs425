@@ -272,10 +272,16 @@ public class MembershipList {
     }
     
     
-    public static void updateCount() {
+    public static void updateCount(Message.Node node) {
         
-        Message.Node node = getSelfNode();
-        node.count++;
+        for (MembershipNode var : nodes) 
+        {
+            if (var.id.compareToIgnoreCase(node.id) == 0)
+            {
+                var.count++;
+                break;
+            }
+        }
     }
 
     public static List<MembershipNode> getMembershipNodes() {

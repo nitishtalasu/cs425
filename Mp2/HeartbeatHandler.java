@@ -42,7 +42,7 @@ public class HeartbeatHandler {
                     if(!status.equals(MembershipNode.Status.RUNNING))
                         continue;
     
-                    MembershipList.updateCount();
+                    MembershipList.updateCount(MembershipList.getSelfNode());
                     
                     Message msg = new Message(MessageType.HEARTBEAT, MembershipList.getMsgNodes());
                     
