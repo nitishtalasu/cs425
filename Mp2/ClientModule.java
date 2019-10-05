@@ -4,8 +4,9 @@
  * @author Prateeth Reddy Chagari (chagari2@illinois.edu)
  */
 import java.io.*;
-import java.net.Socket;
+import java.net.*;
 import java.util.Scanner;
+import java.util.List;
 
 class ClientModule extends Thread  
 { 
@@ -44,7 +45,7 @@ class ClientModule extends Thread
     { 
         
         Scanner sc = new Scanner(System.in);
-      
+        String str = "";
         //time at which thread starts
         //long startTime = System.currentTimeMillis();
            
@@ -52,17 +53,21 @@ class ClientModule extends Thread
         {   
             System.out.println("Waiting for user input..");
             while(true) {
-                if(str = sc.nextLine()) {
+                str = sc.nextLine();
+                if(str != null) {
+                    Message msg = null;
                     if (str.equalsIgnoreCase("JOIN")) {
-                        setSelfNode();
-                        Message msg = new Message(MessageType.JOIN, getMsgNodes());
+                        MembershipList.setSelfNode();
+                        msg = new Message(MessageType.JOIN, MembershipList.getMsgNodes());
+
+
                     }
                     else if(str.equalsIgnoreCase("LEAVE")) {
-                        Message msg = new Message(MessageType.LEAVE, getMsgNodes());
+                        msg = new Message(MessageType.LEAVE, MembershipList.getMsgNodes());
                         
                     }
                     else if(str.equalsIgnoreCase("PRINT")) {
-                        printMembershipList();
+                        MembershipList.printMembershipList();
                         continue;
                     }
                     else {
@@ -71,15 +76,32 @@ class ClientModule extends Thread
                     }
                 
                     this.buffer = msg.toJson().getByteArray();   
-    
-                    List<MembershipNode> neighborList = getNeighbors();
+                    
+                    if (str.equalsIgnoreCase("JOIN")) {
+                        String introducer_address = Introducer.IPADDRESS.getValue();
+                        int introducerPort = Integer.parseInt(Introducer.PORT.getValue());
+                 
+                        InetAddress introducerAddress = InetAddress.getByName(introducer_address);
+
+                        DatagramSocket client = new DatagramSocket(introducerPort, introducerAddress);
+                        DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, 
+                                                                    introducerAddress, this.port); 
+                        client.connect(introducerAddress, introducerPort); 
+                        client.send(dp); 
+                        client.close();
+                        continue;
+                    }
+                    
+                    List<MembershipNode> neighborList = MembershipList.getNeighbors();
     
                     for(MembershipNode neighbor: neighborList) {
     
                         String address = neighbor.ipAddress;
-                        DatagramSocket client = new DatagramSocket(this.port, address);
-                        DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, address, this.port); 
-                        client.connect(address, port); 
+                        InetAddress neighborAddress = InetAddress.getByName(address);
+                        DatagramSocket client = new DatagramSocket(this.port, neighborAddress);
+                        DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, 
+                                                                neighborAddress, this.port); 
+                        client.connect(neighborAddress, port); 
                         client.send(dp); 
                         client.close();
                     }

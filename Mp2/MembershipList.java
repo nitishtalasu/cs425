@@ -182,7 +182,8 @@ public class MembershipList {
         for(MembershipNode mNode: nodes) {
             count ++;
             if (count == (pos-1)%len || count == (pos+1)%len || count == (pos+2)%len) {
-                neighborList.add(mNode);
+                if (mNode.nodeStatus == MembershipNode.Status.RUNNING)
+                    neighborList.add(mNode);
             }
         }
         return neighborList;
@@ -192,5 +193,9 @@ public class MembershipList {
         
         Message.Node node = getSelfNode();
         node.count++;
+    }
+
+    public static List<MembershipNode> getMembershipNodes() {
+        return nodes;
     }
 }

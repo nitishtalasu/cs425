@@ -29,6 +29,9 @@
             logger.LogInfo("[Server] Starting the failure detector");
             new FailureDetector().run();
 
+            logger.LogInfo("[Client] Starting the client");
+            ClientModule.getInstance(serverPort).run();
+
 
           }
           catch(Exception e)

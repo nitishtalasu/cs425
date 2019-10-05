@@ -1,5 +1,7 @@
+import java.lang.reflect.Member;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 public class FailureDetector {
 
@@ -14,19 +16,25 @@ public class FailureDetector {
        try { 
             while(true) {
 
-                //MembershipList mList = initializeMembershipList();
-                
-                LocalDateTime currentTime = LocalDateTime.now();
+                List<MembershipNode> mNodes = MembershipList.getMembershipNodes();
                 Message.Node node = MembershipList.getSelfNode();
-                LocalDateTime lastHeartbeat = node.lastHeartbeatReceived;
-                long duration = ChronoUnit.MILLIS.between(lastHeartbeat, currentTime);
+                long duration;
+                LocalDateTime currentTime = LocalDateTime.now();
+                for (MembershipNode mNode: mNodes) {
+                    if((node.id).equals(mNode.id))
+                        break;
+                    
+                    LocalDateTime lastHeartbeat = mNode.lastHeartbeatReceived;
 
-                if(duration >= FailureDuration.FAIL.getValue()) {
-                    MembershipList.changeNodeStatus(node, MembershipNode.Status.FAILED);
-                }
+                    duration = ChronoUnit.MILLIS.between(lastHeartbeat, currentTime);
 
-                if(duration >= FailureDuration.EXIT.getValue()) {
-                    MembershipList.deleteNode(node);
+                    if(duration >= FailureDuration.FAIL.getValue()) {
+                        MembershipList.changeNodeStatus(node, MembershipNode.Status.FAILED);
+                    }
+    
+                    if(duration >= FailureDuration.EXIT.getValue()) {
+                        MembershipList.deleteNode(node);
+                    }
                 }
             }
         }
