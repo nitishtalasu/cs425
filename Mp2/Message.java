@@ -15,6 +15,11 @@ public class Message
         nodes = new ArrayList<Node>();
     }
 
+    public Message(MessageType messageType, List<Node> membershipNodes) {
+        type = messageType;
+        nodes = membershipNodes;
+    }
+    
     public static Message getMessageObject(String jsonString)
     {     
         Gson gson = new GsonBuilder().setPrettyPrinting().create();

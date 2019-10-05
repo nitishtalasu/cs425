@@ -83,7 +83,7 @@ public class MembershipList {
         }
     }
 
-    private static String getIpAddress(String id) 
+    public static String getIpAddress(String id) 
     {
         String ipAddress = id.split("_")[0];
         return ipAddress;

@@ -3,7 +3,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-public class FailureDetector {
+public class FailureDetector extends Thread {
 
     private GrepLogger logger;
       
@@ -12,6 +12,7 @@ public class FailureDetector {
         logger = GrepLogger.getInstance();
     }
     // run as a thread with timer
+    @Override
     public void run() {
        try { 
             while(true) {

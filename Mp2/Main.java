@@ -19,6 +19,7 @@
       { 
           try
           {
+            
             int serverPort = getPortNumber(args);
             logger.LogInfo("[Server] Starting the server on port: " + serverPort);
             ServerModule.getInstance(serverPort).run();
@@ -27,12 +28,14 @@
             new HeartbeatHandler(serverPort);
 
             logger.LogInfo("[Server] Starting the failure detector");
-            new FailureDetector().run();
+            Thread failureThread = new FailureDetector();
+            failureThread.start();
+            failureThread.join();
 
             logger.LogInfo("[Client] Starting the client");
             ClientModule.getInstance(serverPort).run();
 
-
+            logger.loginfo("closing progam");
           }
           catch(Exception e)
           {
