@@ -19,9 +19,17 @@
       { 
           try
           {
-              int serverPort = getPortNumber(args);
-              logger.LogInfo("[Server] Starting the server on port: " + serverPort);
-              ServerModule.getInstance(serverPort).run();
+            int serverPort = getPortNumber(args);
+            logger.LogInfo("[Server] Starting the server on port: " + serverPort);
+            ServerModule.getInstance(serverPort).run();
+
+            logger.LogInfo("[Server] Starting the heartbeat handler");
+            new HeartbeatHandler(serverPort);
+
+            logger.LogInfo("[Server] Starting the failure detector");
+            new FailureDetector().run();
+
+
           }
           catch(Exception e)
           {

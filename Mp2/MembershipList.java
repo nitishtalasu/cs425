@@ -1,21 +1,31 @@
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
 
-public class MembershipList
-{
+public class MembershipList {
+    private static String id;
+
     private static MembershipList membershipList = null;
 
     private static volatile List<MembershipNode> nodes;
 
-    private MembershipList()
-    {
+    private MembershipList() {
+        try
+        {
+            id = InetAddress.getLocalHost().getHostAddress()+ "_" + LocalDateTime.now();
+        } 
+        catch (UnknownHostException e) 
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         nodes = new ArrayList<MembershipNode>();
     }
 
-    public static MembershipList getMembershipList() 
+    public static MembershipList initializeMembershipList() 
     {
         if (membershipList == null) 
         {
@@ -23,6 +33,37 @@ public class MembershipList
         }
 
         return membershipList;
+    }
+
+    public static void setSelfNode()
+    {
+        try 
+        {
+            id = InetAddress.getLocalHost().getHostAddress()+ "_" + LocalDateTime.now();
+            Message msg = new Message();
+            Message.Node node = msg.new Node(id, 1);
+            addNode(node);
+        } 
+        catch (UnknownHostException e) 
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public static Message.Node getSelfNode()
+    {
+        for (MembershipNode node : nodes) 
+        {
+            if (node.id.compareToIgnoreCase(id) == 0)
+            {
+                Message msg = new Message();
+                Message.Node selfNode = msg.new Node(node.id, node.count);
+                return selfNode;
+            }
+        }
+        
+        return null;
     }
 
     public static void addNode(Message.Node node)
@@ -38,9 +79,8 @@ public class MembershipList
         if(!nodes.contains(newNode))
         {
             nodes.add(newNode);
+            Collections.sort(nodes);
         }
-
-        Collections.sort(nodes);
     }
 
     private static String getIpAddress(String id) 
@@ -83,16 +123,24 @@ public class MembershipList
     {
         for (Message.Node hbNode : hbNodes) 
         {
+            boolean nodePresent = false;
             for (MembershipNode membershipNode : nodes) 
             {
                 if (hbNode.id.equals(membershipNode.id))
                 {
+                    nodePresent = true;
                     if (hbNode.count > membershipNode.count)
                     {
                         membershipNode.count = hbNode.count;
                         membershipNode.lastHeartbeatReceived = LocalDateTime.now();
-                    }
+                        membershipNode.nodeStatus = MembershipNode.Status.RUNNING;
+                   }
                 }
+            }
+
+            if (!nodePresent)
+            {
+                addNode(hbNode);
             }    
         }
     }
@@ -113,27 +161,23 @@ public class MembershipList
 
         for (MembershipNode node : nodes) 
         {
-            Message.Node newNode = newmsg.new Node(node.id, node.count);
-            msgNodes.add(newNode);
+            if (node.nodeStatus == MembershipNode.Status.RUNNING)
+            {
+                Message.Node newNode = newmsg.new Node(node.id, node.count);
+                msgNodes.add(newNode);
+            }
         }
 
         return msgNodes;
     }
+    public static List<MembershipNode> getNeighbors() {
 
-    public static List<MembershipNode> getNeighbors(MembershipNode node) {
-
-        int count = 0;
+        Message.Node node = getSelfNode();
+        int count = 0, pos = 0;
         List<MembershipNode> neighborList = new ArrayList<MembershipNode>();
-        for(MembershipNode mNode : nodes) {
-            count ++;
-            if ((node.id).equals(mNode.id)) {
-                pos = count;
-                break;
-            
-            }
-        }
         
-        int len = mList.size();
+        pos = nodes.indexOf(node);
+        int len = nodes.size();
         count = 0;
         for(MembershipNode mNode: nodes) {
             count ++;
@@ -144,13 +188,9 @@ public class MembershipList
         return neighborList;
     
     }
-    public static updateCount(MembershipNode node) {
+    public static void updateCount() {
         
-        for(MembershipNode mNode : nodes) {
-            if ((node.id).equals(mNode.id)) {
-               mNode.count++;
-               break;
-            }
-        }
+        Message.Node node = getSelfNode();
+        node.count++;
     }
 }
