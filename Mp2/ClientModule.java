@@ -82,10 +82,9 @@ class ClientModule extends Thread
                  
                         InetAddress introducerAddress = InetAddress.getByName(introducer_address);
 
-                        DatagramSocket client = new DatagramSocket(introducerPort, introducerAddress);
+                        DatagramSocket client = new DatagramSocket();
                         DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, 
-                                                                    introducerAddress, this.port); 
-                        client.connect(introducerAddress, introducerPort); 
+                                                                    introducerAddress, introducerPort); 
                         client.send(dp); 
                         client.close();
                         continue;

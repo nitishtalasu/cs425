@@ -45,6 +45,8 @@ public class MessageHandler extends Thread
                 case JOIN:
                 {
                     newMemberJoined(msg);
+                    logger.LogInfo("[MessageHandler] Printing membership list");
+                    MembershipList.printMembershipList();
                     break;
                 }
                 case HEARTBEAT:
