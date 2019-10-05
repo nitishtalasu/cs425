@@ -90,12 +90,29 @@ public class MessageHandler extends Thread
 
     private void newMemberJoined(Message msg) 
     {
+        byte[] buffer = new byte[1024];
+        // CheckIfThisNodeIsIntroducer();
         if (msg.nodes.size() !=  1)
         {
             logger.LogWarning("More nodes are being passed in message. So dropping the message.");
             return;
         }
 
+        
         MembershipList.addNode(msg.nodes.get(0));
+
+        Message ack = new Message(MessageType.HEARTBEAT, MembershipList.getMsgNodes());
+                    
+        buffer = ack.toJson().getByteArray(); 
+
+        String address = MembershipList.getIpAddress(ack.nodes.get(0).id);
+        InetAddress neighborAddress = InetAddress.getByName(address);
+        DatagramSocket hb = new DatagramSocket(this.port, neighborAddress);
+        DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, neighborAddress, this.port); 
+        
+        hb.connect(neighborAddress, this.port); 
+        hb.send(dp); 
+        hb.close();
+        
     }
 }
