@@ -1,4 +1,4 @@
-import java.util.Timer;
+import java.util.TimerTask;
 
 public class HeartbeatHandler {
     
@@ -17,26 +17,20 @@ public class HeartbeatHandler {
             InetAddress address = InetAddress.getLocalHost(); 
             String hostIP = address.getHostAddress();
            
-            
             MembershipList mList = getMembershipList();
-            MembershipNode node = new MembershipNode();
-            int pos;
+        
             // for all its neighbors
             while(true) {
 
                 int port = 5000; 
             
-                for (MembershipNode mNode: mList) {
-                    if (hostIP.equals(mNode.id)) {
-                        node = mNode;
-                    }
-                }
-                node.count++;
-                Message msg = new Message(MessageType.HEARTBEAT, node);
+                updateCount();
+                
+                Message msg = new Message(MessageType.HEARTBEAT, getMsgNodes());
                 
                 byte[] message = msg.toJson().getByteArray();   
 
-                List<MembershipNode> neighborList = mList.getNeighbors(node);
+                List<MembershipNode> neighborList = getNeighbors();
 
                 for(MembershipNode neighbor: neighborList) {
                     String address = neighbor.ipAddress;

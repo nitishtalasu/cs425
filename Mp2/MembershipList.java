@@ -144,4 +144,13 @@ public class MembershipList
         return neighborList;
     
     }
+    public static updateCount(MembershipNode node) {
+        
+        for(MembershipNode mNode : nodes) {
+            if ((node.id).equals(mNode.id)) {
+               mNode.count++;
+               break;
+            }
+        }
+    }
 }
