@@ -112,10 +112,9 @@ public class MessageHandler extends Thread
 
             String address = MembershipList.getIpAddress(ack.nodes.get(0).id);
             InetAddress neighborAddress = InetAddress.getByName(address);
-            DatagramSocket hb = new DatagramSocket(5000, neighborAddress);
+            DatagramSocket hb = new DatagramSocket();
             DatagramPacket dp = new DatagramPacket(buffer, buffer.length, neighborAddress, 5000); 
             
-            hb.connect(neighborAddress, 5000); 
             hb.send(dp); 
             hb.close();
         }

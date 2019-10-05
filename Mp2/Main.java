@@ -19,11 +19,12 @@
       { 
           try
           {
-            
+            //
             int serverPort = getPortNumber(args);
             logger.LogInfo("[Server] Starting the server on port: " + serverPort);
             Thread server = ServerModule.getInstance(serverPort);
             server.start();
+            MembershipList.initializeMembershipList();
 
             logger.LogInfo("[Server] Starting the heartbeat handler");
             new HeartbeatHandler(serverPort);
@@ -43,6 +44,10 @@
           catch(Exception e)
           {
               logger.LogError(e.getMessage());
+          }
+          finally
+          {
+              logger.cleanupLogger();
           }
       }
   

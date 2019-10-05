@@ -48,10 +48,9 @@ public class HeartbeatHandler {
                     for(MembershipNode neighbor: neighborList) {
                         String address = neighbor.ipAddress;
                         InetAddress neighborAddress = InetAddress.getByName(address);
-                        DatagramSocket hb = new DatagramSocket(this.port, neighborAddress);
+                        DatagramSocket hb = new DatagramSocket();
                         DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, neighborAddress, this.port); 
-                        
-                        hb.connect(neighborAddress, this.port); 
+                         
                         hb.send(dp); 
                         hb.close();
                     }

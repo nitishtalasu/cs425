@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class MembershipList {
     private static String id;
@@ -16,23 +17,25 @@ public class MembershipList {
         try
         {
             id = InetAddress.getLocalHost().getHostAddress()+ "_" + LocalDateTime.now();
+            nodes = new ArrayList<MembershipNode>();
+            Message msg = new Message();
+            Message.Node node = msg.new Node(id, 1);
+            addNode(node);
+            changeNodeStatus(node, MembershipNode.Status.LEFT);
         } 
         catch (UnknownHostException e) 
         {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        nodes = new ArrayList<MembershipNode>();
     }
 
-    public static MembershipList initializeMembershipList() 
+    public static void initializeMembershipList() 
     {
         if (membershipList == null) 
         {
             membershipList = new MembershipList();
         }
-
-        return membershipList;
     }
 
     public static void setSelfNode()
@@ -43,6 +46,7 @@ public class MembershipList {
             Message msg = new Message();
             Message.Node node = msg.new Node(id, 1);
             addNode(node);
+            changeNodeStatus(node, MembershipNode.Status.RUNNING);
         } 
         catch (UnknownHostException e) 
         {
@@ -173,7 +177,13 @@ public class MembershipList {
     public static List<MembershipNode> getNeighbors() {
 
         List<MembershipNode> neighbors = new ArrayList<MembershipNode>();
-        neighbors.add(getPredecessor());
+        //neighbors.add(getPredecessor());
+        MembershipNode pNode = getPredecessor();
+        if (pNode != null)
+        {
+            neighbors.add(pNode);
+        }
+
         List<MembershipNode> successorList = getSuccessors();
         for(MembershipNode node: successorList)
             neighbors.add(node);
@@ -184,29 +194,37 @@ public class MembershipList {
     public static List<MembershipNode> getSuccessors() {
         List<MembershipNode> successorList = new ArrayList<MembershipNode>();
         Message.Node node = MembershipList.getSelfNode();
-        int pos = 0;
-        for(MembershipNode mNode: nodes) {
-            pos++;
-            if (mNode.id.equals(node.id))
-                break;
-        }
-        int len = nodes.size();
-        int cur = pos + 1;
-        int neighborCount = 0;
-        do {
-            if(cur == len-1) {
-                cur = 0;
-            }
-            if(nodes.get(cur).nodeStatus == MembershipNode.Status.RUNNING) {
-                successorList.add(nodes.get(cur));
-                neighborCount++;
-            }
-            
-            if(neighborCount == 2)
-                break;
-            cur++;
+        // int pos = 0;
+        // for(MembershipNode mNode: nodes) {
+        //     pos++;
+        //     if (mNode.id.equals(node.id))
+        //         break;
+        // }
 
-        } while (cur < len);
+        int index = -1;
+        for(int i = 0; i < nodes.size(); i++)
+        {
+            if (node.id.equals(nodes.get(i).id))
+            {
+                index = i;
+                break;
+            }
+        }
+        
+        if (index == -1)
+        {
+            System.err.println("Error in finding position"); 
+            return successorList;
+        }
+
+        for (int i = 1; i == nodes.size() || successorList.size() == 2; i++ )
+        {
+            MembershipNode sNode = nodes.get((i + index) % nodes.size());
+            if (sNode.nodeStatus == MembershipNode.Status.RUNNING)
+            {
+                successorList.add(sNode);
+            }
+        }
         
         return successorList;
     }
@@ -214,25 +232,30 @@ public class MembershipList {
     public static MembershipNode getPredecessor() {
         MembershipNode predecessorNode = null;
         Message.Node node = MembershipList.getSelfNode();
-        int pos = 0;
-        for(MembershipNode mNode: nodes) {
-            pos++;
-            if (mNode.id.equals(node.id))
+        int index = -1;
+        for(int i = 0; i < nodes.size(); i++)
+        {
+            if (node.id.equals(nodes.get(i).id))
+            {
+                index = i;
                 break;
+            }
         }
-        int len = nodes.size();
-        int cur = pos - 1;
-        do {
-            if(cur == 0) {
-                cur = len - 1;
-            }
+        
+        if (index == -1)
+        {
+            System.err.println("Error in finding position"); 
+            return predecessorNode;
+        }
 
-            if(nodes.get(cur).nodeStatus == MembershipNode.Status.RUNNING) {
-                predecessorNode = nodes.get(cur);
-                break;
+        for (int i = 1; i == nodes.size() || predecessorNode != null; i++ )
+        {
+            MembershipNode pNode = nodes.get((nodes.size() + index - i) % nodes.size());
+            if (pNode.nodeStatus == MembershipNode.Status.RUNNING)
+            {
+                predecessorNode = pNode;
             }
-            cur--;
-        } while (cur > 0);
+        }
     
         return predecessorNode;
     }

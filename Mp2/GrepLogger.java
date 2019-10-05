@@ -255,4 +255,14 @@ public class GrepLogger {
         logger.removeHandler(toBeRemoved);
     }
 
+    public void cleanupLogger() {
+        if (logger != null) {
+          Handler[] handlers = logger.getHandlers();
+          for (Handler handler : handlers) {
+            handler.close();
+            logger.removeHandler(handler);
+          }
+        }
+      }
+
 }
