@@ -90,6 +90,7 @@ public class MessageHandler extends Thread
 
     private void newMemberJoined(Message msg) 
     {
+        CheckIfThisNodeIsIntroducer();
         if (msg.nodes.size() !=  1)
         {
             logger.LogWarning("More nodes are being passed in message. So dropping the message.");
@@ -97,5 +98,6 @@ public class MessageHandler extends Thread
         }
 
         MembershipList.addNode(msg.nodes.get(0));
+        SendMembershipListToNewNode();
     }
 }
