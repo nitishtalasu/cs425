@@ -37,6 +37,11 @@ public class HeartbeatHandler {
             // for all its neighbors
                 while(true) {
 
+                    MembershipNode.Status status = MembershipList.getNodeStatus(MembershipList.getSelfNode());
+                    
+                    if(!status.equals(MembershipNode.Status.RUNNING))
+                        continue;
+    
                     MembershipList.updateCount();
                     
                     Message msg = new Message(MessageType.HEARTBEAT, MembershipList.getMsgNodes());

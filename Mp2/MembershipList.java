@@ -110,7 +110,18 @@ public class MembershipList {
             nodes.remove(nodeIndex);
         }
     }
-
+    public static MembershipNode.Status getNodeStatus(Message.Node node) {
+        
+        MembershipNode.Status status = null;
+        for (MembershipNode var: nodes) 
+        {
+            if(var.id.compareToIgnoreCase(node.id) == 0)
+            {
+                status = var.nodeStatus;
+            }
+        }
+        return status;
+    }
     public static void changeNodeStatus(Message.Node node, MembershipNode.Status newStatus)
     {
         for (MembershipNode var : nodes) 
