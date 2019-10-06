@@ -87,7 +87,16 @@ public class HeartBeatThread extends Thread {
 
             if(!introducerExists)
             {
-                MembershipList.changeNodeStatus(selfNode, MembershipNode.Status.LEFT);
+                String introducer_address = Introducer.IPADDRESS.getValue();
+                int introducerPort = Integer.parseInt(Introducer.PORT.getValue());
+                            
+                InetAddress introducerAddress = InetAddress.getByName(introducer_address);
+                        
+                DatagramSocket client = new DatagramSocket();
+                DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, 
+                                                                        introducerAddress, introducerPort); 
+                client.send(dp); 
+                client.close();
             }
         }
     }   
