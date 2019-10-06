@@ -1,5 +1,6 @@
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FailureDetector extends Thread {
@@ -15,26 +16,41 @@ public class FailureDetector extends Thread {
     public void run() {
        try { 
             while(true) {
+                try{
+                    List<MembershipNode> mNodes = MembershipList.getMembershipNodes();
+                    Message.Node node = MembershipList.getSelfNode();
+                    long duration;
+                    LocalDateTime currentTime = LocalDateTime.now();
+                    List<MembershipNode> nodesToBeDeteled = new ArrayList<MembershipNode>();
+                    for (MembershipNode mNode: mNodes) {
+                        if(node.id.equals(mNode.id))
+                            continue;
+                        
+                        LocalDateTime lastHeartbeat = mNode.lastHeartbeatReceived;
 
-                List<MembershipNode> mNodes = MembershipList.getMembershipNodes();
-                Message.Node node = MembershipList.getSelfNode();
-                long duration;
-                LocalDateTime currentTime = LocalDateTime.now();
-                for (MembershipNode mNode: mNodes) {
-                    if(node.id.equals(mNode.id))
-                        break;
-                    
-                    LocalDateTime lastHeartbeat = mNode.lastHeartbeatReceived;
+                        duration = ChronoUnit.MILLIS.between(lastHeartbeat, currentTime);
+                        //System.out.println("[FD] Duration" + duration);
+                        if(duration >= FailureDuration.FAIL.getValue()) {
+                            System.out.println("[FD] Changing status" + mNode);
+                            MembershipList.changeNodeStatus(mNode, MembershipNode.Status.FAILED);
+                            MembershipList.printMembershipList();
+                        }
+        
+                        if(duration >= FailureDuration.EXIT.getValue()) {
+                            System.out.println("[FD] Deleting node" + mNode);
+                            //MembershipList.deleteNode(mNode);
+                            nodesToBeDeteled.add(mNode);
+                        }
+                    }
 
-                    duration = ChronoUnit.MILLIS.between(lastHeartbeat, currentTime);
-                    print(duration);
-                    if(duration >= FailureDuration.FAIL.getValue()) {
-                        MembershipList.changeNodeStatus(node, MembershipNode.Status.FAILED);
+                    for (MembershipNode var : nodesToBeDeteled) 
+                    {
+                        MembershipList.deleteNode(var);   
                     }
-    
-                    if(duration >= FailureDuration.EXIT.getValue()) {
-                        MembershipList.deleteNode(node);
-                    }
+                }
+                catch(Exception e) 
+                {
+                    logger.LogException("[FailureDetector] Failure detection failed: ", e);
                 }
             }
         }

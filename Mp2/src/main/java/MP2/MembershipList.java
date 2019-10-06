@@ -105,7 +105,7 @@ public class MembershipList {
         return ipAddress;
     }
 
-    public static synchronized void deleteNode(Message.Node node)
+    public static synchronized void deleteNode(MembershipNode node)
     {
         int nodeIndex = -1;
         for (MembershipNode var : nodes) 
@@ -121,6 +121,7 @@ public class MembershipList {
         {
             nodes.remove(nodeIndex);
         }
+        printMembershipList();
     }
     public static synchronized MembershipNode.Status getNodeStatus(Message.Node node) {
         
@@ -136,6 +137,18 @@ public class MembershipList {
         return status;
     }
     public static synchronized void changeNodeStatus(Message.Node node, MembershipNode.Status newStatus)
+    {
+        for (MembershipNode var : nodes) 
+        {
+            if (var.id.compareToIgnoreCase(node.id) == 0)
+            {
+                var.nodeStatus = newStatus;
+                break;
+            }
+        }
+    }
+
+    public static synchronized void changeNodeStatus(MembershipNode node, MembershipNode.Status newStatus)
     {
         for (MembershipNode var : nodes) 
         {

@@ -53,65 +53,75 @@ class ClientModule extends Thread
         {   
             System.out.println("Waiting for user input..");
             while(true) {
-                str = sc.nextLine();
-                if(str != null) {
-                    Message msg = null;
-                    Message.Node node = MembershipList.getSelfNode();
-                    List<Message.Node> nodeList = new ArrayList<Message.Node>();
-                    nodeList.add(node);
-                    if (str.equalsIgnoreCase("JOIN")) {
-                       
-                        MembershipList.changeNodeStatus(node, MembershipNode.Status.RUNNING);
-                        msg = new Message(MessageType.JOIN, nodeList);
-                    }
-                    else if(str.equalsIgnoreCase("LEAVE")) {
-                        MembershipList.changeNodeStatus(node, MembershipNode.Status.LEFT);
-                        msg = new Message(MessageType.LEAVE, nodeList);
-                        logger.LogInfo("LEFT");
-                        //MembershipList.printMembershipList();
+                try
+                {
+                    str = sc.nextLine();
+                    if(str != null) {
+                        Message msg = null;
+                        Message.Node node = MembershipList.getSelfNode();
+                        List<Message.Node> nodeList = new ArrayList<Message.Node>();
+                        nodeList.add(node);
+                        if (str.equalsIgnoreCase("JOIN")) {
                         
-                    }
-                    else if(str.equalsIgnoreCase("PRINT")) {
-                        MembershipList.printMembershipList();
-                        continue;
-                    }
-                    else {
-                        logger.LogWarning("Wrong command");
-                        continue;
-                    }
-                
-                    this.buffer = Message.toJson(msg).getBytes();   
+                            MembershipList.changeNodeStatus(node, MembershipNode.Status.RUNNING);
+                            msg = new Message(MessageType.JOIN, nodeList);
+                        }
+                        else if(str.equalsIgnoreCase("LEAVE")) {
+                            MembershipList.changeNodeStatus(node, MembershipNode.Status.LEFT);
+                            msg = new Message(MessageType.LEAVE, nodeList);
+                            logger.LogInfo("LEFT");
+                            //MembershipList.printMembershipList();
+                            
+                        }
+                        else if(str.equalsIgnoreCase("PRINT")) {
+                            MembershipList.printMembershipList();
+                            continue;
+                        }
+                        else if(str.equalsIgnoreCase("exit")) {
+                            System.exit(0);
+                        }
+                        else {
+                            logger.LogWarning("Wrong command");
+                            continue;
+                        }
                     
-                    if (str.equalsIgnoreCase("JOIN")) {
-                        String introducer_address = Introducer.IPADDRESS.getValue();
-                        int introducerPort = Integer.parseInt(Introducer.PORT.getValue());
+                        this.buffer = Message.toJson(msg).getBytes();   
                         
-                        InetAddress introducerAddress = InetAddress.getByName(introducer_address);
-                       
-                        DatagramSocket client = new DatagramSocket();
-                        DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, 
-                                                                    introducerAddress, introducerPort); 
-                        client.send(dp); 
-                        client.close();
-                        continue;
+                        if (str.equalsIgnoreCase("JOIN")) {
+                            String introducer_address = Introducer.IPADDRESS.getValue();
+                            int introducerPort = Integer.parseInt(Introducer.PORT.getValue());
+                            
+                            InetAddress introducerAddress = InetAddress.getByName(introducer_address);
+                        
+                            DatagramSocket client = new DatagramSocket();
+                            DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, 
+                                                                        introducerAddress, introducerPort); 
+                            client.send(dp); 
+                            client.close();
+                            continue;
+                        }
+                        
+                        List<MembershipNode> neighborList = MembershipList.getNeighbors();
+        
+                        for(MembershipNode neighbor: neighborList) {
+        
+                            String address = neighbor.ipAddress;
+                            System.out.println(address);
+                            InetAddress neighborAddress = InetAddress.getByName(address);
+                            System.out.println(neighborAddress);
+                            DatagramSocket client = new DatagramSocket();
+                            DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, 
+                                                                    neighborAddress, 5000); 
+                            client.send(dp); 
+                            client.close();
+                        }
+                        this.buffer = new byte[1024]; 
                     }
-                    
-                    List<MembershipNode> neighborList = MembershipList.getNeighbors();
-    
-                    for(MembershipNode neighbor: neighborList) {
-    
-                        String address = neighbor.ipAddress;
-                        System.out.println(address);
-                        InetAddress neighborAddress = InetAddress.getByName(address);
-                        System.out.println(neighborAddress);
-                        DatagramSocket client = new DatagramSocket();
-                        DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, 
-                                                                neighborAddress, 5000); 
-                        client.send(dp); 
-                        client.close();
-                    }
-                    this.buffer = new byte[1024]; 
                 }
+                catch(Exception ex) 
+                { 
+                    logger.LogException("[Client] User request failed", ex); 
+                } 
             }          
         } 
         catch(Exception e) 

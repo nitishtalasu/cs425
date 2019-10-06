@@ -98,7 +98,7 @@ public class ServerModule extends Thread {
     
                 String message = ToString(this.buffer);
 
-                //logger.LogInfo("[Server] Received Serialized message from " + packet.getAddress() + ": " + message );
+                //System.out.println("[Server] Received Serialized message from " + packet.getAddress() + ": " + message );
                 MessageHandler msgHandler = new MessageHandler(message);
                 msgHandler.start();
     
