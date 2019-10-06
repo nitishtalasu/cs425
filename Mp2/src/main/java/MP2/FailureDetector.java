@@ -31,13 +31,13 @@ public class FailureDetector extends Thread {
                         duration = ChronoUnit.MILLIS.between(lastHeartbeat, currentTime);
                         //System.out.println("[FD] Duration" + duration);
                         if(duration >= FailureDuration.FAIL.getValue()) {
-                            System.out.println("[FD] Changing status" + mNode);
+                            //System.out.println("[FD] Changing status" + mNode);
                             MembershipList.changeNodeStatus(mNode, MembershipNode.Status.FAILED);
-                            MembershipList.printMembershipList();
+                            //MembershipList.printMembershipList();
                         }
         
                         if(duration >= FailureDuration.EXIT.getValue()) {
-                            System.out.println("[FD] Deleting node" + mNode);
+                            logger.LogInfo("[FD] Deleting node" + mNode);
                             //MembershipList.deleteNode(mNode);
                             nodesToBeDeteled.add(mNode);
                         }
