@@ -25,7 +25,7 @@ public class HeartBeatThread extends Thread {
                         MembershipNode.Status status = MembershipList.getNodeStatus(MembershipList.getSelfNode());
                         
                         if(!status.equals(MembershipNode.Status.RUNNING))
-                            return;
+                            continue;
         
                         MembershipList.updateCount(MembershipList.getSelfNode());
                         
@@ -53,7 +53,7 @@ public class HeartBeatThread extends Thread {
                         // MembershipList.printMembershipList();
                     
                         this.buffer = new byte[1024]; 
-                        Thread.sleep(1000);
+                        Thread.sleep(500);
                     }
                 
                 catch (Exception e) {
