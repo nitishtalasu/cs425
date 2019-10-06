@@ -27,7 +27,8 @@
             MembershipList.initializeMembershipList();
 
             logger.LogInfo("[Server] Starting the heartbeat handler");
-            new HeartbeatHandler(serverPort);
+            Thread hbThread = new HeartBeatThread();
+            hbThread.start();
 
             logger.LogInfo("[Server] Starting the failure detector");
             Thread failureThread = new FailureDetector();
