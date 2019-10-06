@@ -14,7 +14,7 @@ public class HeartbeatHandler {
         this.port = port;
 
         timer = new Timer();
-        timer.schedule(new HeartbeatTimer(port), 0L, 1000L);
+        timer.schedule(new HeartbeatTimer(port), 1000L, 100000L);
     }
 }
 
@@ -49,8 +49,12 @@ public class HeartbeatHandler {
                     this.buffer = Message.toJson(msg).getBytes();   
 
                     List<MembershipNode> neighborList = MembershipList.getNeighbors();
+                    Message.Node node = MembershipList.getSelfNode();
 
                     for(MembershipNode neighbor: neighborList) {
+                        if (node.id.equals(neighbor.id)){
+                            continue;
+                        }
                         String address = neighbor.ipAddress;
                         InetAddress neighborAddress = InetAddress.getByName(address);
     

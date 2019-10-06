@@ -56,15 +56,17 @@ class ClientModule extends Thread
                 str = sc.nextLine();
                 if(str != null) {
                     Message msg = null;
+                    Message.Node node = MembershipList.getSelfNode();
+                    List<Message.Node> nodeList = new ArrayList<Message.Node>();
+                    nodeList.add(node);
                     if (str.equalsIgnoreCase("JOIN")) {
-                        Message.Node node = MembershipList.getSelfNode();
-                        List<Message.Node> nodeList = new ArrayList<Message.Node>();
-                        nodeList.add(node);
+                       
                         MembershipList.changeNodeStatus(node, MembershipNode.Status.RUNNING);
                         msg = new Message(MessageType.JOIN, nodeList);
                     }
                     else if(str.equalsIgnoreCase("LEAVE")) {
-                        msg = new Message(MessageType.LEAVE, MembershipList.getMsgNodes());
+                        MembershipList.changeNodeStatus(node, MembershipNode.Status.LEFT);
+                        msg = new Message(MessageType.LEAVE, nodeList);
                         logger.LogInfo("LEFT");
                         //MembershipList.printMembershipList();
                         
@@ -83,9 +85,9 @@ class ClientModule extends Thread
                     if (str.equalsIgnoreCase("JOIN")) {
                         String introducer_address = Introducer.IPADDRESS.getValue();
                         int introducerPort = Integer.parseInt(Introducer.PORT.getValue());
-                 
+                        
                         InetAddress introducerAddress = InetAddress.getByName(introducer_address);
-
+                       
                         DatagramSocket client = new DatagramSocket();
                         DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, 
                                                                     introducerAddress, introducerPort); 
@@ -99,10 +101,12 @@ class ClientModule extends Thread
                     for(MembershipNode neighbor: neighborList) {
     
                         String address = neighbor.ipAddress;
+                        System.out.println(address);
                         InetAddress neighborAddress = InetAddress.getByName(address);
+                        System.out.println(neighborAddress);
                         DatagramSocket client = new DatagramSocket();
                         DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, 
-                                                                neighborAddress, this.port); 
+                                                                neighborAddress, 5000); 
                         client.send(dp); 
                         client.close();
                     }

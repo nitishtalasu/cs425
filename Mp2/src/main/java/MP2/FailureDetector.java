@@ -21,13 +21,13 @@ public class FailureDetector extends Thread {
                 long duration;
                 LocalDateTime currentTime = LocalDateTime.now();
                 for (MembershipNode mNode: mNodes) {
-                    if((node.id).equals(mNode.id))
+                    if(node.id.equals(mNode.id))
                         break;
                     
                     LocalDateTime lastHeartbeat = mNode.lastHeartbeatReceived;
 
                     duration = ChronoUnit.MILLIS.between(lastHeartbeat, currentTime);
-
+                    print(duration);
                     if(duration >= FailureDuration.FAIL.getValue()) {
                         MembershipList.changeNodeStatus(node, MembershipNode.Status.FAILED);
                     }

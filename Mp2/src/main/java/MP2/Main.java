@@ -29,9 +29,9 @@
             logger.LogInfo("[Server] Starting the heartbeat handler");
             new HeartbeatHandler(serverPort);
 
-            logger.LogInfo("[Server] Starting the failure detector");
-            Thread failureThread = new FailureDetector();
-            failureThread.start();
+            // logger.LogInfo("[Server] Starting the failure detector");
+            // Thread failureThread = new FailureDetector();
+            // failureThread.start();
             
 
             logger.LogInfo("[Client] Starting the client");

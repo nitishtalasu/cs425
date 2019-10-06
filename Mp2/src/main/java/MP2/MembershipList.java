@@ -30,7 +30,7 @@ public class MembershipList {
         }
     }
 
-    public static void initializeMembershipList() 
+    public static synchronized void initializeMembershipList() 
     {
         if (membershipList == null) 
         {
@@ -38,7 +38,7 @@ public class MembershipList {
         }
     }
 
-    public static void setSelfNode()
+    public static synchronized void setSelfNode()
     {
         try 
         {
@@ -55,7 +55,7 @@ public class MembershipList {
         }
     }
 
-    public static Message.Node getSelfNode()
+    public static synchronized Message.Node getSelfNode()
     {
         for (MembershipNode node : nodes) 
         {
@@ -70,7 +70,7 @@ public class MembershipList {
         return null;
     }
 
-    public static void addNode(Message.Node node)
+    public static synchronized void addNode(Message.Node node)
     {
         MembershipNode newNode = 
             new MembershipNode(
@@ -95,17 +95,17 @@ public class MembershipList {
         nodes.add(newNode);
         Collections.sort(nodes);
 
-        System.out.println("[Add nodes]");
-        System.out.println(nodes);
+        // System.out.println("[Add nodes]");
+        // System.out.println(nodes);
     }
 
-    public static String getIpAddress(String id) 
+    public static synchronized String getIpAddress(String id) 
     {
         String ipAddress = id.split("_")[0];
         return ipAddress;
     }
 
-    public static void deleteNode(Message.Node node)
+    public static synchronized void deleteNode(Message.Node node)
     {
         int nodeIndex = -1;
         for (MembershipNode var : nodes) 
@@ -122,19 +122,20 @@ public class MembershipList {
             nodes.remove(nodeIndex);
         }
     }
-    public static MembershipNode.Status getNodeStatus(Message.Node node) {
+    public static synchronized MembershipNode.Status getNodeStatus(Message.Node node) {
         
         MembershipNode.Status status = null;
         for (MembershipNode var: nodes) 
         {
+
             if(var.id.compareToIgnoreCase(node.id) == 0)
-            {
+            {   
                 status = var.nodeStatus;
             }
         }
         return status;
     }
-    public static void changeNodeStatus(Message.Node node, MembershipNode.Status newStatus)
+    public static synchronized void changeNodeStatus(Message.Node node, MembershipNode.Status newStatus)
     {
         for (MembershipNode var : nodes) 
         {
@@ -146,7 +147,7 @@ public class MembershipList {
         }
     }
 
-    public static void updateNodeStatus(List<Message.Node> hbNodes) 
+    public static synchronized void updateNodeStatus(List<Message.Node> hbNodes) 
     {
         for (Message.Node hbNode : hbNodes) 
         {
@@ -172,7 +173,7 @@ public class MembershipList {
         }
     }
     
-    public static void printMembershipList()
+    public static synchronized void printMembershipList()
     {
         GrepLogger logger = GrepLogger.getInstance();
         for (MembershipNode node : nodes) 
@@ -181,7 +182,7 @@ public class MembershipList {
         }
     }
 
-    public static List<Message.Node> getMsgNodes()
+    public static synchronized List<Message.Node> getMsgNodes()
     {
         List<Message.Node> msgNodes = new ArrayList<Message.Node>();
         Message newmsg = new Message();
@@ -198,7 +199,7 @@ public class MembershipList {
         //System.out.println(msgNodes);
         return msgNodes;
     }
-    public static List<MembershipNode> getNeighbors() {
+    public static synchronized List<MembershipNode> getNeighbors() {
 
         List<MembershipNode> neighbors = new ArrayList<MembershipNode>();
         //neighbors.add(getPredecessor());
@@ -215,7 +216,7 @@ public class MembershipList {
 
     }
 
-    public static List<MembershipNode> getSuccessors() {
+    public static synchronized List<MembershipNode> getSuccessors() {
         List<MembershipNode> successorList = new ArrayList<MembershipNode>();
         Message.Node node = MembershipList.getSelfNode();
         // int pos = 0;
@@ -253,7 +254,7 @@ public class MembershipList {
         return successorList;
     }
 
-    public static MembershipNode getPredecessor() {
+    public static synchronized MembershipNode getPredecessor() {
         MembershipNode predecessorNode = null;
         Message.Node node = MembershipList.getSelfNode();
         int index = -1;
@@ -288,7 +289,7 @@ public class MembershipList {
     }
     
     
-    public static void updateCount(Message.Node node) {
+    public static synchronized void updateCount(Message.Node node) {
         
         for (MembershipNode var : nodes) 
         {
@@ -300,7 +301,7 @@ public class MembershipList {
         }
     }
 
-    public static List<MembershipNode> getMembershipNodes() {
+    public static synchronized List<MembershipNode> getMembershipNodes() {
         return nodes;
     }
 }
