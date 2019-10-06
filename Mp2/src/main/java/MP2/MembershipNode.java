@@ -34,10 +34,10 @@ public class MembershipNode implements Comparable<MembershipNode>
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("Id : " + this.id);
-        sb.append("IpAddress : " + this.ipAddress);
-        sb.append("Count : " + this.count);
-        sb.append("Status : " + this.nodeStatus);
+        sb.append(" Id : " + this.id);
+        sb.append(" IpAddress : " + this.ipAddress);
+        sb.append(" Count : " + this.count);
+        sb.append(" Status : " + this.nodeStatus);
 
         return sb.toString();
     }

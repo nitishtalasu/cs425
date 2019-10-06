@@ -73,8 +73,23 @@ class ClientModule extends Thread
                             //MembershipList.printMembershipList();
                             
                         }
-                        else if(str.equalsIgnoreCase("PRINT")) {
+                        else if(str.equalsIgnoreCase("printlist")) {
                             MembershipList.printMembershipList();
+                            continue;
+                        }
+                        else if(str.equalsIgnoreCase("printId"))
+                        {
+                            Message.Node selfNode = MembershipList.getSelfNode();
+                            logger.LogInfo("[ClientInput] Self Id: " + selfNode);
+                            continue;
+                        }
+                        else if(str.equalsIgnoreCase("printneighbors"))
+                        {
+                            List<MembershipNode> neighbors = MembershipList.getNeighbors();
+                            for (MembershipNode neighbor : neighbors) 
+                            {
+                                logger.LogInfo("[ClientInput] Neigbor: " + neighbor);
+                            }
                             continue;
                         }
                         else if(str.equalsIgnoreCase("exit")) {
