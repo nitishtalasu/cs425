@@ -56,6 +56,7 @@ public class MessageHandler extends Thread
                 }
                 case LEAVE:
                 {
+                    logger.LogInfo("[MessageHandler] Received Left msg.");
                     memberLeaving(msg);
                     break;
                 }

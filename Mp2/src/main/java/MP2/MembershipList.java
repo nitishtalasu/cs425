@@ -80,11 +80,21 @@ public class MembershipList {
                 LocalDateTime.now(),
                 MembershipNode.Status.RUNNING);
 
-        if(!nodes.contains(newNode))
+        for (MembershipNode var : nodes) 
         {
-            nodes.add(newNode);
-            Collections.sort(nodes);
+            if (var.id.compareToIgnoreCase(node.id) == 0)
+            {
+                var.count = node.count;
+                var.lastHeartbeatReceived = LocalDateTime.now();
+                var.nodeStatus = MembershipNode.Status.RUNNING;
+                Collections.sort(nodes);
+                return;
+            }
         }
+
+        nodes.add(newNode);
+        Collections.sort(nodes);
+
         System.out.println("[Add nodes]");
         System.out.println(nodes);
     }
