@@ -85,6 +85,8 @@ public class MembershipList {
             nodes.add(newNode);
             Collections.sort(nodes);
         }
+        System.out.println("[Add nodes]");
+        System.out.println(nodes);
     }
 
     public static String getIpAddress(String id) 
@@ -182,7 +184,8 @@ public class MembershipList {
                 msgNodes.add(newNode);
             }
         }
-
+        //System.out.println("[getMSGNODES]");
+        //System.out.println(msgNodes);
         return msgNodes;
     }
     public static List<MembershipNode> getNeighbors() {
@@ -228,7 +231,7 @@ public class MembershipList {
             return successorList;
         }
 
-        for (int i = 1; i == nodes.size() || successorList.size() == 2; i++ )
+        for (int i = 1; i <= nodes.size() || successorList.size() < 2; i++ )
         {
             MembershipNode sNode = nodes.get((i + index) % nodes.size());
             if (sNode.nodeStatus == MembershipNode.Status.RUNNING)
@@ -259,8 +262,11 @@ public class MembershipList {
             return predecessorNode;
         }
 
-        for (int i = 1; i == nodes.size() || predecessorNode != null; i++ )
+        for (int i = 1; i <= nodes.size() || predecessorNode == null; i++ )
         {
+            //System.out.println("[GP] Index:" + index);
+            //System.out.println("[GP] Pos:" + i);
+            //System.out.println("[GP] size:" + nodes.size());
             MembershipNode pNode = nodes.get((nodes.size() + index - i) % nodes.size());
             if (pNode.nodeStatus == MembershipNode.Status.RUNNING)
             {

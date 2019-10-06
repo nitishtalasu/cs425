@@ -7,7 +7,7 @@ import java.io.*;
 import java.net.*;
 import java.util.Scanner;
 import java.util.List;
-
+import java.util.ArrayList;
 class ClientModule extends Thread  
 { 
     private static ClientModule handler = null;
@@ -58,11 +58,15 @@ class ClientModule extends Thread
                     Message msg = null;
                     if (str.equalsIgnoreCase("JOIN")) {
                         Message.Node node = MembershipList.getSelfNode();
+                        List<Message.Node> nodeList = new ArrayList<Message.Node>();
+                        nodeList.add(node);
                         MembershipList.changeNodeStatus(node, MembershipNode.Status.RUNNING);
-                        msg = new Message(MessageType.JOIN, MembershipList.getMsgNodes());
+                        msg = new Message(MessageType.JOIN, nodeList);
                     }
                     else if(str.equalsIgnoreCase("LEAVE")) {
                         msg = new Message(MessageType.LEAVE, MembershipList.getMsgNodes());
+                        logger.LogInfo("LEFT");
+                        //MembershipList.printMembershipList();
                         
                     }
                     else if(str.equalsIgnoreCase("PRINT")) {
@@ -82,9 +86,9 @@ class ClientModule extends Thread
                  
                         InetAddress introducerAddress = InetAddress.getByName(introducer_address);
 
-                        DatagramSocket client = new DatagramSocket(introducerPort, introducerAddress);
+                        DatagramSocket client = new DatagramSocket();
                         DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, 
-                                                                    introducerAddress, this.port); 
+                                                                    introducerAddress, introducerPort); 
                         client.connect(introducerAddress, introducerPort); 
                         client.send(dp); 
                         client.close();

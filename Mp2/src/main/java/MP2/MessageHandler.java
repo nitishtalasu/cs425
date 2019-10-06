@@ -45,6 +45,8 @@ public class MessageHandler extends Thread
                 case JOIN:
                 {
                     newMemberJoined(msg);
+                    logger.LogInfo("[MessageHandler] Printing membership list");
+                    MembershipList.printMembershipList();
                     break;
                 }
                 case HEARTBEAT:
@@ -101,7 +103,12 @@ public class MessageHandler extends Thread
             return;
         }
 
-        
+        Message.Node selfNode = MembershipList.getSelfNode();
+        if(selfNode.id.equals(msg.nodes.get(0).id))
+        {
+            logger.LogInfo("Same host getting join msg. So dropping it");
+            return;
+        }
         MembershipList.addNode(msg.nodes.get(0));
 
         try

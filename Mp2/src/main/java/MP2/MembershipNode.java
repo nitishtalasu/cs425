@@ -30,6 +30,18 @@ public class MembershipNode implements Comparable<MembershipNode>
         return this.id.compareTo(node.id);
     }
 
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Id : " + this.id);
+        sb.append("IpAddress : " + this.ipAddress);
+        sb.append("Count : " + this.count);
+        sb.append("Status : " + this.nodeStatus);
+
+        return sb.toString();
+    }
+
     public enum Status
     {
         RUNNING,

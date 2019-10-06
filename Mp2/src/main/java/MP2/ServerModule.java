@@ -87,8 +87,8 @@ public class ServerModule extends Thread {
             int noOfClientsServed = 0;; 
             while (true) 
             { 
-                logger.LogInfo("[Server] No of clients serverd so far: " + noOfClientsServed
-                            + ". Waiting for more connections.");
+                //logger.LogInfo("[Server] No of clients serverd so far: " + noOfClientsServed
+                           // + ". Waiting for more connections.");
 
                 // Step 2 : create a DatgramPacket to receive the data. 
                 DatagramPacket packet = new DatagramPacket(this.buffer, this.buffer.length); 
@@ -98,7 +98,7 @@ public class ServerModule extends Thread {
     
                 String message = ToString(this.buffer);
 
-                logger.LogInfo("[Server] Received Serialized message from " + packet.getAddress() + ": " + message );
+                //logger.LogInfo("[Server] Received Serialized message from " + packet.getAddress() + ": " + message );
                 MessageHandler msgHandler = new MessageHandler(message);
                 msgHandler.start();
     

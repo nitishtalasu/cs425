@@ -53,12 +53,16 @@ public class HeartbeatHandler {
                     for(MembershipNode neighbor: neighborList) {
                         String address = neighbor.ipAddress;
                         InetAddress neighborAddress = InetAddress.getByName(address);
+    
                         DatagramSocket hb = new DatagramSocket();
                         DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, neighborAddress, this.port); 
                          
                         hb.send(dp); 
                         hb.close();
                     }
+                    // logger.LogInfo("[MessageHandler] Printing membership list");
+                    // MembershipList.printMembershipList();
+                   
                     this.buffer = new byte[1024]; 
                 }
             }
