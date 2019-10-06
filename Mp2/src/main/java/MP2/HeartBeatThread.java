@@ -22,10 +22,13 @@ public class HeartBeatThread extends Thread {
             {
                 try
                     {
+                        Message.Node selfNode = MembershipList.getSelfNode();
                         MembershipNode.Status status = MembershipList.getNodeStatus(MembershipList.getSelfNode());
                         
                         if(!status.equals(MembershipNode.Status.RUNNING))
                             continue;
+
+                        CheckIntroducerExists(selfNode);
         
                         MembershipList.updateCount(MembershipList.getSelfNode());
                         
@@ -49,8 +52,6 @@ public class HeartBeatThread extends Thread {
                             hb.send(dp); 
                             hb.close();
                         }
-                        // logger.LogInfo("[MessageHandler] Printing membership list");
-                        // MembershipList.printMembershipList();
                     
                         this.buffer = new byte[1024]; 
                         Thread.sleep(500);
@@ -68,6 +69,25 @@ public class HeartBeatThread extends Thread {
                     }
                     
                 }
+            }
+        }
+
+        private void CheckIntroducerExists(Message.Node selfNode) 
+        {
+            List<MembershipNode> nodes = MembershipList.getMembershipNodes();
+            boolean introducerExists = false;
+            for (MembershipNode node : nodes) 
+            {
+                if (node.ipAddress.equals(Introducer.IPADDRESS.getValue()))
+                {
+                    introducerExists = true;
+                    break;
+                }
+            }
+
+            if(!introducerExists)
+            {
+                MembershipList.changeNodeStatus(selfNode, MembershipNode.Status.LEFT);
             }
         }
     }   
