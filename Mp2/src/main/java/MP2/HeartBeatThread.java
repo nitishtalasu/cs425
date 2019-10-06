@@ -1,6 +1,7 @@
 import java.util.Timer;
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class HeartBeatThread extends Thread {
@@ -87,6 +88,11 @@ public class HeartBeatThread extends Thread {
 
             if(!introducerExists)
             {
+                List<Message.Node> nodeList = new ArrayList<Message.Node>();
+                nodeList.add(selfNode);
+                Message msg = new Message(MessageType.JOIN, nodeList);
+                this.buffer = Message.toJson(msg).getBytes();
+
                 String introducer_address = Introducer.IPADDRESS.getValue();
                 int introducerPort = Integer.parseInt(Introducer.PORT.getValue());
                             
@@ -97,6 +103,7 @@ public class HeartBeatThread extends Thread {
                                                                         introducerAddress, introducerPort); 
                 client.send(dp); 
                 client.close();
+                this.buffer = new byte[1024];
             }
         }
     }   
