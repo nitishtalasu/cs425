@@ -88,22 +88,30 @@ public class HeartBeatThread extends Thread {
 
             if(!introducerExists)
             {
-                List<Message.Node> nodeList = new ArrayList<Message.Node>();
-                nodeList.add(selfNode);
-                Message msg = new Message(MessageType.JOIN, nodeList);
-                this.buffer = Message.toJson(msg).getBytes();
+                try
+                {
+                    List<Message.Node> nodeList = new ArrayList<Message.Node>();
+                    nodeList.add(selfNode);
+                    Message msg = new Message(MessageType.JOIN, nodeList);
+                    this.buffer = Message.toJson(msg).getBytes();
 
-                String introducer_address = Introducer.IPADDRESS.getValue();
-                int introducerPort = Integer.parseInt(Introducer.PORT.getValue());
+                    String introducer_address = Introducer.IPADDRESS.getValue();
+                    int introducerPort = Integer.parseInt(Introducer.PORT.getValue());
+                                
+                    InetAddress introducerAddress = InetAddress.getByName(introducer_address);
                             
-                InetAddress introducerAddress = InetAddress.getByName(introducer_address);
-                        
-                DatagramSocket client = new DatagramSocket();
-                DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, 
-                                                                        introducerAddress, introducerPort); 
-                client.send(dp); 
-                client.close();
-                this.buffer = new byte[1024];
+                    DatagramSocket client = new DatagramSocket();
+                    DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, 
+                                                                            introducerAddress, introducerPort); 
+                    client.send(dp); 
+                    client.close();
+                    this.buffer = new byte[1024];
+                }
+                catch(Exception exp)
+                {
+                    logger.LogException("[HeartBeatThread] Error ocurred in sending packet to introducer.", exp);
+                }
+                
             }
         }
     }   
