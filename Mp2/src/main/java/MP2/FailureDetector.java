@@ -6,10 +6,14 @@ import java.util.List;
 public class FailureDetector extends Thread {
 
     private GrepLogger logger;
+    private LocalDateTime start;
+    private long failureCounter;
       
     public FailureDetector() 
     {
         logger = GrepLogger.getInstance();
+        start = LocalDateTime.now();
+        failureCounter = 0;
     }
     // run as a thread with timer
     @Override
@@ -30,27 +34,28 @@ public class FailureDetector extends Thread {
 
                         duration = ChronoUnit.MILLIS.between(lastHeartbeat, currentTime);
                         //System.out.println("[FD] Duration" + duration);
-                        if(duration >= FailureDuration.FAIL.getValue()) {
-                            //System.out.println("[FD] Changing status" + mNode);
-                            MembershipList.changeNodeStatus(mNode, MembershipNode.Status.FAILED);
-                            //MembershipList.printMembershipList();
+                        if(duration >= FailureDuration.FAIL.getValue() && mNode.nodeStatus != MembershipNode.Status.FAILED) 
+                        {
+                            logger.LogInfo("[FD] Changing status" + mNode);
+                            failureCounter += 1;
+                            logger.LogInfo("[FD] failure Detector count" + failureCounter + " . Time difference: " +
+                                 ChronoUnit.MILLIS.between(start, LocalDateTime.now()));
+                            MembershipList.changeNodeStatus(mNode, MembershipNode.Status.FAILED);                           
                         }
         
                         if(duration >= FailureDuration.EXIT.getValue()) {
                             logger.LogInfo("[FD] Deleting node" + mNode);
-                            //MembershipList.deleteNode(mNode);
                             nodesToBeDeteled.add(mNode);
                         }
                     }
 
                     for (MembershipNode var : nodesToBeDeteled) 
                     {
-                        MembershipList.deleteNode(var);   
+                        MembershipList.deleteNode(var);
                     }
                 }
                 catch(Exception e) 
                 {
-                    logger.LogException("[FailureDetector] Failure detection failed: ", e);
                 }
             }
         }

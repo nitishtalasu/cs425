@@ -13,6 +13,8 @@ public class MembershipList {
 
     private static volatile List<MembershipNode> nodes;
 
+    private static GrepLogger logger = GrepLogger.getInstance();
+
     private MembershipList() {
         try
         {
@@ -94,9 +96,6 @@ public class MembershipList {
 
         nodes.add(newNode);
         Collections.sort(nodes);
-
-        // System.out.println("[Add nodes]");
-        // System.out.println(nodes);
     }
 
     public static synchronized String getIpAddress(String id) 
@@ -121,8 +120,11 @@ public class MembershipList {
         {
             nodes.remove(nodeIndex);
         }
+        
+        logger.LogInfo("[FD] Membershiplist after node got deleted:");
         printMembershipList();
     }
+
     public static synchronized MembershipNode.Status getNodeStatus(Message.Node node) {
         
         MembershipNode.Status status = null;
@@ -182,6 +184,8 @@ public class MembershipList {
             if (!nodePresent)
             {
                 addNode(hbNode);
+                logger.LogInfo("[Membershiplist] New node has been added t0 membershiplist.New membershiplist:");
+                printMembershipList();
             }    
         }
     }
@@ -232,13 +236,6 @@ public class MembershipList {
     public static synchronized List<MembershipNode> getSuccessors() {
         List<MembershipNode> successorList = new ArrayList<MembershipNode>();
         Message.Node node = MembershipList.getSelfNode();
-        // int pos = 0;
-        // for(MembershipNode mNode: nodes) {
-        //     pos++;
-        //     if (mNode.id.equals(node.id))
-        //         break;
-        // }
-
         int index = -1;
         for(int i = 0; i < nodes.size(); i++)
         {

@@ -1,4 +1,5 @@
 import java.util.Timer;
+import java.util.concurrent.ThreadLocalRandom;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
@@ -44,6 +45,10 @@ public class HeartBeatThread extends Thread {
                             if (node.id.equals(neighbor.id)){
                                 continue;
                             }
+                            if (isPacketToBedropped())
+                            {
+                                continue;
+                            }
                             String address = neighbor.ipAddress;
                             InetAddress neighborAddress = InetAddress.getByName(address);
         
@@ -73,7 +78,17 @@ public class HeartBeatThread extends Thread {
             }
         }
 
-        private void CheckIntroducerExists(Message.Node selfNode) 
+        private boolean isPacketToBedropped() 
+        {
+            int random = ThreadLocalRandom.current().nextInt()%100;
+            if (random % 30 == 0)
+            {
+                return true;
+            }
+            return false;
+        }
+
+    private void CheckIntroducerExists(Message.Node selfNode) 
         {
             List<MembershipNode> nodes = MembershipList.getMembershipNodes();
             boolean introducerExists = false;
