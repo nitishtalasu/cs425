@@ -89,7 +89,6 @@ class ClientModule extends Thread
                         DatagramSocket client = new DatagramSocket();
                         DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, 
                                                                     introducerAddress, introducerPort); 
-                        client.connect(introducerAddress, introducerPort); 
                         client.send(dp); 
                         client.close();
                         continue;
