@@ -255,8 +255,12 @@ public class MembershipList {
             return successorList;
         }
 
-        for (int i = 1; i <= nodes.size() || successorList.size() < 2; i++ )
+        for (int i = 1; successorList.size() < 2; i++ )
         {
+            if (i == nodes.size())
+            {
+                break;
+            }
             MembershipNode sNode = nodes.get((i + index) % nodes.size());
             if (sNode.nodeStatus == MembershipNode.Status.RUNNING)
             {
@@ -286,11 +290,12 @@ public class MembershipList {
             return predecessorNode;
         }
 
-        for (int i = 1; i <= nodes.size() || predecessorNode == null; i++ )
+        for (int i = 1; predecessorNode == null; i++ )
         {
-            //System.out.println("[GP] Index:" + index);
-            //System.out.println("[GP] Pos:" + i);
-            //System.out.println("[GP] size:" + nodes.size());
+            if (i == nodes.size())
+            {
+                break;
+            }
             MembershipNode pNode = nodes.get((nodes.size() + index - i) % nodes.size());
             if (pNode.nodeStatus == MembershipNode.Status.RUNNING)
             {
