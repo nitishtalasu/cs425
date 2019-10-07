@@ -1,6 +1,10 @@
+/**
+ * Enum for introducer IpAddress and port to send join messages.
+ */
 public enum Introducer
 {
-    IPADDRESS("ipaddress", "172.22.154.195"),
+
+    IPADDRESS("ipaddress", "192.168.0.3"),
     PORT("port", "5000");
 
     private final String key;

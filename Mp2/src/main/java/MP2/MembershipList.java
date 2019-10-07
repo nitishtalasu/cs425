@@ -6,7 +6,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class MembershipList {
+/**
+ * Class for maintaing the membershiplist and operations on membershiplist nodes.
+ * This keeps volatile object for membershipList so that each thread and can access it,
+ * and methods are synchronized to handle concurrent accessing to the methods.
+ */
+public class MembershipList 
+{
     private static String id;
 
     private static MembershipList membershipList = null;
@@ -27,11 +33,13 @@ public class MembershipList {
         } 
         catch (UnknownHostException e) 
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.LogException("[MemnershipList] Failed to create the membership list object. ", e);
         }
     }
 
+    /**
+     * To initialize the membership list.
+     */
     public static synchronized void initializeMembershipList() 
     {
         if (membershipList == null) 
@@ -40,6 +48,9 @@ public class MembershipList {
         }
     }
 
+    /**
+     * To set the self node in the membership list.
+     */
     public static synchronized void setSelfNode()
     {
         try 
@@ -52,11 +63,15 @@ public class MembershipList {
         } 
         catch (UnknownHostException e) 
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            
+            logger.LogException("[MemnershipList] Failed to set the self node in membershiplist. ", e);
         }
     }
 
+    /**
+     * Gets the self node details.
+     * @return Self node deatils.
+     */
     public static synchronized Message.Node getSelfNode()
     {
         for (MembershipNode node : nodes) 
@@ -72,6 +87,10 @@ public class MembershipList {
         return null;
     }
 
+    /**
+     * Adds the node to the membershiplist.
+     * @param node Node details to be added.
+     */
     public static synchronized void addNode(Message.Node node)
     {
         MembershipNode newNode = 
@@ -98,12 +117,21 @@ public class MembershipList {
         Collections.sort(nodes);
     }
 
+    /**
+     * Gets the IpAddress from the node Id.
+     * @param id Node Id.
+     * @return IpAddress of the given node Id.
+     */
     public static synchronized String getIpAddress(String id) 
     {
         String ipAddress = id.split("_")[0];
         return ipAddress;
     }
 
+    /**
+     * Deleted the given node in membershiplist.
+     * @param node Node to be deleted.
+     */
     public static synchronized void deleteNode(MembershipNode node)
     {
         int nodeIndex = -1;
@@ -121,10 +149,13 @@ public class MembershipList {
             nodes.remove(nodeIndex);
         }
         
-        logger.LogInfo("[FD] Membershiplist after node got deleted:");
+        logger.LogInfo("[MemnershipList] Membershiplist after node got deleted:");
         printMembershipList();
     }
 
+    /**
+     * Gets the node status in the membershiplist for given node.
+     */
     public static synchronized MembershipNode.Status getNodeStatus(Message.Node node) {
         
         MembershipNode.Status status = null;
@@ -138,6 +169,12 @@ public class MembershipList {
         }
         return status;
     }
+
+    /**
+     * Change the node status for the given node.
+     * @param node Node for which the status has to be changed.
+     * @param newStatus New status that has to be updated.
+     */
     public static synchronized void changeNodeStatus(Message.Node node, MembershipNode.Status newStatus)
     {
         for (MembershipNode var : nodes) 
@@ -150,6 +187,11 @@ public class MembershipList {
         }
     }
 
+    /**
+     * Change the node status for the given node.
+     * @param node Node for which the status has to be changed.
+     * @param newStatus New status that has to be updated.
+     */
     public static synchronized void changeNodeStatus(MembershipNode node, MembershipNode.Status newStatus)
     {
         for (MembershipNode var : nodes) 
@@ -162,6 +204,12 @@ public class MembershipList {
         }
     }
 
+    /**
+     * Updates the heartbeat counts in the membershiplist according to the heartbeat received from the neighbors.
+     * If count in own membershiplist is less than the incoming one, then updates it.
+     * It also adds new nodes if present.
+     * @param hbNodes Nodes that are sent in heartbeat.
+     */
     public static synchronized void updateNodeStatus(List<Message.Node> hbNodes) 
     {
         for (Message.Node hbNode : hbNodes) 
@@ -184,12 +232,15 @@ public class MembershipList {
             if (!nodePresent)
             {
                 addNode(hbNode);
-                logger.LogInfo("[Membershiplist] New node has been added t0 membershiplist.New membershiplist:");
+                logger.LogInfo("[Membershiplist] New node has been added to membershiplist. New membershiplist:");
                 printMembershipList();
             }    
         }
     }
     
+    /**
+     * Prints the membership list.
+     */
     public static synchronized void printMembershipList()
     {
         GrepLogger logger = GrepLogger.getInstance();
@@ -199,6 +250,10 @@ public class MembershipList {
         }
     }
 
+    /**
+     * Gets the nodes to be sent in the heartbeat messages.
+     * @return Nodes to be sent.
+     */
     public static synchronized List<Message.Node> getMsgNodes()
     {
         List<Message.Node> msgNodes = new ArrayList<Message.Node>();
@@ -212,14 +267,17 @@ public class MembershipList {
                 msgNodes.add(newNode);
             }
         }
-        //System.out.println("[getMSGNODES]");
-        //System.out.println(msgNodes);
+        
         return msgNodes;
     }
+
+    /**
+     * Gets the neighbors of the current node.
+     * @return Neighbors of the node.
+     */
     public static synchronized List<MembershipNode> getNeighbors() {
 
         List<MembershipNode> neighbors = new ArrayList<MembershipNode>();
-        //neighbors.add(getPredecessor());
         MembershipNode pNode = getPredecessor();
         if (pNode != null)
         {
@@ -233,6 +291,10 @@ public class MembershipList {
 
     }
 
+    /**
+     * Gets the successors of the current node.
+     * @return Successors of the node.
+     */
     public static synchronized List<MembershipNode> getSuccessors() {
         List<MembershipNode> successorList = new ArrayList<MembershipNode>();
         Message.Node node = MembershipList.getSelfNode();
@@ -248,7 +310,7 @@ public class MembershipList {
         
         if (index == -1)
         {
-            System.err.println("Error in finding position"); 
+            logger.LogError("[Membershiplist] Error in finding position.");
             return successorList;
         }
 
@@ -268,7 +330,12 @@ public class MembershipList {
         return successorList;
     }
 
-    public static synchronized MembershipNode getPredecessor() {
+    /**
+     * Gets the predecessor of the current node.
+     * @return Predecessors of the node.
+     */
+    public static synchronized MembershipNode getPredecessor() 
+    {
         MembershipNode predecessorNode = null;
         Message.Node node = MembershipList.getSelfNode();
         int index = -1;
@@ -283,7 +350,7 @@ public class MembershipList {
         
         if (index == -1)
         {
-            System.err.println("Error in finding position"); 
+            logger.LogError("[Membershiplist] Error in finding position."); 
             return predecessorNode;
         }
 
@@ -303,8 +370,11 @@ public class MembershipList {
         return predecessorNode;
     }
     
-    
-    public static synchronized void updateCount(Message.Node node) {
+    /**
+     * Updates the heartbeat count of the node.
+     */
+    public static synchronized void updateCount(Message.Node node) 
+    {
         
         for (MembershipNode var : nodes) 
         {
@@ -316,7 +386,12 @@ public class MembershipList {
         }
     }
 
-    public static synchronized List<MembershipNode> getMembershipNodes() {
+    /**
+     * Gets all the membership nodes.
+     * @return Nodes in the membership list.
+     */
+    public static synchronized List<MembershipNode> getMembershipNodes() 
+    {
         return nodes;
     }
 }

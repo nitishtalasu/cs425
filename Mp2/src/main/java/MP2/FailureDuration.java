@@ -1,3 +1,6 @@
+/**
+ * Enum for fail time and cleanup time values.
+ */
 public enum FailureDuration
 {
     // time in milliseconds

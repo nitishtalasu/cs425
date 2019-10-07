@@ -1,10 +1,4 @@
 
-/**
- * Logger for grep server.
- * 
- * @author Nitish Talasu(ntalasu2@illinois.edu)
- */
-
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -16,7 +10,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Logger for server.
+ * Logger wrapper.
  */
 public class GrepLogger {
 
@@ -255,6 +249,9 @@ public class GrepLogger {
         logger.removeHandler(toBeRemoved);
     }
 
+    /**
+     * Closes the handler.
+     */
     public void cleanupLogger() {
         if (logger != null) {
           Handler[] handlers = logger.getHandlers();

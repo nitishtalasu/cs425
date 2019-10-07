@@ -5,6 +5,10 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Component for sending the heartbeat to its neighbors for every 500 Milli seconds.
+ * 
+ */
 public class HeartBeatThread extends Thread {
 
         private GrepLogger logger;
@@ -41,14 +45,16 @@ public class HeartBeatThread extends Thread {
                         List<MembershipNode> neighborList = MembershipList.getNeighbors();
                         Message.Node node = MembershipList.getSelfNode();
 
-                        for(MembershipNode neighbor: neighborList) {
-                            if (node.id.equals(neighbor.id)){
-                                continue;
-                            }
-                            if (isPacketToBedropped())
+                        for(MembershipNode neighbor: neighborList) 
+                        {
+                            if (node.id.equals(neighbor.id))
                             {
                                 continue;
                             }
+                            // if (isPacketToBedropped())
+                            // {
+                            //     continue;
+                            // }
                             String address = neighbor.ipAddress;
                             InetAddress neighborAddress = InetAddress.getByName(address);
         
@@ -63,7 +69,8 @@ public class HeartBeatThread extends Thread {
                         Thread.sleep(500);
                     }
                 
-                catch (Exception e) {
+                catch (Exception e) 
+                {
                     logger.LogException("[HeartbeatHandler] HeartbeatHandler failed", e); 
                     try
                     {
@@ -78,6 +85,10 @@ public class HeartBeatThread extends Thread {
             }
         }
 
+        /**
+         * Checks the if the packet needs to be dropped based on random number generation (For collecting metrics).
+         * @return True if packet has to be dropped, otherwise false.
+         */
         private boolean isPacketToBedropped() 
         {
             int random = ThreadLocalRandom.current().nextInt()%100;
@@ -88,7 +99,13 @@ public class HeartBeatThread extends Thread {
             return false;
         }
 
-    private void CheckIntroducerExists(Message.Node selfNode) 
+        /**
+         * Checks if the introducer exists when the current node is in running state.
+         * There could be chance that introducer might fail and then current node joined to the system.
+         * So, in this case we keep pinging introducer to get the membershiplist.
+         * @param selfNode Current node details.
+         */
+        private void CheckIntroducerExists(Message.Node selfNode) 
         {
             List<MembershipNode> nodes = MembershipList.getMembershipNodes();
             boolean introducerExists = false;
@@ -116,8 +133,11 @@ public class HeartBeatThread extends Thread {
                     InetAddress introducerAddress = InetAddress.getByName(introducer_address);
                             
                     DatagramSocket client = new DatagramSocket();
-                    DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, 
-                                                                            introducerAddress, introducerPort); 
+                    DatagramPacket dp = new DatagramPacket(
+                        this.buffer, 
+                        this.buffer.length, 
+                        introducerAddress, 
+                        introducerPort); 
                     client.send(dp); 
                     client.close();
                     this.buffer = new byte[1024];

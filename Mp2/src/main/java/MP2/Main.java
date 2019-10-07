@@ -9,9 +9,6 @@
   */
   public class Main
   { 
-      /**
-       * Logger instance.
-       */
       public static GrepLogger logger =
           GrepLogger.initialize("FailureDetector", "FailureDetector.log");
   
@@ -19,29 +16,30 @@
       { 
           try
           {
-            //
             int serverPort = getPortNumber(args);
-            logger.LogInfo("[Server] Starting the server on port: " + serverPort);
+            logger.LogInfo("[Main] Starting the server on port: " + serverPort);
             Thread server = ServerModule.getInstance(serverPort);
             server.start();
             MembershipList.initializeMembershipList();
 
-            logger.LogInfo("[Server] Starting the heartbeat handler");
+            logger.LogInfo("[Main] Starting the heartbeat handler");
             Thread hbThread = new HeartBeatThread();
             hbThread.start();
 
-            logger.LogInfo("[Server] Starting the failure detector");
+            logger.LogInfo("[Main] Starting the failure detector");
             Thread failureThread = new FailureDetector();
             failureThread.start();
             
 
-            logger.LogInfo("[Client] Starting the client");
+            logger.LogInfo("[Main] Starting the client");
             Thread client = ClientModule.getInstance(serverPort);
             client.start();
 
             server.join();
+            hbThread.join();
+            failureThread.join();
             client.join();
-            logger.LogInfo("closing progam");
+            logger.LogInfo("[Main] closing progam");
 
           }
           catch(Exception e)
@@ -71,13 +69,13 @@
               }
               catch (NumberFormatException e) 
               {
-                  logger.LogError("[Server] First argument" + args[0] + " must be an integer. " +
+                  logger.LogError("[Main] First argument" + args[0] + " must be an integer. " +
                       "Exiting the application");
                   System.exit(-1);
               }
           }
   
-          logger.LogInfo("[Server] As port was not passed. Setting port to default value 5000.");
+          logger.LogInfo("[Main] As port was not passed. Setting port to default value 5000.");
           return 5000;
       }
   } 

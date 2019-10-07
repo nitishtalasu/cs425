@@ -1,13 +1,17 @@
-/**
- * Class for the client side operations.
- * 
- * @author Prateeth Reddy Chagari (chagari2@illinois.edu)
- */
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
+
+/**
+ * Thread for handling client inputs.
+ * Join      : To join the system (Sends join message to introducer).
+ * Leave     : To leave the system (Sends Leave message to its neighbors).
+ * PrintList : To print the membership list.
+ * PrintId   : To print the node Id.
+ * Exit      : To exit the program.
+ */
 class ClientModule extends Thread  
 { 
     private static ClientModule handler = null;
@@ -34,21 +38,13 @@ class ClientModule extends Thread
         return handler;
     }
 
-    /**
-     * Run the client.
-     * 
-     * @throws IOException              if I/O error occurs.
-     * @throws IllegalArgumentException if any illegal arguments are passed.
-     */
     @Override
     public void run()  
     { 
         
         Scanner sc = new Scanner(System.in);
         String str = "";
-        //time at which thread starts
-        //long startTime = System.currentTimeMillis();
-           
+                  
         try
         {   
             System.out.println("Waiting for user input..");
@@ -61,29 +57,28 @@ class ClientModule extends Thread
                         Message.Node node = MembershipList.getSelfNode();
                         List<Message.Node> nodeList = new ArrayList<Message.Node>();
                         nodeList.add(node);
-                        if (str.equalsIgnoreCase("JOIN")) {
-                        
+                        if (str.equalsIgnoreCase("Join")) 
+                        {
                             MembershipList.changeNodeStatus(node, MembershipNode.Status.RUNNING);
                             msg = new Message(MessageType.JOIN, nodeList);
                         }
-                        else if(str.equalsIgnoreCase("LEAVE")) {
+                        else if(str.equalsIgnoreCase("Leave")) 
+                        {
                             MembershipList.changeNodeStatus(node, MembershipNode.Status.LEFT);
-                            msg = new Message(MessageType.LEAVE, nodeList);
-                            logger.LogInfo("LEFT");
-                            //MembershipList.printMembershipList();
-                            
+                            msg = new Message(MessageType.LEAVE, nodeList);                           
                         }
-                        else if(str.equalsIgnoreCase("printlist")) {
+                        else if(str.equalsIgnoreCase("PrintList")) 
+                        {
                             MembershipList.printMembershipList();
                             continue;
                         }
-                        else if(str.equalsIgnoreCase("printId"))
+                        else if(str.equalsIgnoreCase("PrintId"))
                         {
                             Message.Node selfNode = MembershipList.getSelfNode();
                             logger.LogInfo("[ClientInput] Self Id: " + selfNode);
                             continue;
                         }
-                        else if(str.equalsIgnoreCase("printneighbors"))
+                        else if(str.equalsIgnoreCase("PrintNeighbors"))
                         {
                             List<MembershipNode> neighbors = MembershipList.getNeighbors();
                             for (MembershipNode neighbor : neighbors) 
@@ -96,21 +91,25 @@ class ClientModule extends Thread
                             System.exit(0);
                         }
                         else {
-                            logger.LogWarning("Wrong command");
+                            logger.LogWarning("[ClientInput] Wrong command");
                             continue;
                         }
                     
                         this.buffer = Message.toJson(msg).getBytes();   
                         
-                        if (str.equalsIgnoreCase("JOIN")) {
+                        if (str.equalsIgnoreCase("JOIN")) 
+                        {
                             String introducer_address = Introducer.IPADDRESS.getValue();
                             int introducerPort = Integer.parseInt(Introducer.PORT.getValue());
                             
                             InetAddress introducerAddress = InetAddress.getByName(introducer_address);
                         
                             DatagramSocket client = new DatagramSocket();
-                            DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, 
-                                                                        introducerAddress, introducerPort); 
+                            DatagramPacket dp = new DatagramPacket(
+                                this.buffer, 
+                                this.buffer.length, 
+                                introducerAddress, 
+                                introducerPort); 
                             client.send(dp); 
                             client.close();
                             continue;
@@ -125,8 +124,11 @@ class ClientModule extends Thread
                             InetAddress neighborAddress = InetAddress.getByName(address);
                             System.out.println(neighborAddress);
                             DatagramSocket client = new DatagramSocket();
-                            DatagramPacket dp = new DatagramPacket(this.buffer, this.buffer.length, 
-                                                                    neighborAddress, 5000); 
+                            DatagramPacket dp = new DatagramPacket(
+                                this.buffer, 
+                                this.buffer.length, 
+                                neighborAddress, 
+                                5000); 
                             client.send(dp); 
                             client.close();
                         }
@@ -135,13 +137,13 @@ class ClientModule extends Thread
                 }
                 catch(Exception ex) 
                 { 
-                    logger.LogException("[Client] User request failed", ex); 
+                    logger.LogException("[ClientInput] User request failed", ex); 
                 } 
             }          
         } 
         catch(Exception e) 
         { 
-            logger.LogException("[Client] User request failed", e); 
+            logger.LogException("[ClientInput] User request failed", e); 
         } 
         finally
         {

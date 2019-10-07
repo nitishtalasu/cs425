@@ -1,10 +1,4 @@
 
-/**
- * Class for the server side operations.
- * 
- * @author Nitish Talasu(ntalasu2@illinois.edu)
- */
-
 import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -13,50 +7,23 @@ import java.net.DatagramSocket;
  * Class to handle the server side operations.
  */
 public class ServerModule extends Thread {
-    /**
-     * Singleton object of ServerHandler type class.
-     */
+    
     private static ServerModule handler = null;
 
-    /**
-     * A server socket waits for client requests to come in over the network. It
-     * performs operations based on the client request and then returns a result to
-     * the requester.
-     */
     private DatagramSocket server;
 
-    /**
-     * Port number where server is running.
-     */
     private final int port;
 
-    /**
-     * buffer for the packet.
-     */
     private byte[] buffer = new byte[1024]; 
 
-    /**
-     * Logger instance.
-     */
     private GrepLogger logger;
 
-    /**
-     * Private constructor of ServerHandler type class.
-     * 
-     * @param portNumber Port on which server is listening.
-     */
     private ServerModule(int portNumber) 
     {
         this.port = portNumber;
         logger = GrepLogger.getInstance();
     }
 
-    /**
-     * Returns the singleton object of ServerHandler class.
-     * 
-     * @param portNumber Port on which server is listening.
-     * @return ServerHandler class object.
-     */
     public static ServerModule getInstance(int portNumber) 
     {
         if (handler == null) 
@@ -67,9 +34,6 @@ public class ServerModule extends Thread {
         return handler;
     }
 
-    /**
-     * Run the server.
-     */
     @Override
     public void run()
     {
@@ -87,13 +51,10 @@ public class ServerModule extends Thread {
             int noOfClientsServed = 0;; 
             while (true) 
             { 
-                //logger.LogInfo("[Server] No of clients serverd so far: " + noOfClientsServed
-                           // + ". Waiting for more connections.");
-
-                // Step 2 : create a DatgramPacket to receive the data. 
+                // Create a DatgramPacket to receive the data. 
                 DatagramPacket packet = new DatagramPacket(this.buffer, this.buffer.length); 
     
-                // Step 3 : revieve the data in byte buffer. 
+                // Recieve the data in byte buffer. 
                 this.server.receive(packet); 
     
                 String message = ToString(this.buffer);

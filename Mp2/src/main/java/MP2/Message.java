@@ -1,9 +1,11 @@
 import java.util.ArrayList;
 import java.util.List;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+/**
+ * Class for the message to be sent in the UDP payload.
+ */
 public class Message
 {
     public MessageType type;
@@ -20,6 +22,11 @@ public class Message
         nodes = membershipNodes;
     }
     
+    /**
+     * Gets the message object given json string.
+     * @param jsonString Serialized json string.
+     * @return Message object.
+     */
     public static Message getMessageObject(String jsonString)
     {     
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -29,6 +36,11 @@ public class Message
         return msg;
     }
 
+    /**
+     * Converts message object to json string.
+     * @param msg Message object.
+     * @return Serialized json string.
+     */
     public static String toJson(Message msg)
     {     
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -50,6 +62,9 @@ public class Message
         return sb.toString();
     }
 
+    /**
+     * Class for the node details in the message payload.
+     */
     public class Node
     {
         public String id;

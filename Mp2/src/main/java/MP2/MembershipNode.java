@@ -1,5 +1,8 @@
 import java.time.*;
 
+/**
+ * Class for nodes in the membership list.
+ */
 public class MembershipNode implements Comparable<MembershipNode>
 {
     public String id;
@@ -42,6 +45,9 @@ public class MembershipNode implements Comparable<MembershipNode>
         return sb.toString();
     }
 
+    /**
+     * Status of the node.
+     */
     public enum Status
     {
         RUNNING,

@@ -3,27 +3,14 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 /**
- * This class handles the operations requested by the clients.
- * 
- * @author Nitish Talasu(ntalasu2@illinois.edu)
- */
-
-/**
- * Class handles the client requests.
+ * Class handles the client message requests.
  */
 public class MessageHandler extends Thread
 {
     private String message;
 
-    /**
-     * Logger instance.
-     */
     private GrepLogger logger;
   
-    /**
-     * Constructor for the class MessageHandler
-     * @param socket Socket of the client and server connection.
-     */
     public MessageHandler(String message)  
     { 
         this.message = message;
@@ -62,7 +49,7 @@ public class MessageHandler extends Thread
                 }
                 default:
                 {
-                    logger.LogError("Message type " + msg.type + "is not handled.");
+                    logger.LogError("[MessageHandler] Message type " + msg.type + "is not handled.");
                 }
             }
         }
@@ -72,42 +59,56 @@ public class MessageHandler extends Thread
         }
     }
 
+    /**
+     * Handling the LEAVE message type.
+     * Marks the node status as LEFT.
+     * @param msg Message object.
+     */
     private void memberLeaving(Message msg) 
     {
         if (msg.nodes.size() !=  1)
         {
-            logger.LogWarning("More nodes are being passed in message. So dropping the message.");
+            logger.LogWarning("[MessageHandler] More nodes are being passed in message. So dropping the message.");
             return;
         }
 
         MembershipList.changeNodeStatus(msg.nodes.get(0), MembershipNode.Status.LEFT);
     }
 
+    /**
+     * Handling the HEARTBEAT message type.
+     * Merges the received membershiplist with its own list.
+     * @param msg Message object.
+     */
     private void processHeartBeat(Message msg) 
     {
         if (msg.nodes.size() ==  0)
         {
-            logger.LogWarning("Nodes hearbeat is zero. So dropping the message.");
+            logger.LogWarning("[MessageHandler] Nodes hearbeat is zero. So dropping the message.");
             return;
         }
 
         MembershipList.updateNodeStatus(msg.nodes);
     }
 
+    /**
+     * Handling the JOIN message type.
+     * Adds the node to the membershiplist and sends the entire membershiplist to the sender.
+     * @param msg Message object.
+     */
     private void newMemberJoined(Message msg) 
     {
         byte[] buffer = new byte[1024];
-        // CheckIfThisNodeIsIntroducer();
         if (msg.nodes.size() !=  1)
         {
-            logger.LogWarning("More nodes are being passed in message. So dropping the message.");
+            logger.LogWarning("[MessageHandler] More nodes are being passed in message. So dropping the message.");
             return;
         }
 
         Message.Node selfNode = MembershipList.getSelfNode();
         if(selfNode.id.equals(msg.nodes.get(0).id))
         {
-            logger.LogInfo("Same host getting join msg. So dropping it");
+            logger.LogInfo("[MessageHandler] Same host getting join msg. So dropping it");
             return;
         }
         MembershipList.addNode(msg.nodes.get(0));
@@ -117,7 +118,6 @@ public class MessageHandler extends Thread
             Message ack = new Message(MessageType.HEARTBEAT, MembershipList.getMsgNodes());
                     
             buffer = Message.toJson(ack).getBytes(); 
-
             String address = MembershipList.getIpAddress(ack.nodes.get(0).id);
             InetAddress neighborAddress = InetAddress.getByName(address);
             DatagramSocket hb = new DatagramSocket();
@@ -128,7 +128,7 @@ public class MessageHandler extends Thread
         }
         catch(Exception e)
         {
-            logger.LogException("Failed in sending ack. ", e);
+            logger.LogException("[MessageHandler] Failed in sending ack for join message. ", e);
         }
         
     }
