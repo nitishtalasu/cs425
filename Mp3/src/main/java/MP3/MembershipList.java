@@ -90,6 +90,23 @@ public class MembershipList
     }
 
     /**
+     * Gets the self node details.
+     * @return Self node deatils.
+     */
+    public static synchronized MembershipNode getSelfNodeDetails()
+    {
+        for (MembershipNode node : nodes) 
+        {
+            if (node.id.compareToIgnoreCase(id) == 0)
+            {
+                return node;
+            }
+        }
+        
+        return null;
+    }
+
+    /**
      * Adds the node to the membershiplist.
      * @param node Node details to be added.
      */
@@ -407,7 +424,7 @@ public class MembershipList
         return leaderIpAddress;
     }
 
-    public static synchronized String setLeaderIpAddress(String ipAddress)
+    public static synchronized void setLeaderIpAddress(String ipAddress)
     {
         leaderIpAddress = ipAddress;
     }
@@ -416,4 +433,42 @@ public class MembershipList
     {
         return nodes.get(0).ipAddress;
     }
+
+    public static synchronized List<String> getHigherNodesIpAdress()
+    {
+        String ownIpAddress = getIpAddress(id);
+        List<String> higherNodesIpAddress = new ArrayList<String>();
+        for(MembershipNode node : nodes)
+        {
+            if(node.ipAddress.equalsIgnoreCase(ownIpAddress))
+            {
+                break;
+            }
+            higherNodesIpAddress.add(node.ipAddress);
+        }
+
+        return higherNodesIpAddress;
+    }
+
+    public static boolean IsAddressHigher(String clientIpAddress) 
+    {
+        boolean isHigher = false;
+        String ownIpAdderss = getIpAddress(id);
+        for (MembershipNode membershipNode : nodes) 
+        {
+            if(membershipNode.ipAddress.equals(clientIpAddress))
+            {
+                isHigher = true;
+                break;
+            }
+            
+            if(membershipNode.ipAddress.equals(ownIpAdderss))
+            {
+                isHigher = false;
+                break;
+            }
+        }
+
+		return isHigher;
+	}
 }

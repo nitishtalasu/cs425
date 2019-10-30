@@ -5,5 +5,8 @@ public enum MessageType
 {
     JOIN,
     HEARTBEAT,
-    LEAVE
+    LEAVE,
+    ElECTION,
+    VICTORY,
+    COORDINATION
 }

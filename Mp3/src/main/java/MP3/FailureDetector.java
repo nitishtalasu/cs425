@@ -50,7 +50,8 @@ public class FailureDetector extends Thread {
                             //      ChronoUnit.MILLIS.between(start, LocalDateTime.now()));                                                     
                         }
         
-                        if(duration >= FailureDuration.EXIT.getValue()) {
+                        if(duration >= FailureDuration.EXIT.getValue()) 
+                        {
                             logger.LogInfo("[FailureDetector] Deleting node" + mNode);
                             nodesToBeDeteled.add(mNode);
                         }
@@ -65,8 +66,10 @@ public class FailureDetector extends Thread {
                         {
                             logger.LogInfo("[FailureDetector] Failure detector detected leader as failed. " +
                                 "So start leader election.");
+                            MembershipList.setLeaderIpAddress("");
                             isLeaderDeleted = true;
                         }
+                        Leader.ReReplicateDeletedNodeFiles();
                     }
 
                     logger.LogInfo("[FailureDetector] Failure detector triggered leader election.");
