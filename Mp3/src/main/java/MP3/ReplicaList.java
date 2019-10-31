@@ -93,5 +93,6 @@ public class ReplicaList
             replicaMachines.add(var);
             quorum--;
         }
+        return replicaMachines;
     }
 }

@@ -71,32 +71,29 @@ class ClientModule extends Thread
                             if(addresses == null)
                                 logger.LogInfo("[Client: Get] No replicas found");
 
-                            
                             TcpClientModule.getFiles(sdfsFileName, localFileName, addresses);
-                            /*  open socket
-                                write file contents to each 'addresses'
-                                close socket
-                            */
 
                         }
                         else if(command[0].equalsIgnoreCase("put"))
                         {   
                             sdfsFileName = command[2];
                             localFileName = command[1];
+                            // call Leader and get addresses
                             addresses = ReplicaList.getReplicas(sdfsFileName);
                             if(addresses == null)
                                 logger.LogInfo("[Client: Put] No replicas found");
 
                             TcpClientModule.putFiles(sdfsFileName, localFileName, addresses);
-                            // connect to each of the VMs and write files to replica VMs
+                           
                         }
                         else if(command[0].equalsIgnoreCase("delete"))
                         {   
                             sdfsFileName = command[1];
+                            // call Leader and get addresses
                             addresses = ReplicaList.getReplicas(sdfsFileName);
                             if(addresses == null)
                                 logger.LogInfo("[Client: Delete] No replicas found");
-                            // connect to each of the VMs and delete files 
+                           
                             TcpClientModule.deleteFiles(sdfsFileName, addresses);
                         }
                         else if(command[0].equalsIgnoreCase("ls"))

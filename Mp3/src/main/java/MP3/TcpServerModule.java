@@ -3,7 +3,8 @@ import java.lang.reflect.Constructor;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class TcpServerModule {
+public class TcpServerModule 
+{
     /**
      * Singleton object of TcpServerModule type class.
      */
@@ -73,10 +74,12 @@ public class TcpServerModule {
 
         int noOfClientsServed = 0;
 
-        try {
+        try 
+        {
 
-            while (true) {
-                logger.LogInfo("[Server] No of clients serverd so far: " + noOfClientsServed
+            while (true) 
+            {
+                logger.LogInfo("[TcpServer] No of clients serverd so far: " + noOfClientsServed
                         + ". Waiting for more connections.");
 
                 // Server waiting for the client connection.
@@ -84,14 +87,14 @@ public class TcpServerModule {
                 noOfClientsServed += 1;
 
                 // Creates a client handler to perform the client requested operations.
-                Thread clientRequestHandler = new TcpMessagesRequestHandler(client);
+                Thread tcpMessageRequestHandler = new TcpMessagesRequestHandler(client);
 
-                clientRequestHandler.start();
+                tcpMessageRequestHandler.start();
             }
         } 
         catch (Exception e) 
         {
-            logger.LogException("[Server] Server running operation occurred error.", e);
+            logger.LogException("[TcpServer] Server running operation occurred error.", e);
         } 
         finally 
         {
@@ -110,17 +113,17 @@ public class TcpServerModule {
         try 
         {
             this.server = new ServerSocket(this.port);
-            logger.LogInfo("[Server] Server started at Socket : " + this.server.getInetAddress() + " Port : "
+            logger.LogInfo("[TcpServer] Server started at Socket : " + this.server.getInetAddress() + " Port : "
                     + this.server.getLocalPort());
         } 
         catch (IOException e) 
         {
-            logger.LogException("[Server] Server socket creation failed.", e);
+            logger.LogException("[TcpServer] Server socket creation failed.", e);
             throw e;
         }
         catch (IllegalArgumentException e) 
         {
-            logger.LogException("[Server] The port is outside the specified range of valid port "
+            logger.LogException("[TcpServer] The port is outside the specified range of valid port "
                     + "   values.Exception stack trace:", e);
             throw e;
         }
@@ -144,7 +147,7 @@ public class TcpServerModule {
         }
         catch (IOException e) 
         {
-            logger.LogException("[Server] Server socket creation failed with exception:", e);
+            logger.LogException("[TcpServer] Server socket creation failed with exception:", e);
         }
     }
 }

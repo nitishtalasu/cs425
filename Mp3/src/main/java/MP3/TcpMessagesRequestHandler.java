@@ -35,6 +35,12 @@ public class TcpMessagesRequestHandler extends Thread
      * Logger instance.
      */
     private GrepLogger logger;
+
+    private FileWriter localWriteFile = null;
+
+    private FileReader localReadFile = null;
+
+    private int writeCount = 0;
   
     /**
      * Constructor for the class TcpMessagesRequestHandler
@@ -54,44 +60,209 @@ public class TcpMessagesRequestHandler extends Thread
     @Override
     public void run()  
     { 
-        logger.LogInfo("[Server] Server started serving client: " + this.socket); 
+        logger.LogInfo("[TcpMessageHandler] Server started serving client: " + this.socket); 
         
         while (true)  
         {
             try 
             {
-                // Clients sending the log file name.
-                String vmLogFileName = this.socketInputStream.readUTF();
+                // Reading message type.
+                String msgType = this.socketInputStream.readUTF();
                 
                 // Creating the process with given client command.
-                logger.LogInfo("[Server] Server executing the process with command: "); 
+                logger.LogInfo("[TcpMessageHandler] Server received message type: " + msgType);
                 
-                // Reads from buffer and sends back to the client in socket output stream.
-                String outputLine;
-                int matchedLinescount = 0;
-                while ((outputLine = processOutputReader.readLine()) != null)
+                if (msgType.equals(MessageType.PUT))
                 {
-                    this.socketOutputStream.writeUTF(vmLogFileName + " " + outputLine);
-                    matchedLinescount++;
+                    if(writeCount >= 1)
+                    {
+                        this.socketOutputStream.writeUTF("Another write in process. Continue?");
+                        // ask user if they want to overwrite
+                        String choice = this.socketInputStream.readUTF();
+                        if (choice.equals("no"))
+                        {
+                            // send negative reply to TcpClientModule
+                            continue;
+                        }
+                    }
+                    writeCount++;
                 }
+                
+                String reply = ProcessMessage(msgType);
 
-                // Writing the matched lines count to the stream.
-                this.socketOutputStream.writeUTF(vmLogFileName + " " + matchedLinescount);            
-                logger.LogInfo("[Server] Client request has been served.");
+                // Writing the reply to the stream.
+                logger.LogInfo("[TcpMessageHandler] Server sending reply: " + reply);
+                this.socketOutputStream.writeUTF(reply);            
+                logger.LogInfo("[TcpMessageHandler] Client request has been served.");
             } 
             catch (Exception ex) 
             {
-                logger.LogException("[Server] Client requested operation failed with:", ex);
+                logger.LogException("[TcpMessageHandler] Client requested operation failed with:", ex);
             }
 
             break;
         }
         
-        logger.LogInfo("[Server] Closing connection"); 
+        logger.LogInfo("[TcpMessageHandler] Closing connection"); 
         this.closeSocket();
     } 
 
-	/**
+    private String ProcessMessage(String msgType) 
+    {
+        String reply = "";
+        MessageType msgTypeEnum = Enum.valueOf(MessageType.class, msgType);
+        switch (msgTypeEnum) 
+        {
+            case ELECTION:
+                reply = ElectionMessage();
+                break;
+            
+            case VICTORY:
+                reply = VictoryMessage();
+                break;
+
+            case COORDINATION:
+                reply = CoordinationMessage();
+                break;
+            
+            case GET:
+                reply = GetFiles();
+                break;
+
+            case PUT:
+                reply = PutFiles();
+                break;
+
+            case DELETE:
+                reply = DeleteFile();
+                break;
+
+            default:
+                logger.LogWarning("[TcpMessageHandler] Either failed to resolve message type. Or" +
+                    "Forgot to add msgType: " + msgType);
+                break;
+        }
+
+        return reply;
+    }
+
+    private String ElectionMessage() 
+    {
+        String reply = "";
+        String clientIpAddress = this.socket.getInetAddress().getHostAddress();
+        boolean isClientAddressHigher = MembershipList.IsAddressHigher(clientIpAddress);
+        if(isClientAddressHigher)
+        {
+            reply = "NACK";
+        }
+        else
+        {
+            reply = "OK";
+            logger.LogInfo("[TcpMessageHandler] Received election message from lower Id. So starting election");
+            LeaderElection leaderElection = new LeaderElection();
+            leaderElection.start();
+        }
+
+        return reply;
+    }
+    
+    private String VictoryMessage() 
+    {
+        String reply = "";
+        String clientIpAddress = this.socket.getInetAddress().getHostAddress();
+        MembershipList.setLeaderIpAddress(clientIpAddress);
+        logger.LogInfo("[TcpMessageHandler] Newly elected leader: " + MembershipList.getLeaderIpAddress());
+
+        return reply;
+    }
+
+    private String CoordinationMessage() 
+    {
+        String reply = "";
+        //reply = ReplicaList.getAllFiles().toJson().toString();
+
+        return reply;
+    }    
+
+    private String GetFiles()
+    {
+        String reply = "OK";
+        try 
+        {
+            String sdfsFileName = this.socketInputStream.readUTF();
+
+            localReadFile = new FileReader(sdfsFileName);
+
+            //variable to check end of file
+            BufferedReader br = new BufferedReader(localReadFile);
+            // read line by line
+            String line;
+            while ((line = br.readLine()) != null) {
+                this.socketOutputStream.writeUTF(line);
+            }  
+        }
+        catch(IOException e)
+        {
+            logger.LogException("[TCPMessageRequestHandler] Unable to get file data.", e); 
+        }
+        return reply;
+    }
+
+    private String PutFiles()
+    {
+        String reply = "OK";
+        try
+        {
+            String sdfsFileName = this.socketInputStream.readUTF();
+            localWriteFile = new FileWriter(sdfsFileName);
+            boolean eof = false;
+                while (!eof) 
+                {
+                    try 
+                    {
+                        //read data sent by server, line-by-line, and write to file
+                        String lineOutputs = this.socketInputStream.readUTF();
+                        localWriteFile.write(lineOutputs);
+                        localWriteFile.write(System.getProperty("line.separator"));
+                    } 
+                    catch (EOFException e) 
+                    {
+                        eof = true;
+                        logger.LogInfo("Completed writing logs to file: "+sdfsFileName);
+                    }
+                }
+        }
+        catch(IOException e) 
+        {
+            logger.LogException("[TCPMessageRequestHandler] Unable to put file data.", e); 
+        }
+        return reply;
+    }
+
+    private String DeleteFile()
+    {
+        String reply = "OK";
+        try
+        {
+            String sdfsFileName = this.socketInputStream.readUTF();
+            File file = new File(sdfsFileName);
+            if(file.delete()) 
+            { 
+                logger.LogInfo("[TCPMessageRequestHandler] File deleted successfully"); 
+            } 
+            else
+            { 
+                System.out.println("[TCPMessageRequestHandler] Failed to delete the file"); 
+            } 
+        }
+        catch(IOException e) 
+        {
+            logger.LogException("[TCPMessageRequestHandler] Exception while deleting file", e); 
+        }
+        return reply;
+    }
+
+    /**
      * Initializes the input and output streams.
      */
     private void initializeStreams()
@@ -103,7 +274,7 @@ public class TcpMessagesRequestHandler extends Thread
         } 
         catch (IOException e)
         {
-            logger.LogException("[Server] Stream initializations failed:", e);
+            logger.LogException("[TcpMessageHandler] Stream initializations failed:", e);
         }
     }
 
@@ -120,7 +291,7 @@ public class TcpMessagesRequestHandler extends Thread
         }
         catch(IOException e)
         { 
-            logger.LogException("[Server] Failed in closing resources with message:", e); 
+            logger.LogException("[TcpMessageHandler] Failed in closing resources with message:", e); 
         } 
 	}
 }
