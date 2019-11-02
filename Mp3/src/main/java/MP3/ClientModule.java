@@ -58,19 +58,27 @@ class ClientModule extends Thread
         {   
             System.out.println("Waiting for user input..");
             while(true) {
+                // String str = "";
                 try
                 {
+                    String command[] = null;
+                    
                     str = sc.nextLine();
+                    // logger.LogInfo("printing");
+                    // logger.LogInfo(str);
+                    // logger.LogInfo(command[0]);
                     // logger.LogInfo(str);
                     if(str != null) {
-                        String command[];
+                        // String command[];
                         String sdfsFileName;
                         String localFileName;
                         List<String> addresses;
                         Message msg = null;
                         Message.Node node = MembershipList.getSelfNode();
+                        // MembershipList.printMembershipList();
                         List<Message.Node> nodeList = new ArrayList<Message.Node>();
                         nodeList.add(node);
+                        // logger.LogInfo(nodeList.toString());
                         command = str.split(" ");
                         logger.LogInfo(command[0]); 
                         if(command[0].equalsIgnoreCase("get"))
@@ -125,28 +133,31 @@ class ClientModule extends Thread
                                 logger.LogInfo(filename);
                             }
                         }
-                        if (str.equalsIgnoreCase("Join")) 
+                        else if (str.equalsIgnoreCase("Join")) 
                         {
+                            logger.LogInfo("1");
                             MembershipList.changeNodeStatus(node, MembershipNode.Status.RUNNING);
+                            logger.LogInfo("2");
                             msg = new Message(MessageType.JOIN, nodeList);
+                            logger.LogInfo("3");
                         }
-                        else if(str.equalsIgnoreCase("Leave")) 
+                        else if(command[0].equalsIgnoreCase("Leave")) 
                         {
                             MembershipList.changeNodeStatus(node, MembershipNode.Status.LEFT);
                             msg = new Message(MessageType.LEAVE, nodeList);                           
                         }
-                        else if(str.equalsIgnoreCase("PrintList")) 
+                        else if(command[0].equalsIgnoreCase("PrintList")) 
                         {
                             MembershipList.printMembershipList();
                             continue;
                         }
-                        else if(str.equalsIgnoreCase("PrintId"))
+                        else if(command[0].equalsIgnoreCase("PrintId"))
                         {
                             Message.Node selfNode = MembershipList.getSelfNode();
                             logger.LogInfo("[ClientInput] Self Id: " + selfNode);
                             continue;
                         }
-                        else if(str.equalsIgnoreCase("PrintNeighbors"))
+                        else if(command[0].equalsIgnoreCase("PrintNeighbors"))
                         {
                             List<MembershipNode> neighbors = MembershipList.getNeighbors();
                             for (MembershipNode neighbor : neighbors) 
@@ -155,7 +166,7 @@ class ClientModule extends Thread
                             }
                             continue;
                         }
-                        else if(str.equalsIgnoreCase("exit")) {
+                        else if(command[0].equalsIgnoreCase("exit")) {
                             System.exit(0);
                         }
                         else {

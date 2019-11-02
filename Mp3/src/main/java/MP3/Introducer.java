@@ -4,7 +4,7 @@
 public enum Introducer
 {
 
-    IPADDRESS("ipaddress", "127.0.0.1"),
+    IPADDRESS("ipaddress", "192.168.0.3"),
     PORT("port", "5500");
 
     private final String key;

@@ -21,10 +21,11 @@
             Thread server = ServerModule.getInstance(serverPort);
             server.start();
             MembershipList.initializeMembershipList();
+            ReplicaList.initializeReplicaList();
 
-            // logger.LogInfo("[Main] Starting the heartbeat handler");
-            // Thread hbThread = new HeartBeatThread();
-            // hbThread.start();
+            logger.LogInfo("[Main] Starting the heartbeat handler");
+            Thread hbThread = new HeartBeatThread();
+            hbThread.start();
 
             logger.LogInfo("[Main] Starting the failure detector");
             Thread failureThread = new FailureDetector();

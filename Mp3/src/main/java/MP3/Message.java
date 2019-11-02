@@ -23,7 +23,7 @@ public class Message
     {
         type = messageType;
         nodes = membershipNodes;
-        leaderIpAddress = MembershipList.getLeaderIpAddress();
+        // leaderIpAddress = MembershipList.getLeaderIpAddress();
     }
     
     /**
