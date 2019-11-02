@@ -38,10 +38,9 @@ public class TcpServerModule
      * @param portNumber Port on which server is listening.
      * @param handler    Handler that the server would be using to serve the clients.
      */
-    private TcpServerModule(int portNumber, Class<?> handler) 
+    private TcpServerModule(int portNumber) 
     {
         this.port = portNumber;
-        requestHandler = handler;
         logger = GrepLogger.getInstance();
     }
 
@@ -52,11 +51,11 @@ public class TcpServerModule
      * @param typeOfHandler Handler that the server would be using to serve the clients.
      * @return TcpServerModule class object.
      */
-    public static TcpServerModule getInstance(int portNumber, Class<?> typeOfhandler) 
+    public static TcpServerModule getInstance(int portNumber) 
     {
         if (handler == null) 
         {
-            handler = new TcpServerModule(portNumber, typeOfhandler);
+            handler = new TcpServerModule(portNumber);
         }
 
         return handler;

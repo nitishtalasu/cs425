@@ -115,6 +115,7 @@ public class ReplicaList
     public static synchronized void replicationCompleted(String fileName)
     {
         for (ReplicaFile replicaFile : files) 
+
         {
             if (replicaFile.FileName.equals(fileName))
             {
@@ -136,4 +137,111 @@ public class ReplicaList
 
         return replicaIpAddress;
     }
+
+
+    public static void reReplicateDeletedNodeFiles(String ipAddress) 
+    {
+        List<String> fileNames = new ArrayList<String>();
+        for (ReplicaNode node : nodes) 
+        {
+            if (node.ipAddress.equals(ipAddress))
+            {
+                fileNames = node.sdfsFileNames;
+                nodes.remove(node);
+                break;
+            }
+        }
+
+        List<ReplicaFile> filesToBeReplicated = new ArrayList<ReplicaFile>();
+        for (ReplicaFile replicaFile : files) 
+        {
+            for (String file : fileNames) 
+            {
+                if (file.equals(replicaFile.FileName))
+                {
+                    replicaFile.ReplicaIpAddress.remove(ipAddress);
+                    filesToBeReplicated.add(replicaFile);
+                }
+            }
+        }
+
+        for (ReplicaFile replicaFile : filesToBeReplicated) 
+        {
+            int countOfCurrentReplicas = getReplicaIpAddress(replicaFile.FileName).size();
+            List<ReplicaNode> possibleNewReplicaIpAddress = getReplicaMachines();
+            for(int i = countOfCurrentReplicas; i <= 4; i++)
+            {
+                if (replicaFile.ReplicaIpAddress.isEmpty())
+                {
+                    logger.LogError("[ReplicaList] There is no active replicas for this fileName" +
+                        replicaFile.FileName);
+                }
+
+                if(replicateFile(
+                    replicaFile.ReplicaIpAddress.get(0), 
+                    possibleNewReplicaIpAddress.get(i - countOfCurrentReplicas).ipAddress, 
+                    replicaFile.FileName))
+                {
+                    logger.LogInfo("[ReplicaList] Replicated file " + replicaFile.FileName + " to " +
+                        possibleNewReplicaIpAddress.get(i - countOfCurrentReplicas).ipAddress);
+                }
+                else
+                {
+                    logger.LogInfo("[ReplicaList] Failed to replicate file " + replicaFile.FileName + " to " +
+                        possibleNewReplicaIpAddress.get(i - countOfCurrentReplicas).ipAddress);
+                }
+            }
+        }
+	}
+
+    private static boolean replicateFile(String currentReplica, String newReplicaIpAddress, String file) 
+    {
+        TcpClientModule client = new TcpClientModule();
+        return client.reReplicateFiles(currentReplica, file, newReplicaIpAddress);
+    }
+
+
+    public static void addReplicaNode(String ipAddress, List<String> fileNames) 
+    {
+        ReplicaNode newNode = new ReplicaNode(ipAddress, ipAddress, fileNames);
+        for (ReplicaNode node : nodes) 
+        {
+            if (node.ipAddress.equals(newNode.ipAddress))
+            {
+                logger.LogInfo("[ReplicaList] Deleting existing node of having IpAddress " +
+                    node.ipAddress);
+                nodes.remove(node);
+                break;
+            }
+        }
+
+        logger.LogInfo("[ReplicaList] Adding new node of having IpAddress " +
+                    newNode.ipAddress);
+        for (String file : fileNames) 
+        {
+            logger.LogInfo("[ReplicaList] Adding files to the node " + file);
+        }
+        nodes.add(newNode);
+
+        for (String fileName : fileNames) 
+        {
+            boolean fileExists = false;
+            for (ReplicaFile file : files) 
+            {
+                if (file.FileName.equals(fileName))
+                {
+                    file.ReplicaIpAddress.add(ipAddress);
+                    fileExists = true;
+                }
+            }
+
+            if (!fileExists)
+            {
+                List<String> replicaIpAddress = new ArrayList<String>();
+                replicaIpAddress.add(ipAddress);
+                ReplicaFile newFile = new ReplicaFile(fileName, replicaIpAddress);
+                files.add(newFile);
+            }
+        }
+	}
 }

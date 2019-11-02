@@ -27,7 +27,7 @@ public class TcpClientModule
      * constructor of ClientThread type class.
      * 
      */
-    public TcpClientModule() throws Exception  
+    public TcpClientModule()
     { 
         // this.socket = socket; 
         // this.vmId = vmId;
@@ -122,7 +122,11 @@ public class TcpClientModule
                 if(reply.equals("OK"))
                 {
                     logger.LogInfo("[TCPClient] File sent."); 
-                }   
+                }
+                else
+                {
+                    logger.LogError("[TCPClient] File not sent."); 
+                }
             } 
             catch(IOException i) 
             { 
@@ -133,6 +137,41 @@ public class TcpClientModule
             this.closeSocket();
         }
     }
+
+    public boolean reReplicateFiles(String currentReplicaAddress, String sdfsFileName, String ipAddressToReplicate)
+    {   
+        this.initializeStreams(currentReplicaAddress);
+        try
+        { 
+            // sends VM log ID and user input to server
+            logger.LogInfo("[TCPClient] Connected to "+ currentReplicaAddress + ".");
+            
+            this.outputStream.writeUTF(MessageType.REREPLICATE.toString());
+            this.outputStream.writeUTF(sdfsFileName);
+            this.outputStream.writeUTF(ipAddressToReplicate);
+            String reply = this.inputStream.readUTF();
+            if(reply.equals("OK"))
+            {
+                logger.LogInfo("[TCPClient] Replica node accepted the request to replicate file " + 
+                    sdfsFileName + " to " + ipAddressToReplicate);
+                return true;
+            }
+            else
+            {
+                logger.LogError("[TCPClient] Replica node rejected the request to replicate file " + 
+                    sdfsFileName + " to " + ipAddressToReplicate);
+            }
+        } 
+        catch(IOException i) 
+        { 
+            logger.LogException("[TCPClient] Unable to put file data.", i);
+            return false;
+        } 
+
+        this.closeSocket();
+        return false;
+    }
+
     public void deleteFiles(String sdfsFileName, List<String> addresses)
     {   
 

@@ -12,5 +12,6 @@ public enum MessageType
     GET,
     PUT,
     DELETE,
-    LIST
+    LIST,
+    REREPLICATE
 }

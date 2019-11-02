@@ -1,15 +1,18 @@
+
 /**
  * This class handles the operations requested by the clients.
  * 
  * @author Nitish Talasu(ntalasu2@illinois.edu)
  */
 
-import java.io.*; 
+import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.google.gson.Gson;
 
 /**
  * Class handles the client requests.
@@ -71,9 +74,6 @@ public class TcpMessagesRequestHandler extends Thread
                 
                 // Creating the process with given client command.
                 logger.LogInfo("[TcpMessageHandler] Server received message type: " + msgType);
-<<<<<<< HEAD
-
-=======
                 
                 if (msgType.equals(MessageType.PUT))
                 {
@@ -91,7 +91,6 @@ public class TcpMessagesRequestHandler extends Thread
                     writeCount++;
                 }
                 
->>>>>>> 7a25a983eda9d0d95fdad7f1816e3b2491ee761d
                 String reply = ProcessMessage(msgType);
 
                 // Writing the reply to the stream.
@@ -142,6 +141,10 @@ public class TcpMessagesRequestHandler extends Thread
                 reply = DeleteFile();
                 break;
 
+            case REREPLICATE:
+                reply = ReReplicateFile();
+                break;
+
             default:
                 logger.LogWarning("[TcpMessageHandler] Either failed to resolve message type. Or" +
                     "Forgot to add msgType: " + msgType);
@@ -183,8 +186,10 @@ public class TcpMessagesRequestHandler extends Thread
 
     private String CoordinationMessage() 
     {
-        String reply = "";
-        //reply = ReplicaList.getAllFiles().toJson().toString();
+        String reply;
+        List<String> files = ReplicaList.getLocalReplicas();
+        reply = new Gson().toJson(files);
+        //this.socketOutputStream.writeUTF(json);
 
         return reply;
     }    
@@ -264,6 +269,20 @@ public class TcpMessagesRequestHandler extends Thread
         {
             logger.LogException("[TCPMessageRequestHandler] Exception while deleting file", e); 
         }
+        return reply;
+    }
+
+    private String ReReplicateFile()
+    {
+        String reply = "OK";
+
+        String sdfsFileName = this.socketInputStream.readUTF();
+        String ipAddressToReplicate = this.socketInputStream.readUTF();
+        List<String> ipAddresses = new ArrayList<String>();
+        ipAddresses.add(ipAddressToReplicate);
+        TcpClientModule client = new TcpClientModule();
+        client.putFiles(sdfsFileName, sdfsFileName, ipAddresses);
+        
         return reply;
     }
 

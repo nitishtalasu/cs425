@@ -56,7 +56,7 @@ class ClientModule extends Thread
                         String command[];
                         String sdfsFileName;
                         String localFileName;
-                        List<ReplicaNode> addresses;
+                        List<String> addresses;
                         Message msg = null;
                         Message.Node node = MembershipList.getSelfNode();
                         List<Message.Node> nodeList = new ArrayList<Message.Node>();
@@ -67,11 +67,12 @@ class ClientModule extends Thread
                             sdfsFileName = command[1];
                             localFileName = command[2];
                             // call Leader and get addresses
-                            addresses = ReplicaList.getReplicas(sdfsFileName);
+                            addresses = ReplicaList.getReplicaIpAddress(sdfsFileName);
                             if(addresses == null)
                                 logger.LogInfo("[Client: Get] No replicas found");
 
-                            TcpClientModule.getFiles(sdfsFileName, localFileName, addresses);
+                            TcpClientModule client = new TcpClientModule();
+                            client.getFiles(sdfsFileName, localFileName, addresses);
 
                         }
                         else if(command[0].equalsIgnoreCase("put"))
@@ -79,7 +80,7 @@ class ClientModule extends Thread
                             sdfsFileName = command[2];
                             localFileName = command[1];
                             // call Leader and get addresses
-                            addresses = ReplicaList.getReplicas(sdfsFileName);
+                            addresses = ReplicaList.getReplicaIpAddress(sdfsFileName);
                             if(addresses == null)
                                 logger.LogInfo("[Client: Put] No replicas found");
 
@@ -90,7 +91,7 @@ class ClientModule extends Thread
                         {   
                             sdfsFileName = command[1];
                             // call Leader and get addresses
-                            addresses = ReplicaList.getReplicas(sdfsFileName);
+                            addresses = ReplicaList.getReplicaIpAddress(sdfsFileName);
                             if(addresses == null)
                                 logger.LogInfo("[Client: Delete] No replicas found");
                            
