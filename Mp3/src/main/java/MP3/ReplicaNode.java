@@ -20,6 +20,13 @@ public class ReplicaNode implements Comparable<ReplicaNode>
         this.sdfsFileNames.add(sdfsFileName);
     }
 
+    public ReplicaNode(String id, String ipAddress, List<String> sdfsFileNames)
+    {
+        this.id = id;
+        this.ipAddress = ipAddress;
+        this.sdfsFileNames = sdfsFileNames;
+    }
+
     @Override
     public int compareTo(ReplicaNode node)
     {

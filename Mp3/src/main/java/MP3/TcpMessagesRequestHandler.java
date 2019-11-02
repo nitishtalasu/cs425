@@ -276,12 +276,20 @@ public class TcpMessagesRequestHandler extends Thread
     {
         String reply = "OK";
 
-        String sdfsFileName = this.socketInputStream.readUTF();
-        String ipAddressToReplicate = this.socketInputStream.readUTF();
-        List<String> ipAddresses = new ArrayList<String>();
-        ipAddresses.add(ipAddressToReplicate);
-        TcpClientModule client = new TcpClientModule();
-        client.putFiles(sdfsFileName, sdfsFileName, ipAddresses);
+        try
+        {
+            String sdfsFileName = this.socketInputStream.readUTF();
+            String ipAddressToReplicate = this.socketInputStream.readUTF();
+            List<String> ipAddresses = new ArrayList<String>();
+            ipAddresses.add(ipAddressToReplicate);
+            TcpClientModule client = new TcpClientModule();
+            client.putFiles(sdfsFileName, sdfsFileName, ipAddresses);
+        }
+        catch(Exception e)
+        {
+            logger.LogException("[TcpMessageRequestHandler] Failed with ", e);
+        }
+        
         
         return reply;
     }
