@@ -23,17 +23,27 @@ public class ReplicaList
 
     private static GrepLogger logger = GrepLogger.getInstance();
 
-    public ReplicaList() {
-        // try
-        // {
+    private ReplicaList() 
+    {
+        try
+        {
+            id = InetAddress.getLocalHost().getHostAddress();
             nodes = new ArrayList<ReplicaNode>();
             files = new ArrayList<ReplicaFile>();
+            addSelfNode(id);
+        } 
+        catch (UnknownHostException e) 
+        {
+            logger.LogException("[MemnershipList] Failed to create the membership list object. ", e);
+        }
+    }
 
-        // } 
-        // catch (UnknownHostException e) 
-        // {
-        //     logger.LogException("[MemnershipList] Failed to create the membership list object. ", e);
-        // }
+    public static synchronized void initializeReplicaList() 
+    {
+        if (replicaList == null) 
+        {
+            replicaList = new ReplicaList();
+        }
     }
 
     public static synchronized List<ReplicaNode> getReplicas(String sdfsFileName) 
@@ -273,5 +283,25 @@ public class ReplicaList
                 files.add(newFile);
             }
         }
+	}
+
+    public static void addNewFile(String sdfsFileName) 
+    {
+        for (ReplicaNode node : nodes) 
+        {
+            if (node.id.equals(node.ipAddress))
+            {
+                logger.LogInfo("[ReplicaList] Adding file to the list " + sdfsFileName);
+                node.sdfsFileNames.add(sdfsFileName);
+            }          
+        }
+	}
+
+    public static void addSelfNode(String ipAddress) 
+    {
+        logger.LogInfo("[ReplicaList] Initilizing self replicaNode");
+
+        ReplicaNode selfNode = new ReplicaNode(ipAddress);
+        nodes.add(selfNode);
 	}
 }

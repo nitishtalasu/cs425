@@ -150,6 +150,10 @@ public class TcpMessagesRequestHandler extends Thread
                 reply = ReplicaList();
                 break;
 
+            case REPLICALIST:
+                reply = GetReplicaList();
+                break;
+
             case PUT_SUCCESS:
                 reply = PutFilesSuccess();
                 break;
@@ -247,9 +251,12 @@ public class TcpMessagesRequestHandler extends Thread
                     catch (EOFException e) 
                     {
                         eof = true;
+                        reply = "NACK";
                         logger.LogInfo("Completed writing logs to file: "+sdfsFileName);
                     }
                 }
+
+            ReplicaList.addNewFile(sdfsFileName);
         }
         catch(IOException e) 
         {
@@ -316,6 +323,24 @@ public class TcpMessagesRequestHandler extends Thread
         catch(IOException e) 
         {
             logger.LogException("[TCPMessageRequestHandler] Exception while deleting file", e); 
+        }
+        return reply;
+    }
+
+    private String GetReplicaList()
+    {
+        String reply = "OK";
+        try
+        {
+           String sdfsFileName = this.socketInputStream.readUTF();
+           List<String> addresses = ReplicaList.getReplicaIpAddress(sdfsFileName);
+           String json = this.toJson(addresses);
+           this.socketOutputStream.writeUTF(json);
+        }
+        catch(IOException e) 
+        {
+            logger.LogException("[TCPMessageRequestHandler] Exception while deleting file", e); 
+            reply = "NACK";
         }
         return reply;
     }

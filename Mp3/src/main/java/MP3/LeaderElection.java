@@ -67,7 +67,6 @@ class LeaderElection extends Thread
 
         MembershipList.setLeaderIpAddress(MembershipList.getSelfNodeDetails().ipAddress);
         logger.LogInfo("HELO");
-        new ReplicaList();
         SendCoordinationMessage();
     }
 

@@ -13,6 +13,13 @@ public class ReplicaNode implements Comparable<ReplicaNode>
 
     public List<String> sdfsFileNames = new ArrayList<String>();
 
+    public ReplicaNode(String ipAddress)
+    {
+        this.id = ipAddress;
+        this.ipAddress = ipAddress;
+    }
+
+
     public ReplicaNode(String id, String ipAddress, String sdfsFileName)
     {
         this.id = id;

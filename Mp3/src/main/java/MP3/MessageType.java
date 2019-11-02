@@ -13,6 +13,7 @@ public enum MessageType
     PUT,
     DELETE,
     LIST,
+    REPLICALIST,
     REREPLICATE,
     PUT_SUCCESS
 }

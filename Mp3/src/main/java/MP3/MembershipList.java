@@ -23,7 +23,8 @@ public class MembershipList
 
     private static GrepLogger logger = GrepLogger.getInstance();
 
-    private MembershipList() {
+    private MembershipList() 
+    {
         try
         {
             id = InetAddress.getLocalHost().getHostAddress()+ "_" + LocalDateTime.now();
@@ -34,6 +35,7 @@ public class MembershipList
             changeNodeStatus(node, MembershipNode.Status.LEFT);
             if(getIpAddress(id).equals(Introducer.IPADDRESS.getValue()))
                 getLeaderIpAddress();
+            ReplicaList.addSelfNode(getIpAddress(id));
         } 
         catch (UnknownHostException e) 
         {

@@ -301,5 +301,29 @@ public class TcpClientModule
 
         return msg;
     }
+
+    public List<String> getreplicasFromLeader(String sdfsFileName) 
+    {
+		String ip = MembershipList.getLeaderIpAddress();
+        String json = "";
+        this.initializeStreams(ip);
+        try
+        {
+            this.outputStream.writeUTF(MessageType.REPLICALIST.toString());
+            this.outputStream.writeUTF(sdfsFileName);
+            json = this.inputStream.readUTF();
+            String reply = this.inputStream.readUTF();
+            if(reply.equals("OK"))
+            {
+                logger.LogInfo("[TCPClient] Addresses received."); 
+            }  
+        }
+        catch(IOException i) 
+        { 
+            logger.LogException("[TCPClient] Unable to receive file data.", i); 
+        } 
+        this.closeSocket();
+        return getListObject(json);
+	}
 }
 

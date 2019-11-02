@@ -79,7 +79,7 @@ class ClientModule extends Thread
                             localFileName = command[2];
                             // call Leader and get addresses
                             
-                            addresses = this.tcp.getAddressesFromLeader(sdfsFileName);
+                            addresses = this.tcp.getreplicasFromLeader(sdfsFileName);
                             if(addresses == null)
                                 logger.LogInfo("[Client: Get] No replicas found");
                            
