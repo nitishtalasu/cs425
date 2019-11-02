@@ -78,7 +78,8 @@ class ClientModule extends Thread
                             sdfsFileName = command[1];
                             localFileName = command[2];
                             // call Leader and get addresses
-                            addresses = ReplicaList.getReplicaIpAddress(sdfsFileName);
+                            
+                            addresses = this.tcp.getAddressesFromLeader(sdfsFileName);
                             if(addresses == null)
                                 logger.LogInfo("[Client: Get] No replicas found");
                            
@@ -90,23 +91,24 @@ class ClientModule extends Thread
                             sdfsFileName = command[2];
                             localFileName = command[1];
                             // call Leader and get addresses
-
-                            addresses = ReplicaList.addReplicaFiles(sdfsFileName);
+                            addresses = this.tcp.getAddressesFromLeader(sdfsFileName);
                             if(addresses == null)
                                 logger.LogInfo("[Client: Put] No replicas found");
 
                             this.tcp.putFiles(sdfsFileName, localFileName, addresses);
+                            this.tcp.putSuccess(sdfsFileName);
                            
                         }
                         else if(command[0].equalsIgnoreCase("delete"))
                         {   
                             sdfsFileName = command[1];
                             // call Leader and get addresses
-                            addresses = ReplicaList.getReplicaIpAddress(sdfsFileName);
+                            addresses = this.tcp.getAddressesFromLeader(sdfsFileName);
                             if(addresses == null)
                                 logger.LogInfo("[Client: Delete] No replicas found");
                            
                             this.tcp.deleteFiles(sdfsFileName, addresses);
+                            
                         }
                         else if(command[0].equalsIgnoreCase("ls"))
                         {   

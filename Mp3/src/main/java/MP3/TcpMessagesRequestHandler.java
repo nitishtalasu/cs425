@@ -11,8 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 
 /**
  * Class handles the client requests.
@@ -143,6 +144,14 @@ public class TcpMessagesRequestHandler extends Thread
 
             case REREPLICATE:
                 reply = ReReplicateFile();
+                break;
+            
+            case LIST:
+                reply = ReplicaList();
+                break;
+
+            case PUT_SUCCESS:
+                reply = PutFilesSuccess();
                 break;
 
             default:
@@ -294,6 +303,41 @@ public class TcpMessagesRequestHandler extends Thread
         return reply;
     }
 
+    private String ReplicaList()
+    {
+        String reply = "OK";
+        try
+        {
+           String sdfsFileName = this.socketInputStream.readUTF();
+           List<String> addresses = ReplicaList.addReplicaFiles(sdfsFileName);
+           String json = this.toJson(addresses);
+           this.socketOutputStream.writeUTF(json);
+        }
+        catch(IOException e) 
+        {
+            logger.LogException("[TCPMessageRequestHandler] Exception while deleting file", e); 
+        }
+        return reply;
+    }
+
+    private String PutFilesSuccess()
+    {
+        String reply = "OK";
+        try
+        {
+           String sdfsFileName = this.socketInputStream.readUTF();
+        //    List<String> addresses = ReplicaList.getReplicaIpAddress(sdfsFileName);
+        //    String json = this.toJson(addresses);
+           ReplicaList.replicationCompleted(sdfsFileName);
+        }
+        catch(IOException e) 
+        {
+            logger.LogException("[TCPMessageRequestHandler] Exception while deleting file", e); 
+        }
+        return reply;
+    }
+
+
     /**
      * Initializes the input and output streams.
      */
@@ -325,5 +369,13 @@ public class TcpMessagesRequestHandler extends Thread
         { 
             logger.LogException("[TcpMessageHandler] Failed in closing resources with message:", e); 
         } 
-	}
+    }
+
+    private String toJson(List<String> msg)
+    {     
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String json = gson.toJson(msg);
+
+        return json;
+    }
 }

@@ -114,10 +114,11 @@ public class ReplicaList
             localId = InetAddress.getLocalHost().getHostAddress();
         }
         catch(UnknownHostException e){}
-        ReplicaNode newNode = new ReplicaNode(localId, localId, fileName);
-        logger.LogInfo(newNode.toString());
-        logger.LogInfo(nodes.toString());
-        nodes.add(newNode);
+
+        // ReplicaNode newNode = new ReplicaNode(localId, localId, fileName);
+        // logger.LogInfo(newNode.toString());
+        // logger.LogInfo(nodes.toString());
+        // nodes.add(newNode);
         List<ReplicaNode> replicaNodes = getReplicaMachines();
 
         List<String> replicaIpAddress = new ArrayList<String>();

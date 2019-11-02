@@ -13,5 +13,6 @@ public enum MessageType
     PUT,
     DELETE,
     LIST,
-    REREPLICATE
+    REREPLICATE,
+    PUT_SUCCESS
 }

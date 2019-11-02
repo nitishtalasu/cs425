@@ -7,7 +7,9 @@ import java.io.*;
 import java.net.Socket;
 import java.util.List;
 import java.util.Scanner;
- 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 public class TcpClientModule 
 { 
     private DataOutputStream outputStream = null; 
@@ -34,6 +36,53 @@ public class TcpClientModule
         this.logger = GrepLogger.getInstance();
     } 
 
+    public List<String> getAddressesFromLeader(String sdfsFileName)
+    {
+        String ip = MembershipList.getLeaderIpAddress();
+        String json = "";
+        this.initializeStreams(ip);
+        try
+        {
+            this.outputStream.writeUTF(MessageType.LIST.toString());
+            this.outputStream.writeUTF(sdfsFileName);
+            json = this.inputStream.readUTF();
+            String reply = this.inputStream.readUTF();
+            if(reply.equals("OK"))
+            {
+                logger.LogInfo("[TCPClient] Addresses received."); 
+            }  
+        }
+        catch(IOException i) 
+        { 
+            logger.LogException("[TCPClient] Unable to receive file data.", i); 
+        } 
+        this.closeSocket();
+        return getListObject(json);
+    }
+
+    public void putSuccess(String sdfsFileName)
+    {
+        String ip = MembershipList.getLeaderIpAddress();
+        this.initializeStreams(ip);
+        try
+        {
+            this.outputStream.writeUTF(MessageType.PUT_SUCCESS.toString());
+            this.outputStream.writeUTF(sdfsFileName);
+            
+            String reply = this.inputStream.readUTF();
+            if(reply.equals("OK"))
+            {
+                logger.LogInfo("[TCPClient] Addresses received."); 
+            }  
+        }
+        catch(IOException i) 
+        { 
+            logger.LogException("[TCPClient] Unable to receive file data.", i); 
+        } 
+        this.closeSocket();
+        
+        
+    }
 
     public void getFiles(String sdfsFileName, String localFileName, List<String> addresses)
     {   
@@ -70,6 +119,7 @@ public class TcpClientModule
                 if(reply.equals("OK"))
                 {
                     logger.LogInfo("[TCPClient] File received."); 
+
                 }  
             } 
             catch(IOException i) 
@@ -241,6 +291,15 @@ public class TcpClientModule
         { 
             logger.LogException("[TcpMessageHandler] Failed in closing resources with message:", e); 
         } 
-	}
+    }
+    
+    public static List<String> getListObject(String jsonString)
+    {     
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        List<String> msg = gson.fromJson(jsonString, List.class);
+        //String jsonEmp = gson.toJson(emp);
+
+        return msg;
+    }
 }
 
