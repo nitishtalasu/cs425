@@ -33,7 +33,7 @@ public class MessageHandler extends Thread
                 {
                     newMemberJoined(msg);
                     logger.LogInfo("[MessageHandler] Printing membership list");
-                    // MembershipList.printMembershipList();
+                    MembershipList.printMembershipList();
                     break;
                 }
                 case HEARTBEAT:

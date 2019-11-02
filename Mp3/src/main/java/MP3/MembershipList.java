@@ -15,7 +15,7 @@ public class MembershipList
 {
     private static String id;
 
-    private static volatile String leaderIpAddress;
+    private static volatile String leaderIpAddress = "";
 
     private static MembershipList membershipList = null;
 

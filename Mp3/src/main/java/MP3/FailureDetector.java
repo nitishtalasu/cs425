@@ -72,9 +72,12 @@ public class FailureDetector extends Thread {
                         Leader.ReReplicateDeletedNodeFiles(var.ipAddress);
                     }
 
-                    logger.LogInfo("[FailureDetector] Failure detector triggered leader election.");
-                    LeaderElection leaderElection = new LeaderElection();
-                    leaderElection.start();
+                    if (isLeaderDeleted)
+                    {
+                        logger.LogInfo("[FailureDetector] Failure detector triggered leader election.");
+                        LeaderElection leaderElection = new LeaderElection();
+                        leaderElection.start();
+                    }
                 }
                 catch(Exception e) 
                 {

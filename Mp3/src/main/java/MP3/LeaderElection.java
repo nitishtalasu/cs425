@@ -120,7 +120,7 @@ class LeaderElection extends Thread
     {
         try
         {
-            Socket socket = new Socket(ipAddress, 8000);
+            Socket socket = new Socket(ipAddress, Ports.TCPPort.getValue());
             socket.setSoTimeout(100000);
             logger.LogInfo("[LeaderElection] Connected to "+ ipAddress + ".");
             DataInputStream inputStream = new DataInputStream(socket.getInputStream());	
