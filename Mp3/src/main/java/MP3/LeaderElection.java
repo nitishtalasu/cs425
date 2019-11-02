@@ -11,11 +11,6 @@ class LeaderElection extends Thread
     {
         MembershipList.setLeaderIpAddress("");
     }
-<<<<<<< HEAD
-    
-=======
-
->>>>>>> 7a25a983eda9d0d95fdad7f1816e3b2491ee761d
     @Override
     public void run()
     {
@@ -68,22 +63,17 @@ class LeaderElection extends Thread
     private void LeaderElected()
     {
         SendLeaderElectedMessage();
+
         MembershipList.setLeaderIpAddress(MembershipList.getSelfNodeDetails().ipAddress);
+        logger.LogInfo("HELO");
+        new ReplicaList();
         SendCoordinationMessage();
     }
-<<<<<<< HEAD
-    
-    private int SendLeaderElectionMessage(String nodeIpAddress) 
-    {
-        logger.LogInfo("[LeaderElection] Sending election message to node "+ nodeIpAddress + ".");
-        return SendElectionMessage(MessageType.ElECTION, nodeIpAddress);
-=======
 
     private int SendLeaderElectionMessage(String nodeIpAddress) 
     {
         logger.LogInfo("[LeaderElection] Sending election message to node "+ nodeIpAddress + ".");
         return SendElectionMessage(MessageType.ELECTION, nodeIpAddress);
->>>>>>> 7a25a983eda9d0d95fdad7f1816e3b2491ee761d
     }
 
     private void SendLeaderElectedMessage()

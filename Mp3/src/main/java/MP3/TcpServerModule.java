@@ -3,7 +3,7 @@ import java.lang.reflect.Constructor;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class TcpServerModule 
+public class TcpServerModule extends Thread
 {
     /**
      * Singleton object of TcpServerModule type class.
@@ -23,11 +23,6 @@ public class TcpServerModule
     private final int port;
 
     /**
-     * Handler which the server uses to request client operations.
-     */
-    private final Class<?> requestHandler;
-
-    /**
      * Logger instance.
      */
     private GrepLogger logger;
@@ -38,10 +33,9 @@ public class TcpServerModule
      * @param portNumber Port on which server is listening.
      * @param handler    Handler that the server would be using to serve the clients.
      */
-    private TcpServerModule(int portNumber, Class<?> handler) 
+    private TcpServerModule(int portNumber) 
     {
         this.port = portNumber;
-        requestHandler = handler;
         logger = GrepLogger.getInstance();
     }
 
@@ -52,25 +46,27 @@ public class TcpServerModule
      * @param typeOfHandler Handler that the server would be using to serve the clients.
      * @return TcpServerModule class object.
      */
-    public static TcpServerModule getInstance(int portNumber, Class<?> typeOfhandler) 
+    public static TcpServerModule getInstance(int portNumber) 
     {
         if (handler == null) 
         {
-            handler = new TcpServerModule(portNumber, typeOfhandler);
+            handler = new TcpServerModule(portNumber);
         }
 
         return handler;
     }
 
-    /**
-     * Run the server.
-     * 
-     * @throws IOException              if I/O error occurs.
-     * @throws IllegalArgumentException if any illegal arguments are passed.
-     */
-    public void run() throws IOException, IllegalArgumentException 
+    @Override
+    public void run() 
     {
-        this.setupServer();
+        try
+        {
+            this.setupServer();
+        }   
+        catch(Exception e)
+        {
+            logger.LogException("[TCPServerModule] Error in setting up server ", e);
+        }
 
         int noOfClientsServed = 0;
 

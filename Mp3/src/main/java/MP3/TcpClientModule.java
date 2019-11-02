@@ -16,7 +16,7 @@ public class TcpClientModule
     private String vmId = "";
     private FileWriter localWriteFile = null;
     private FileReader localReadFile = null;
-    private int port = 5000;
+
 
     /**
      * Logger instance.
@@ -76,8 +76,14 @@ public class TcpClientModule
             { 
                 logger.LogException("[TCPClient] Unable to receive file data.", i); 
             } 
-    
-            this.localWriteFile.close();
+            try
+            {
+                this.localWriteFile.close();
+            }
+            catch(IOException e)
+            {
+                logger.LogException("[TCPClient] Unable to close write file", e); 
+            }
             this.closeSocket();
         }
     }
@@ -128,8 +134,14 @@ public class TcpClientModule
             { 
                 logger.LogException("[TCPClient] Unable to put file data.", i); 
             } 
-
-            this.localReadFile.close();
+            try
+            {
+                this.localReadFile.close();
+            }
+            catch(IOException e) 
+            { 
+                logger.LogException("[TCPClient] Unable to close read file", e); 
+            } 
             this.closeSocket();
         }
     }
@@ -166,7 +178,7 @@ public class TcpClientModule
     {
         try 
         {
-            this.socket = new Socket(address, port);
+            this.socket = new Socket(address, Ports.TCPPort.getValue());
             this.inputStream = new DataInputStream(this.socket.getInputStream());
             this.outputStream = new DataOutputStream(this.socket.getOutputStream());
         } 

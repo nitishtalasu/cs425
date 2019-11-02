@@ -1,5 +1,6 @@
 import java.time.*;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Comparator;
 /**
  * Class for nodes in the membership list.
@@ -10,13 +11,13 @@ public class ReplicaNode implements Comparable<ReplicaNode>
     
     public String ipAddress;
 
-    public List<String> sdfsFileNames;
+    public List<String> sdfsFileNames = new ArrayList<String>();
 
-    public ReplicaNode(String id, String ipAddress, List<String> sdfsFileNames)
+    public ReplicaNode(String id, String ipAddress, String sdfsFileName)
     {
         this.id = id;
         this.ipAddress = ipAddress;
-        this.sdfsFileNames = sdfsFileNames;
+        this.sdfsFileNames.add(sdfsFileName);
     }
 
     @Override

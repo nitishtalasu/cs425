@@ -18,6 +18,8 @@ class ClientModule extends Thread
     
     private final int port;
 
+    TcpClientModule tcp;
+
     private byte[] buffer = new byte[1024]; 
 
     private GrepLogger logger;
@@ -26,6 +28,13 @@ class ClientModule extends Thread
     {
         this.port = portNumber;
         logger = GrepLogger.getInstance();
+        try 
+        {
+            this.tcp = new TcpClientModule();
+        }
+        catch(Exception e){
+
+        }
     }
     
     public static ClientModule getInstance(int portNumber) 
@@ -52,26 +61,29 @@ class ClientModule extends Thread
                 try
                 {
                     str = sc.nextLine();
+                    // logger.LogInfo(str);
                     if(str != null) {
                         String command[];
                         String sdfsFileName;
                         String localFileName;
-                        List<ReplicaNode> addresses;
+                        List<String> addresses;
                         Message msg = null;
                         Message.Node node = MembershipList.getSelfNode();
                         List<Message.Node> nodeList = new ArrayList<Message.Node>();
                         nodeList.add(node);
                         command = str.split(" ");
+                        logger.LogInfo(command[0]); 
                         if(command[0].equalsIgnoreCase("get"))
                         {   
                             sdfsFileName = command[1];
                             localFileName = command[2];
                             // call Leader and get addresses
-                            addresses = ReplicaList.getReplicas(sdfsFileName);
+                            addresses = ReplicaList.getReplicaIpAddress(sdfsFileName);
                             if(addresses == null)
                                 logger.LogInfo("[Client: Get] No replicas found");
+                           
+                            this.tcp.getFiles(sdfsFileName, localFileName, addresses);
 
-                            TcpClientModule.getFiles(sdfsFileName, localFileName, addresses);
 
                         }
                         else if(command[0].equalsIgnoreCase("put"))
@@ -79,22 +91,22 @@ class ClientModule extends Thread
                             sdfsFileName = command[2];
                             localFileName = command[1];
                             // call Leader and get addresses
-                            addresses = ReplicaList.getReplicas(sdfsFileName);
+                            addresses = ReplicaList.addReplicaFiles(sdfsFileName);
                             if(addresses == null)
                                 logger.LogInfo("[Client: Put] No replicas found");
 
-                            TcpClientModule.putFiles(sdfsFileName, localFileName, addresses);
+                            this.tcp.putFiles(sdfsFileName, localFileName, addresses);
                            
                         }
                         else if(command[0].equalsIgnoreCase("delete"))
                         {   
                             sdfsFileName = command[1];
                             // call Leader and get addresses
-                            addresses = ReplicaList.getReplicas(sdfsFileName);
+                            addresses = ReplicaList.getReplicaIpAddress(sdfsFileName);
                             if(addresses == null)
                                 logger.LogInfo("[Client: Delete] No replicas found");
                            
-                            TcpClientModule.deleteFiles(sdfsFileName, addresses);
+                            this.tcp.deleteFiles(sdfsFileName, addresses);
                         }
                         else if(command[0].equalsIgnoreCase("ls"))
                         {   
@@ -104,7 +116,12 @@ class ClientModule extends Thread
                         else if(command[0].equalsIgnoreCase("store"))
                         {   
                             sdfsFileName = command[1];
-                            List<String> fileNames = ReplicaList.getSdfsFileNames();
+                            List<String> fileNames = ReplicaList.getLocalReplicas();
+                            logger.LogInfo("The files in the current machine are: ");
+                            for(String filename: fileNames)
+                            {
+                                logger.LogInfo(filename);
+                            }
                         }
                         if (str.equalsIgnoreCase("Join")) 
                         {
@@ -148,6 +165,7 @@ class ClientModule extends Thread
                         
                         if (str.equalsIgnoreCase("JOIN")) 
                         {
+                            logger.LogInfo("HELLO");
                             String introducer_address = Introducer.IPADDRESS.getValue();
                             int introducerPort = Integer.parseInt(Introducer.PORT.getValue());
                             
@@ -177,7 +195,7 @@ class ClientModule extends Thread
                                 this.buffer, 
                                 this.buffer.length, 
                                 neighborAddress, 
-                                5000); 
+                                Ports.UDPPort.getValue()); 
                             client.send(dp); 
                             client.close();
                         }

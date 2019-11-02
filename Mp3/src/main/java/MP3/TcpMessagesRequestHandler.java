@@ -71,9 +71,6 @@ public class TcpMessagesRequestHandler extends Thread
                 
                 // Creating the process with given client command.
                 logger.LogInfo("[TcpMessageHandler] Server received message type: " + msgType);
-<<<<<<< HEAD
-
-=======
                 
                 if (msgType.equals(MessageType.PUT))
                 {
@@ -91,7 +88,6 @@ public class TcpMessagesRequestHandler extends Thread
                     writeCount++;
                 }
                 
->>>>>>> 7a25a983eda9d0d95fdad7f1816e3b2491ee761d
                 String reply = ProcessMessage(msgType);
 
                 // Writing the reply to the stream.
