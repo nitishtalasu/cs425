@@ -19,6 +19,8 @@ public class ReplicaList
 
     private static volatile List<ReplicaNode> nodes;
 
+    private static volatile List<ReplicaFile> files;
+
     private static GrepLogger logger = GrepLogger.getInstance();
 
     private ReplicaList() {
@@ -26,6 +28,7 @@ public class ReplicaList
         {
             id = InetAddress.getLocalHost().getHostAddress();
             nodes = new ArrayList<ReplicaNode>();
+            files = new ArrayList<ReplicaFile>();
 
         } 
         catch (UnknownHostException e) 
@@ -94,5 +97,43 @@ public class ReplicaList
             quorum--;
         }
         return replicaMachines;
+    }
+
+    public static synchronized List<String> addReplicaFiles(String fileName)
+    {
+        List<ReplicaNode> replicaNodes = getReplicaMachines();
+        List<String> replicaIpAddress = new ArrayList<String>();
+        for (ReplicaNode node : replicaNodes) 
+        {
+            replicaIpAddress.add(node.ipAddress);
+        }
+        ReplicaFile replicaFile = new ReplicaFile(fileName, replicaIpAddress);
+
+        return replicaIpAddress;
+    }
+
+    public static synchronized void replicationCompleted(String fileName)
+    {
+        for (ReplicaFile replicaFile : files) 
+        {
+            if (replicaFile.FileName.equals(fileName))
+            {
+                replicaFile.updateStatus("Replicated");
+            }
+        }
+    }
+
+    public static synchronized List<String> getReplicaIpAddress(String fileName)
+    {
+        List<String> replicaIpAddress = new ArrayList<String>();
+        for (ReplicaFile file : files) 
+        {
+            if (file.equals(fileName))
+            {
+                replicaIpAddress = file.ReplicaIpAddress;
+            }
+        }
+
+        return replicaIpAddress;
     }
 }
