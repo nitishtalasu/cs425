@@ -189,7 +189,7 @@ public class TcpMessagesRequestHandler extends Thread
     
     private String VictoryMessage() 
     {
-        String reply = "";
+        String reply = "OK";
         String clientIpAddress = this.socket.getInetAddress().getHostAddress();
         MembershipList.setLeaderIpAddress(clientIpAddress);
         logger.LogInfo("[TcpMessageHandler] Newly elected leader: " + MembershipList.getLeaderIpAddress());

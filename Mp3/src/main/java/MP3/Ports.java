@@ -6,7 +6,7 @@ public enum Ports
 
     TCPPort("TCPPort", "5000"),
     UDPPort("UDPPort", "5500"),
-    HEARTBEAT("HEARTBEAT", "6000");
+    HEARTBEAT("HEARTBEAT", "5500");
 
     private final String key;
     private final String value;

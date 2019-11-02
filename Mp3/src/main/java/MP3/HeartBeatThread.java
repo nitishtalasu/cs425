@@ -34,7 +34,7 @@ public class HeartBeatThread extends Thread {
                         if(!status.equals(MembershipNode.Status.RUNNING))
                             continue;
 
-                        //CheckIntroducerExists(selfNode);
+                        CheckIntroducerExists(selfNode);
         
                         MembershipList.updateCount(MembershipList.getSelfNode());
                         
