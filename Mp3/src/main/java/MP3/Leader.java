@@ -27,5 +27,10 @@ class Leader
     {
         return ReplicaList.addReplicaFiles(file);
     }
+
+    public static void DeleteReplicas(String file)
+    {
+        ReplicaList.deleteReplicaFiles(file);
+    }
 }
 

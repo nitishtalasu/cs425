@@ -11,7 +11,7 @@ class LeaderElection extends Thread
     {
         MembershipList.setLeaderIpAddress("");
     }
-    
+
     @Override
     public void run()
     {
@@ -64,7 +64,10 @@ class LeaderElection extends Thread
     private void LeaderElected()
     {
         SendLeaderElectedMessage();
+
         MembershipList.setLeaderIpAddress(MembershipList.getSelfNodeDetails().ipAddress);
+        logger.LogInfo("HELO");
+        new ReplicaList();
         SendCoordinationMessage();
     }
 

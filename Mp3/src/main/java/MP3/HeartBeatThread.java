@@ -16,7 +16,7 @@ public class HeartBeatThread extends Thread {
         private byte[] buffer;
         public HeartBeatThread()
         {
-            this.port = 5000;
+            this.port = Ports.HEARTBEAT.getValue();
             this.logger = GrepLogger.getInstance();
             this.buffer = new byte[1024];
         }

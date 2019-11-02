@@ -23,20 +23,18 @@ public class ReplicaList
 
     private static GrepLogger logger = GrepLogger.getInstance();
 
-    private ReplicaList() {
-        try
-        {
-            id = InetAddress.getLocalHost().getHostAddress();
+    public ReplicaList() {
+        // try
+        // {
             nodes = new ArrayList<ReplicaNode>();
             files = new ArrayList<ReplicaFile>();
 
-        } 
-        catch (UnknownHostException e) 
-        {
-            logger.LogException("[MemnershipList] Failed to create the membership list object. ", e);
-        }
+        // } 
+        // catch (UnknownHostException e) 
+        // {
+        //     logger.LogException("[MemnershipList] Failed to create the membership list object. ", e);
+        // }
     }
-
 
     public static synchronized List<ReplicaNode> getReplicas(String sdfsFileName) 
     {
@@ -74,7 +72,15 @@ public class ReplicaList
     
     public static synchronized List<String> getLocalReplicas() 
     {
-        String ip = InetAddress.getLocalHost().getHostAddress();
+        String ip = "";
+        try
+        {
+            ip = InetAddress.getLocalHost().getHostAddress();
+        }
+        catch (UnknownHostException e) 
+        {
+            logger.LogException("[MemnershipList] Failed to create the membership list object. ", e);
+        }
         for (ReplicaNode var: nodes)
         {
             if(var.ipAddress.equals(ip))
@@ -82,12 +88,14 @@ public class ReplicaList
                 return var.sdfsFileNames;
             }
         }
+        return null;
     }
 
     public static synchronized List<ReplicaNode> getReplicaMachines() 
     {
         int quorum = 4;
-        List<ReplicaNode> replicaMachines;
+        List<ReplicaNode> replicaMachines = null;
+
         Collections.sort(nodes, new SortByFiles());
         for (ReplicaNode var: nodes)
         {
@@ -101,7 +109,17 @@ public class ReplicaList
 
     public static synchronized List<String> addReplicaFiles(String fileName)
     {
+        String localId = "";
+        try{
+            localId = InetAddress.getLocalHost().getHostAddress();
+        }
+        catch(UnknownHostException e){}
+        ReplicaNode newNode = new ReplicaNode(localId, localId, fileName);
+        logger.LogInfo(newNode.toString());
+        logger.LogInfo(nodes.toString());
+        nodes.add(newNode);
         List<ReplicaNode> replicaNodes = getReplicaMachines();
+
         List<String> replicaIpAddress = new ArrayList<String>();
         for (ReplicaNode node : replicaNodes) 
         {
@@ -110,6 +128,17 @@ public class ReplicaList
         ReplicaFile replicaFile = new ReplicaFile(fileName, replicaIpAddress);
 
         return replicaIpAddress;
+    }
+
+    public static synchronized void deleteReplicaFiles(String fileName)
+    {
+        List<ReplicaNode> replicaNodes = getReplicaMachines();
+        List<String> replicaIpAddress = new ArrayList<String>();
+        for (ReplicaNode node : replicaNodes) 
+        {
+            replicaIpAddress.remove(node.ipAddress);
+        }
+        ReplicaFile replicaFile = new ReplicaFile(fileName, replicaIpAddress);
     }
 
     public static synchronized void replicationCompleted(String fileName)

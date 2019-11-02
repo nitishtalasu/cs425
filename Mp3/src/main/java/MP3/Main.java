@@ -16,27 +16,33 @@
       { 
           try
           {
-            int serverPort = getPortNumber(args);
+            int serverPort = Ports.UDPPort.getValue();
             logger.LogInfo("[Main] Starting the server on port: " + serverPort);
             Thread server = ServerModule.getInstance(serverPort);
             server.start();
             MembershipList.initializeMembershipList();
 
-            logger.LogInfo("[Main] Starting the heartbeat handler");
-            Thread hbThread = new HeartBeatThread();
-            hbThread.start();
+            // logger.LogInfo("[Main] Starting the heartbeat handler");
+            // Thread hbThread = new HeartBeatThread();
+            // hbThread.start();
 
             logger.LogInfo("[Main] Starting the failure detector");
             Thread failureThread = new FailureDetector();
             failureThread.start();
             
 
+            logger.LogInfo("[Main] Starting the TCP Server");
+            Thread tcpServer = TcpServerModule.getInstance(Ports.TCPPort.getValue());
+            tcpServer.start();
+
             logger.LogInfo("[Main] Starting the client");
             Thread client = ClientModule.getInstance(serverPort);
             client.start();
 
+
+
             server.join();
-            hbThread.join();
+            // hbThread.join();
             failureThread.join();
             client.join();
             logger.LogInfo("[Main] closing progam");
@@ -76,7 +82,7 @@
           }
   
           logger.LogInfo("[Main] As port was not passed. Setting port to default value 5000.");
-          return 5000;
+          return 5500;
       }
   } 
   

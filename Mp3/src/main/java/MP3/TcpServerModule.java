@@ -3,7 +3,7 @@ import java.lang.reflect.Constructor;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class TcpServerModule 
+public class TcpServerModule extends Thread
 {
     /**
      * Singleton object of TcpServerModule type class.
@@ -21,11 +21,6 @@ public class TcpServerModule
      * Port number where server is running.
      */
     private final int port;
-
-    /**
-     * Handler which the server uses to request client operations.
-     */
-    private final Class<?> requestHandler;
 
     /**
      * Logger instance.
@@ -61,15 +56,17 @@ public class TcpServerModule
         return handler;
     }
 
-    /**
-     * Run the server.
-     * 
-     * @throws IOException              if I/O error occurs.
-     * @throws IllegalArgumentException if any illegal arguments are passed.
-     */
-    public void run() throws IOException, IllegalArgumentException 
+    @Override
+    public void run() 
     {
-        this.setupServer();
+        try
+        {
+            this.setupServer();
+        }   
+        catch(Exception e)
+        {
+            logger.LogException("[TCPServerModule] Error in setting up server ", e);
+        }
 
         int noOfClientsServed = 0;
 

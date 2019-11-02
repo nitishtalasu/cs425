@@ -32,6 +32,8 @@ public class MembershipList
             Message.Node node = msg.new Node(id, 1);
             addNode(node);
             changeNodeStatus(node, MembershipNode.Status.LEFT);
+            if(getIpAddress(id).equals(Introducer.IPADDRESS.getValue()))
+                getLeaderIpAddress();
         } 
         catch (UnknownHostException e) 
         {
