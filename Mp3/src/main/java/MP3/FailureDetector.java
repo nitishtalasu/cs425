@@ -67,7 +67,7 @@ public class FailureDetector extends Thread {
                             logger.LogInfo("[FailureDetector] Failure detector detected leader as failed. " +
                                 "So start leader election.");
                             MembershipList.setLeaderIpAddress("");
-                            isLeaderDeleted = true;
+                            isLeaderDeleted = true;  
                         }
                         Leader.ReReplicateDeletedNodeFiles();
                     }

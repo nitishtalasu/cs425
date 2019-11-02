@@ -6,7 +6,11 @@ public enum MessageType
     JOIN,
     HEARTBEAT,
     LEAVE,
-    ElECTION,
+    ELECTION,
     VICTORY,
-    COORDINATION
+    COORDINATION,
+    GET,
+    PUT,
+    DELETE,
+    LIST
 }

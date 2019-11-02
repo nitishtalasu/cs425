@@ -11,7 +11,11 @@ class LeaderElection extends Thread
     {
         MembershipList.setLeaderIpAddress("");
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> 7a25a983eda9d0d95fdad7f1816e3b2491ee761d
     @Override
     public void run()
     {
@@ -67,11 +71,19 @@ class LeaderElection extends Thread
         MembershipList.setLeaderIpAddress(MembershipList.getSelfNodeDetails().ipAddress);
         SendCoordinationMessage();
     }
+<<<<<<< HEAD
     
     private int SendLeaderElectionMessage(String nodeIpAddress) 
     {
         logger.LogInfo("[LeaderElection] Sending election message to node "+ nodeIpAddress + ".");
         return SendElectionMessage(MessageType.ElECTION, nodeIpAddress);
+=======
+
+    private int SendLeaderElectionMessage(String nodeIpAddress) 
+    {
+        logger.LogInfo("[LeaderElection] Sending election message to node "+ nodeIpAddress + ".");
+        return SendElectionMessage(MessageType.ELECTION, nodeIpAddress);
+>>>>>>> 7a25a983eda9d0d95fdad7f1816e3b2491ee761d
     }
 
     private void SendLeaderElectedMessage()
@@ -122,10 +134,9 @@ class LeaderElection extends Thread
             socket.setSoTimeout(100000);
             logger.LogInfo("[LeaderElection] Connected to "+ ipAddress + ".");
             DataInputStream inputStream = new DataInputStream(socket.getInputStream());	
-            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());		
-            
+            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());	
             String reply;
-            outputStream.writeUTF(MessageType.ElECTION.toString());
+            outputStream.writeUTF(msgType.toString());
             reply = inputStream.readUTF();
             return reply;
         }
@@ -136,4 +147,4 @@ class LeaderElection extends Thread
 
         return null;
     }
-}
+} 

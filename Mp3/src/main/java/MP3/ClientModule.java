@@ -53,10 +53,59 @@ class ClientModule extends Thread
                 {
                     str = sc.nextLine();
                     if(str != null) {
+                        String command[];
+                        String sdfsFileName;
+                        String localFileName;
+                        List<ReplicaNode> addresses;
                         Message msg = null;
                         Message.Node node = MembershipList.getSelfNode();
                         List<Message.Node> nodeList = new ArrayList<Message.Node>();
                         nodeList.add(node);
+                        command = str.split(" ");
+                        if(command[0].equalsIgnoreCase("get"))
+                        {   
+                            sdfsFileName = command[1];
+                            localFileName = command[2];
+                            // call Leader and get addresses
+                            addresses = ReplicaList.getReplicas(sdfsFileName);
+                            if(addresses == null)
+                                logger.LogInfo("[Client: Get] No replicas found");
+
+                            TcpClientModule.getFiles(sdfsFileName, localFileName, addresses);
+
+                        }
+                        else if(command[0].equalsIgnoreCase("put"))
+                        {   
+                            sdfsFileName = command[2];
+                            localFileName = command[1];
+                            // call Leader and get addresses
+                            addresses = ReplicaList.getReplicas(sdfsFileName);
+                            if(addresses == null)
+                                logger.LogInfo("[Client: Put] No replicas found");
+
+                            TcpClientModule.putFiles(sdfsFileName, localFileName, addresses);
+                           
+                        }
+                        else if(command[0].equalsIgnoreCase("delete"))
+                        {   
+                            sdfsFileName = command[1];
+                            // call Leader and get addresses
+                            addresses = ReplicaList.getReplicas(sdfsFileName);
+                            if(addresses == null)
+                                logger.LogInfo("[Client: Delete] No replicas found");
+                           
+                            TcpClientModule.deleteFiles(sdfsFileName, addresses);
+                        }
+                        else if(command[0].equalsIgnoreCase("ls"))
+                        {   
+                            sdfsFileName = command[1];
+                            ReplicaList.printReplicas(sdfsFileName);
+                        }
+                        else if(command[0].equalsIgnoreCase("store"))
+                        {   
+                            sdfsFileName = command[1];
+                            List<String> fileNames = ReplicaList.getSdfsFileNames();
+                        }
                         if (str.equalsIgnoreCase("Join")) 
                         {
                             MembershipList.changeNodeStatus(node, MembershipNode.Status.RUNNING);
