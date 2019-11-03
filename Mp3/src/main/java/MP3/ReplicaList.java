@@ -121,6 +121,20 @@ public class ReplicaList
         return replicaMachines;
     }
 
+    private static List<ReplicaNode> getPossibleReplicaMachines(List<String> replicaIps) 
+    {
+        List<ReplicaNode> possibleReplicas = new ArrayList<ReplicaNode>();
+        for (ReplicaNode node : nodes) 
+        {
+            if (!replicaIps.contains(node.ipAddress))
+            {
+                possibleReplicas.add(node);
+            }
+        }
+
+        return possibleReplicas;
+    }
+
     public static synchronized List<String> addReplicaFiles(String fileName)
     {
         String localId = "";
@@ -288,7 +302,7 @@ public class ReplicaList
         for (ReplicaFile replicaFile : filesToBeReplicated) 
         {
             int countOfCurrentReplicas = replicaFile.ReplicaIpAddress.size();
-            List<ReplicaNode> possibleNewReplicaIpAddress = getReplicaMachines();
+            List<ReplicaNode> possibleNewReplicaIpAddress = getPossibleReplicaMachines(replicaFile.ReplicaIpAddress);
             for(int i = countOfCurrentReplicas; i < 4; i++)
             {
                 if (replicaFile.ReplicaIpAddress.isEmpty())
