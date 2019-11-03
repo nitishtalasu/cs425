@@ -160,14 +160,24 @@ public class ReplicaList
 
     public static synchronized void deleteReplicaFile(String fileName)
     {
-        List<ReplicaNode> replicaNodes = getReplicaMachines();
         List<String> replicaIpAddress = new ArrayList<String>();
+        logger.LogInfo("[ReplicaList][deletereplicafile] Before deleting.");
+        for (ReplicaFile file : files) 
+        {
+            logger.LogInfo(file.FileName);
+        }
         for (ReplicaFile file : files) 
         {
             if (file.FileName.equals("fileName"))
             {
                 files.remove(file);
             }
+        }
+
+        logger.LogInfo("[ReplicaList][deletereplicafile] After deleting.");
+        for (ReplicaFile file : files) 
+        {
+            logger.LogInfo(file.FileName);
         }
     }
 

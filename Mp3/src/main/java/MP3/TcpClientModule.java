@@ -102,7 +102,7 @@ public class TcpClientModule
                 // generating files (for each server input) to store logs received from servers
                 String currentDir = System.getProperty("user.dir");
                 logger.LogInfo("Current directory"+ currentDir);
-                localWriteFile = new FileWriter("/src/main/java/MP3/localFile/"+localFileName);
+                localWriteFile = new FileWriter(currentDir + "/src/main/java/MP3/localFile/"+localFileName);
 
                 //variable to check end of file
                 boolean eof = false;
