@@ -100,7 +100,7 @@ public class TcpClientModule
                 
                 this.outputStream.writeUTF(sdfsFileName);
                 // generating files (for each server input) to store logs received from servers
-                localWriteFile = new FileWriter(localFileName);
+                localWriteFile = new FileWriter("./localFile/"+localFileName);
 
                 //variable to check end of file
                 boolean eof = false;
@@ -166,7 +166,7 @@ public class TcpClientModule
                 }
                 
                 // generating files (for each server input) to store logs received from servers
-                localReadFile = new FileReader(localFileName);
+                localReadFile = new FileReader("./localFile/"+localFileName);
                 BufferedReader br = new BufferedReader(localReadFile);
                 // read line by line
                 String line;

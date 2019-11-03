@@ -219,7 +219,7 @@ public class TcpMessagesRequestHandler extends Thread
         {
             String sdfsFileName = this.socketInputStream.readUTF();
 
-            localReadFile = new FileReader(sdfsFileName);
+            localReadFile = new FileReader("./sdfsFile/"+sdfsFileName);
 
             //variable to check end of file
             BufferedReader br = new BufferedReader(localReadFile);
@@ -242,7 +242,7 @@ public class TcpMessagesRequestHandler extends Thread
         try
         {
             String sdfsFileName = this.socketInputStream.readUTF();
-            localWriteFile = new FileWriter(sdfsFileName);
+            localWriteFile = new FileWriter("./sdfsFile/"+sdfsFileName);
             boolean eof = false;
                 while (!eof) 
                 {
