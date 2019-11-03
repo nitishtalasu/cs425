@@ -76,21 +76,21 @@ public class TcpMessagesRequestHandler extends Thread
                 // Creating the process with given client command.
                 logger.LogInfo("[TcpMessageHandler] Server received message type: " + msgType);
                 
-                if (msgType.equals(MessageType.PUT))
-                {
-                    if(writeCount >= 1)
-                    {
-                        this.socketOutputStream.writeUTF("Another write in process. Continue?");
-                        // ask user if they want to overwrite
-                        String choice = this.socketInputStream.readUTF();
-                        if (choice.equals("no"))
-                        {
-                            // send negative reply to TcpClientModule
-                            continue;
-                        }
-                    }
-                    writeCount++;
-                }
+                // if (msgType.equals(MessageType.PUT))
+                // {
+                //     if(writeCount >= 1)
+                //     {
+                //         this.socketOutputStream.writeUTF("Another write in process. Continue?");
+                //         // ask user if they want to overwrite
+                //         String choice = this.socketInputStream.readUTF();
+                //         if (choice.equals("no"))
+                //         {
+                //             // send negative reply to TcpClientModule
+                //             continue;
+                //         }
+                //     }
+                //     writeCount++;
+                // }
                 
                 String reply = ProcessMessage(msgType);
 

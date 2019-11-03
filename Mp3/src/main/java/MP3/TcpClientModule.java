@@ -149,9 +149,10 @@ public class TcpClientModule
                 // sends VM log ID and user input to server
                 logger.LogInfo("[TCPClient] Connected to "+ address + ".");
                 
-                this.outputStream.writeUTF(MessageType.PUT.toString());
-                String choice = "";
+                // this.outputStream.writeUTF(MessageType.PUT.toString());
+                // String choice = "";
                 String writeStatus = this.inputStream.readUTF();
+                logger.LogInfo("[TCPClient] 1.  "+ writeStatus);
                 if(writeStatus != "")
                 {   
                     logger.LogInfo(writeStatus);
@@ -160,10 +161,10 @@ public class TcpClientModule
                     this.outputStream.writeUTF(choice);
 
                 }
-                if(choice.equalsIgnoreCase("no"))
-                {
-                    continue;
-                }
+                // if(choice.equalsIgnoreCase("no"))
+                // {
+                //     continue;
+                // }
                 
                 // generating files (for each server input) to store logs received from servers
                 localReadFile = new FileReader("./localFile/"+localFileName);
@@ -175,6 +176,7 @@ public class TcpClientModule
                 }  
 
                 String reply = this.inputStream.readUTF();
+                logger.LogInfo("[TCPClient] 2.  "+ reply);
                 if(reply.equals("OK"))
                 {
                     logger.LogInfo("[TCPClient] File sent."); 
