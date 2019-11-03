@@ -1,3 +1,5 @@
+package MP3;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
@@ -65,9 +67,7 @@ class LeaderElection extends Thread
     private void LeaderElected()
     {
         SendLeaderElectedMessage();
-
         MembershipList.setLeaderIpAddress(MembershipList.getSelfNodeDetails().ipAddress);
-        logger.LogInfo("HELO");
         SendCoordinationMessage();
     }
 

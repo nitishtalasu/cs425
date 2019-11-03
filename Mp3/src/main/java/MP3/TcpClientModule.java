@@ -1,3 +1,5 @@
+package MP3;
+
 /**
  * Class for the client side thread operations.
  * 

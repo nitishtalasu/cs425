@@ -1,3 +1,5 @@
+package MP3;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
@@ -128,20 +130,21 @@ public class ReplicaList
         catch(UnknownHostException e){}
         
 
-        List<String> replicaIpAddress = new ArrayList<String>();
+        //List<String> replicaIpAddress = new ArrayList<String>();
         ReplicaFile replicaFile;// = new ReplicaFile(fileName, replicaIpAddress);
         boolean fileAlreadyExist = false;
         for (ReplicaFile file : files) 
         {
             if(file.FileName.equals(fileName))
             {
-                replicaIpAddress = file.ReplicaIpAddress; 
+                //replicaIpAddress = file.ReplicaIpAddress; 
                 files.remove(file);
             }
         }
 
         List<ReplicaNode> replicaNodes = getReplicaMachines();
-        int currentReplicas = replicaIpAddress.size();
+        List<String> replicaIpAddress = new ArrayList<String>();
+        int currentReplicas = 0;//replicaIpAddress.size();
         for (ReplicaNode node : replicaNodes) 
         {
             if (currentReplicas >= 4)
@@ -198,7 +201,7 @@ public class ReplicaList
                     ReplicaNode replicaNode = null;
                     for (ReplicaNode node : nodes) 
                     {
-                        if(node.ipAddress.equals("ip"))
+                        if(node.ipAddress.equals(ip))
                         {
                             replicaNodeExists = true;
                             replicaNode = node;
@@ -208,7 +211,10 @@ public class ReplicaList
 
                     if(replicaNodeExists)
                     {
-                        replicaNode.sdfsFileNames.add(replicaFile.FileName);
+                        if (!replicaNode.sdfsFileNames.contains(replicaFile.FileName))
+                        {
+                            replicaNode.sdfsFileNames.add(replicaFile.FileName);
+                        }
                     }
                     else
                     {
@@ -216,6 +222,8 @@ public class ReplicaList
                     }
                     nodes.add(replicaNode);
                 }
+
+                break;
             }
 
         }
@@ -352,7 +360,7 @@ public class ReplicaList
         MembershipNode selfNodeDetails = MembershipList.getSelfNodeDetails();
         for (ReplicaNode node : nodes) 
         {
-            if (node.id.equals(selfNodeDetails.ipAddress))
+            if (node.id.equals(selfNodeDetails.ipAddress) && !node.sdfsFileNames.contains(sdfsFileName))
             {
                 logger.LogInfo("[ReplicaList] Adding file to the list " + sdfsFileName);
                 node.sdfsFileNames.add(sdfsFileName);

@@ -1,3 +1,5 @@
+package MP3;
+
 /**
  * Enum for fail time and cleanup time values.
  */
