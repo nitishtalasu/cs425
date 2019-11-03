@@ -7,6 +7,7 @@ package MP3;
  */
 import java.io.*;
 import java.net.Socket;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
 import com.google.gson.Gson;
@@ -88,7 +89,7 @@ public class TcpClientModule
 
     public void getFiles(String sdfsFileName, String localFileName, List<String> addresses)
     {   
-
+        long startTime = System.currentTimeMillis();
         for(String address: addresses) 
         {
 
@@ -147,11 +148,13 @@ public class TcpClientModule
             }
             this.closeSocket();
         }
+            long endTime = System.currentTimeMillis();
+            System.out.println("[TCPClient] Rereplication time for " + sdfsFileName + " : " + (endTime - startTime));
     }
 
     public void putFiles(String sdfsFileName, String localFileName, List<String> addresses)
     {   
-
+        long startTime = System.currentTimeMillis();
         for(String address: addresses) 
         {
             this.initializeStreams(address);
@@ -169,7 +172,7 @@ public class TcpClientModule
                 // read line by line
                 String line;
                 while ((line = br.readLine()) != null) {
-                    logger.LogInfo(line);
+                    //logger.LogInfo(line);
                     this.outputStream.writeUTF(line);
                 }  
                 this.outputStream.writeUTF("EOF");
@@ -199,6 +202,8 @@ public class TcpClientModule
             } 
             this.closeSocket();
         }
+            long endTime = System.currentTimeMillis();
+            System.out.println("[TCPClient] Rereplication time for " + sdfsFileName + " : " + (endTime - startTime));
     }
 
     public boolean reReplicateFiles(String currentReplicaAddress, String sdfsFileName, String ipAddressToReplicate)
@@ -208,7 +213,7 @@ public class TcpClientModule
         { 
             // sends VM log ID and user input to server
             logger.LogInfo("[TCPClient] Connected to "+ currentReplicaAddress + ".");
-            
+            long startTime = System.currentTimeMillis();
             this.outputStream.writeUTF(MessageType.REREPLICATE.toString());
             this.outputStream.writeUTF(sdfsFileName);
             this.outputStream.writeUTF(ipAddressToReplicate);
@@ -217,6 +222,8 @@ public class TcpClientModule
             {
                 logger.LogInfo("[TCPClient] Replica node accepted the request to replicate file " + 
                     sdfsFileName + " to " + ipAddressToReplicate);
+                long endTime = System.currentTimeMillis();
+                System.out.println("[TCPClient] Rereplication time for " + sdfsFileName + " : " + (endTime - startTime));
                 return true;
             }
             else
@@ -260,7 +267,7 @@ public class TcpClientModule
 
     public void deleteFiles(String sdfsFileName, List<String> addresses)
     {   
-
+        long startTime = System.currentTimeMillis();
         for(String address: addresses) 
         {
             this.initializeStreams(address);
@@ -282,6 +289,9 @@ public class TcpClientModule
             } 
             this.closeSocket();
         }
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("[TCPClient] Rereplication time for " + sdfsFileName + " : " + (endTime - startTime));
     }
 
      /**
@@ -348,6 +358,38 @@ public class TcpClientModule
         } 
         this.closeSocket();
         return getListObject(json);
+	}
+
+    public long getFileLastUpdatedTime(String sdfsFileName) 
+    {
+        String ip = MembershipList.getLeaderIpAddress();
+        String timeElapsedString = "";
+        long timeElapsed = -1;
+        this.initializeStreams(ip);
+        try
+        {
+            this.outputStream.writeUTF(MessageType.FILEELAPSED.toString());
+            this.outputStream.writeUTF(sdfsFileName);
+            timeElapsedString = this.inputStream.readUTF();
+            logger.LogInfo("[TCPClient] Received time elapsed from server: "+ timeElapsedString); 
+            timeElapsed = Long.parseLong(timeElapsedString);
+            String reply = this.inputStream.readUTF();
+            if(reply.equals("OK") && timeElapsed != -1)
+            {
+                logger.LogInfo("[TCPClient] Received OK from server."); 
+            }
+            else
+            {
+                logger.LogInfo("[TCPClient] Received NACK from server. Maybe file does not exist or got deleted."); 
+            }
+        }
+        catch(Exception i) 
+        { 
+            logger.LogException("[TCPClient] Unable to receive data.", i); 
+        } 
+        this.closeSocket();
+
+        return timeElapsed;
 	}
 }
 

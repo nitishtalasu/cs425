@@ -2,6 +2,7 @@ package MP3;
 
 import java.io.*;
 import java.net.*;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
@@ -101,6 +102,19 @@ class ClientModule extends Thread
                             sdfsFileName = command[2];
                             localFileName = command[1];
                             // call Leader and get addresses
+                            long timeElapsedAfterFileInsert = this.tcp.getFileLastUpdatedTime(sdfsFileName);
+                            if (timeElapsedAfterFileInsert <= 60000 && timeElapsedAfterFileInsert != -1)
+                            {
+                                logger.LogInfo("[Client : Put] The file was inserted one minute before. "+
+                                    "Do you still want to proceed? (y/n)"); 
+                                str = sc.nextLine();
+                            }
+                            if (str.equalsIgnoreCase("n"))
+                            {
+                                logger.LogInfo("[Client : Put] Aborting the file insertion.");
+                                continue;
+                            }
+
                             addresses = this.tcp.getAddressesFromLeader(sdfsFileName);
                             if(addresses == null)
                                 logger.LogInfo("[Client: Put] No replicas found");

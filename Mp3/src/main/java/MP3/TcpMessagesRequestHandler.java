@@ -165,6 +165,10 @@ public class TcpMessagesRequestHandler extends Thread
             case DELETE_SUCCESS:
                 reply = DeleteFilesSuccess();
                 break;
+            
+            case FILEELAPSED:
+                reply = FileTimeElapsed();
+                break;
 
             default:
                 logger.LogWarning("[TcpMessageHandler] Either failed to resolve message type. Or" +
@@ -251,6 +255,28 @@ public class TcpMessagesRequestHandler extends Thread
         return reply;
     }
 
+    private String FileTimeElapsed() 
+    {
+        String reply = "OK";
+
+        try
+        {
+            String sdfsFileName = this.socketInputStream.readUTF();
+            long timeElapsed = ReplicaList.GetFileTimeElapsed(sdfsFileName);
+            logger.LogInfo("[TCPMessageRequestHandler] Received time elapsed of file: "+ sdfsFileName + 
+                " is " + timeElapsed);
+            this.socketOutputStream.writeUTF(String.valueOf(timeElapsed));
+        }
+        catch(Exception e)
+        {
+            logger.LogException("[TcpMessageRequestHandler] Failed with ", e);
+            reply = "NACK";
+        }
+        
+        
+        return reply;
+    }
+
     private String PutFiles()
     {
         String reply = "OK";
@@ -273,7 +299,7 @@ public class TcpMessagesRequestHandler extends Thread
                         {
                             eof = true;
                             localWriteFile.close();
-                            logger.LogInfo("Completed writing logs to file: "+sdfsFileName);
+                            //logger.LogInfo("Completed writing logs to file: "+sdfsFileName);
                             break;
                         }
                         localWriteFile.write(lineOutputs);

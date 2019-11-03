@@ -3,6 +3,7 @@ package MP3;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -137,28 +138,28 @@ public class ReplicaList
 
     public static synchronized List<String> addReplicaFiles(String fileName)
     {
-        String localId = "";
-        try{
-            localId = InetAddress.getLocalHost().getHostAddress();
-        }
-        catch(UnknownHostException e){}
+        // String localId = "";
+        // try{
+        //     localId = InetAddress.getLocalHost().getHostAddress();
+        // }
+        // catch(UnknownHostException e){}
         
 
-        //List<String> replicaIpAddress = new ArrayList<String>();
+        List<String> replicaIpAddress = new ArrayList<String>();
         ReplicaFile replicaFile;// = new ReplicaFile(fileName, replicaIpAddress);
         boolean fileAlreadyExist = false;
         for (ReplicaFile file : files) 
         {
             if(file.FileName.equals(fileName))
             {
-                //replicaIpAddress = file.ReplicaIpAddress; 
+                replicaIpAddress = file.ReplicaIpAddress; 
                 files.remove(file);
             }
         }
 
         List<ReplicaNode> replicaNodes = getReplicaMachines();
-        List<String> replicaIpAddress = new ArrayList<String>();
-        int currentReplicas = 0;//replicaIpAddress.size();
+        //List<String> replicaIpAddress = new ArrayList<String>();
+        int currentReplicas = replicaIpAddress.size();
         for (ReplicaNode node : replicaNodes) 
         {
             if (currentReplicas >= 4)
@@ -302,6 +303,7 @@ public class ReplicaList
         for (ReplicaFile replicaFile : filesToBeReplicated) 
         {
             int countOfCurrentReplicas = replicaFile.ReplicaIpAddress.size();
+            logger.LogError("[ReplicaList] The current replicas count for file " + replicaFile.FileName + " : " + countOfCurrentReplicas);
             List<ReplicaNode> possibleNewReplicaIpAddress = getPossibleReplicaMachines(replicaFile.ReplicaIpAddress);
             for(int i = countOfCurrentReplicas; i < 4; i++)
             {
@@ -466,5 +468,19 @@ public class ReplicaList
                 nodes.remove(node);
             }
         }
+	}
+
+    public static long GetFileTimeElapsed(String sdfsFileName) 
+    {
+        long timeElapsed = -1;
+        for (ReplicaFile replicaFile : files) 
+        {
+            if (replicaFile.FileName.equals(sdfsFileName))
+            {
+                LocalDateTime currentTime = LocalDateTime.now();
+                timeElapsed = ChronoUnit.MILLIS.between(replicaFile.LastUpdatedTime, currentTime);
+            }
+        }
+		return timeElapsed;
 	}
 }
