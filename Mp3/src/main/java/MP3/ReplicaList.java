@@ -317,13 +317,11 @@ public class ReplicaList
                 logger.LogInfo("[ReplicaList] [reReplicateDeletedNodeFiles] Replicating file " + replicaFile.FileName + " from " +
                         currentReplicaIp + " to " + newReplicaIp);
 
-                if(replicateFile(
-                    replicaFile.ReplicaIpAddress.get(0), 
-                    possibleNewReplicaIpAddress.get(i - countOfCurrentReplicas).ipAddress, 
-                    replicaFile.FileName))
+                replicaFile.ReplicaIpAddress.add(newReplicaIp);
+                if(replicateFile(currentReplicaIp, newReplicaIp, replicaFile.FileName))
                 {
                     logger.LogInfo("[ReplicaList] [reReplicateDeletedNodeFiles] Replicated file " + replicaFile.FileName + " to " +
-                        possibleNewReplicaIpAddress.get(i - countOfCurrentReplicas).ipAddress);
+                        newReplicaIp); 
                 }
                 else
                 {
