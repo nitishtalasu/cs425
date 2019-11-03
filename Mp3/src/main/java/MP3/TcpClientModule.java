@@ -131,15 +131,15 @@ public class TcpClientModule
 
                 }  
             } 
-            catch(IOException i) 
+            catch(Exception e) 
             { 
-                logger.LogException("[TCPClient] Unable to receive file data.", i); 
+                logger.LogException("[TCPClient] Unable to receive file data.", e); 
             } 
             try
             {
                 this.localWriteFile.close();
             }
-            catch(IOException e)
+            catch(Exception e)
             {
                 logger.LogException("[TCPClient] Unable to close write file", e); 
             }
@@ -200,7 +200,7 @@ public class TcpClientModule
                     logger.LogError("[TCPClient] File not sent."); 
                 }
             } 
-            catch(IOException i) 
+            catch(Exception i) 
             { 
                 logger.LogException("[TCPClient] Unable to put file data.", i); 
             } 
@@ -208,7 +208,7 @@ public class TcpClientModule
             {
                 this.localReadFile.close();
             }
-            catch(IOException e) 
+            catch(Exception e) 
             { 
                 logger.LogException("[TCPClient] Unable to close read file", e); 
             } 
@@ -240,7 +240,7 @@ public class TcpClientModule
                     sdfsFileName + " to " + ipAddressToReplicate);
             }
         } 
-        catch(IOException i) 
+        catch(Exception i) 
         { 
             logger.LogException("[TCPClient] Unable to put file data.", i);
             return false;

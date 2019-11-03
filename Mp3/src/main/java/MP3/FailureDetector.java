@@ -69,7 +69,14 @@ public class FailureDetector extends Thread {
                             MembershipList.setLeaderIpAddress("");
                             isLeaderDeleted = true;  
                         }
-                        Leader.ReReplicateDeletedNodeFiles(var.ipAddress);
+
+                        MembershipNode selfDetails = MembershipList.getSelfNodeDetails();
+                        if (selfDetails.ipAddress.equals(leaderIpAddress))
+                        {
+                            logger.LogInfo("[FailureDetector] Leader detected a node as failed. " +
+                                "So start leader election.");
+                            Leader.ReReplicateDeletedNodeFiles(var.ipAddress);
+                        }  
                     }
 
                     if (isLeaderDeleted)
