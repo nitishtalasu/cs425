@@ -241,12 +241,14 @@ public class TcpMessagesRequestHandler extends Thread
     private String PutFiles()
     {
         String reply = "OK";
+        logger.LogInfo("[TCPMessageRequestHandler] Entered PutFile method.");
         try
         {
             String sdfsFileName = this.socketInputStream.readUTF();
             String currentDir = System.getProperty("user.dir");
             logger.LogInfo("Current directory"+ currentDir);
             localWriteFile = new FileWriter(currentDir+"/src/main/java/MP3/sdfsFile/"+sdfsFileName);
+
             boolean eof = false;
                 while (!eof) 
                 {
@@ -258,15 +260,17 @@ public class TcpMessagesRequestHandler extends Thread
                         {
                             eof = true;
                             localWriteFile.close();
+                            logger.LogInfo("Completed writing logs to file: "+sdfsFileName);
                             break;
                         }
                         localWriteFile.write(lineOutputs);
+                        logger.LogInfo("Received line from : "+lineOutputs);
                         localWriteFile.write(System.getProperty("line.separator"));
                     } 
                     catch (EOFException e) 
                     {
                         eof = true;
-                        // reply = "NACK";
+                        reply = "NACK";
                         localWriteFile.close();
                         logger.LogInfo("Completed writing logs to file: "+sdfsFileName);
                     }
@@ -276,6 +280,7 @@ public class TcpMessagesRequestHandler extends Thread
         }
         catch(IOException e) 
         {
+            reply = "NACK";
             logger.LogException("[TCPMessageRequestHandler] Unable to put file data.", e); 
         }
         return reply;
@@ -333,6 +338,11 @@ public class TcpMessagesRequestHandler extends Thread
         {
            String sdfsFileName = this.socketInputStream.readUTF();
            List<String> addresses = ReplicaList.addReplicaFiles(sdfsFileName);
+           logger.LogInfo("[TCPMessageRequestHandler] Returning replicaIpAddress");
+           for (String string : addresses) 
+           {
+                logger.LogInfo("[TCPMessageRequestHandler] IpAddress: " + string);
+           } 
            String json = this.toJson(addresses);
            this.socketOutputStream.writeUTF(json);
         }
@@ -351,6 +361,7 @@ public class TcpMessagesRequestHandler extends Thread
            String sdfsFileName = this.socketInputStream.readUTF();
            List<String> addresses = ReplicaList.getReplicaIpAddress(sdfsFileName);
            String json = this.toJson(addresses);
+           logger.LogInfo("[TCPMessageRequestHandler] [GetReplicaList] Sending replica list as: " + json);
            this.socketOutputStream.writeUTF(json);
         }
         catch(IOException e) 

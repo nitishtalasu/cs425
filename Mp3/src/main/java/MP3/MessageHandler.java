@@ -34,9 +34,14 @@ public class MessageHandler extends Thread
                     newMemberJoined(msg);
                     logger.LogInfo("[MessageHandler] Printing membership list");
                     MembershipList.printMembershipList();
-                    logger.LogInfo("[MessageHandler] New member joined triggering leader election.");
-                    LeaderElection leaderElection = new LeaderElection();
-                    leaderElection.start();
+                    MembershipNode selfNodeDetails = MembershipList.getSelfNodeDetails();
+                    if (selfNodeDetails.nodeStatus == MembershipNode.Status.RUNNING)
+                    {
+                        logger.LogInfo("[MessageHandler] New member joined triggering leader election.");
+                        LeaderElection leaderElection = new LeaderElection();
+                        leaderElection.start();
+                    }
+
                     break;
                 }
                 case HEARTBEAT:
@@ -114,6 +119,7 @@ public class MessageHandler extends Thread
             logger.LogInfo("[MessageHandler] Same host getting join msg. So dropping it");
             return;
         }
+
         MembershipList.addNode(msg.nodes.get(0));
 
         try

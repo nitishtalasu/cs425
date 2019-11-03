@@ -105,8 +105,8 @@ public class ReplicaList
     public static synchronized List<ReplicaNode> getReplicaMachines() 
     {
         int quorum = 4;
-        List<ReplicaNode> replicaMachines = null;
-
+        List<ReplicaNode> replicaMachines = new ArrayList<ReplicaNode>();
+        printReplicaNodes();
         Collections.sort(nodes, new SortByFiles());
         for (ReplicaNode var: nodes)
         {
@@ -168,6 +168,7 @@ public class ReplicaList
     public static synchronized List<String> getReplicaIpAddress(String fileName)
     {
         List<String> replicaIpAddress = new ArrayList<String>();
+        printReplicaNodes();
         for (ReplicaFile file : files) 
         {
             if (file.equals(fileName))
@@ -288,6 +289,8 @@ public class ReplicaList
 
     public static void addNewFile(String sdfsFileName) 
     {
+        logger.LogInfo("[ReplicaList] [AddNewFile] Printing nodes");
+        printReplicaNodes();
         for (ReplicaNode node : nodes) 
         {
             if (node.id.equals(node.ipAddress))
