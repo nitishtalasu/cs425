@@ -277,7 +277,7 @@ public class TcpMessagesRequestHandler extends Thread
                             break;
                         }
                         localWriteFile.write(lineOutputs);
-                        logger.LogInfo("Received line from : "+lineOutputs);
+                        // logger.LogInfo("Received line from : "+lineOutputs);
                         localWriteFile.write(System.getProperty("line.separator"));
                     } 
                     catch (EOFException e) 

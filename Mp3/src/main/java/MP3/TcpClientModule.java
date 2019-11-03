@@ -169,7 +169,7 @@ public class TcpClientModule
                 // read line by line
                 String line;
                 while ((line = br.readLine()) != null) {
-                    logger.LogInfo(line);
+                    // logger.LogInfo(line);
                     this.outputStream.writeUTF(line);
                 }  
                 this.outputStream.writeUTF("EOF");
