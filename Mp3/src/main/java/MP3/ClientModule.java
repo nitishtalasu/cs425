@@ -166,6 +166,11 @@ class ClientModule extends Thread
                             }
                             continue;
                         }
+                        else if(command[0].equalsIgnoreCase("Pl"))
+                        {
+                            logger.LogInfo("[ClientInput] Leader: " + MembershipList.getLeaderIpAddress());
+                            continue;
+                        }
                         else if(command[0].equalsIgnoreCase("exit")) {
                             System.exit(0);
                         }

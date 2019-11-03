@@ -420,11 +420,6 @@ public class MembershipList
 
     public static synchronized String getLeaderIpAddress()
     {
-        if(leaderIpAddress.isEmpty())
-        {
-            leaderIpAddress = Introducer.IPADDRESS.getValue();
-        }
-        
         return leaderIpAddress;
     }
 

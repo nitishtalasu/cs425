@@ -34,6 +34,9 @@ public class MessageHandler extends Thread
                     newMemberJoined(msg);
                     logger.LogInfo("[MessageHandler] Printing membership list");
                     MembershipList.printMembershipList();
+                    logger.LogInfo("[MessageHandler] New member joined triggering leader election.");
+                    LeaderElection leaderElection = new LeaderElection();
+                    leaderElection.start();
                     break;
                 }
                 case HEARTBEAT:

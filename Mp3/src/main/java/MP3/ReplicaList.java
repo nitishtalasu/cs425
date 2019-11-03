@@ -98,6 +98,7 @@ public class ReplicaList
                 return var.sdfsFileNames;
             }
         }
+
         return null;
     }
 
@@ -302,6 +303,20 @@ public class ReplicaList
         logger.LogInfo("[ReplicaList] Initilizing self replicaNode");
 
         ReplicaNode selfNode = new ReplicaNode(ipAddress);
+        //ReplicaFile filesNode = new ReplicaFile();
         nodes.add(selfNode);
-	}
+    }
+    
+    public static void printReplicaNodes()
+    {
+        logger.LogInfo("[ReplicaList] Printing replicaNodes");
+        for (ReplicaNode node : nodes) 
+        {
+            logger.LogInfo("[ReplicaList] Printing replicaNode of IP: " + node.ipAddress);
+            for (String file : node.sdfsFileNames) 
+            {
+                logger.LogInfo("[ReplicaList] FileName: " + file);
+            }
+        }
+    }
 }

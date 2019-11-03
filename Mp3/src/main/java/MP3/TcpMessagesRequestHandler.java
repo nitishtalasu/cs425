@@ -191,6 +191,7 @@ public class TcpMessagesRequestHandler extends Thread
     {
         String reply = "OK";
         String clientIpAddress = this.socket.getInetAddress().getHostAddress();
+        //logger.logInfo("Blablabla " + clientIpAddress);
         MembershipList.setLeaderIpAddress(clientIpAddress);
         logger.LogInfo("[TcpMessageHandler] Newly elected leader: " + MembershipList.getLeaderIpAddress());
 
@@ -199,9 +200,13 @@ public class TcpMessagesRequestHandler extends Thread
 
     private String CoordinationMessage() 
     {
-        String reply;
+        String reply = "";
+        ReplicaList.printReplicaNodes();
         List<String> files = ReplicaList.getLocalReplicas();
-        reply = new Gson().toJson(files);
+        if (files != null)
+        {
+            reply = new Gson().toJson(files);
+        }
         //this.socketOutputStream.writeUTF(json);
 
         return reply;

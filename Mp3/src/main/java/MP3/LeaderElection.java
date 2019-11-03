@@ -15,7 +15,7 @@ class LeaderElection extends Thread
     @Override
     public void run()
     {
-        while(!MembershipList.getLeaderIpAddress().isEmpty())
+        do
         {
             String newLeaderIpAddress = MembershipList.selectNewLeader();
             List<String> higherIpAddress = MembershipList.getHigherNodesIpAdress();
@@ -57,6 +57,7 @@ class LeaderElection extends Thread
                 }
             }
         }
+        while(MembershipList.getLeaderIpAddress().isEmpty());
 
         logger.LogInfo("[LeaderElection] leader election completed with leader: " + MembershipList.getLeaderIpAddress());
     }
