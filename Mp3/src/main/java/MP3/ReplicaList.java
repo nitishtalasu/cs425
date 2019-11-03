@@ -157,15 +157,17 @@ public class ReplicaList
         return replicaIpAddress;
     }
 
-    public static synchronized void deleteReplicaFiles(String fileName)
+    public static synchronized void deleteReplicaFile(String fileName)
     {
         List<ReplicaNode> replicaNodes = getReplicaMachines();
         List<String> replicaIpAddress = new ArrayList<String>();
-        for (ReplicaNode node : replicaNodes) 
+        for (ReplicaFile file : files) 
         {
-            replicaIpAddress.remove(node.ipAddress);
+            if (file.FileName.equals("fileName"))
+            {
+                files.remove(file);
+            }
         }
-        ReplicaFile replicaFile = new ReplicaFile(fileName, replicaIpAddress);
     }
 
     public static synchronized void replicationCompleted(String fileName)
@@ -381,4 +383,21 @@ public class ReplicaList
             }
         }
     }
+
+    public static void deleteFileFromNode(String sdfsFileName) 
+    {
+        for (ReplicaNode node : nodes) 
+        {
+            if(node.sdfsFileNames.contains(sdfsFileName))
+            {
+                for (String file: node.sdfsFileNames)
+                {
+                    if(file.equals(sdfsFileName))
+                    {
+                        node.sdfsFileNames.remove(sdfsFileName);
+                    }
+                }
+            }
+        }
+	}
 }
