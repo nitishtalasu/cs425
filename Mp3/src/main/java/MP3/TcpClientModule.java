@@ -149,18 +149,18 @@ public class TcpClientModule
                 // sends VM log ID and user input to server
                 logger.LogInfo("[TCPClient] Connected to "+ address + ".");
                 
-                // this.outputStream.writeUTF(MessageType.PUT.toString());
+                this.outputStream.writeUTF(MessageType.PUT.toString());
                 // String choice = "";
-                String writeStatus = this.inputStream.readUTF();
-                logger.LogInfo("[TCPClient] 1.  "+ writeStatus);
-                if(writeStatus != "")
-                {   
-                    logger.LogInfo(writeStatus);
-                    Scanner sc = new Scanner(System.in);
-                    choice = sc.nextLine();
-                    this.outputStream.writeUTF(choice);
+                // String writeStatus = this.inputStream.readUTF();
+                // logger.LogInfo("[TCPClient] 1.  "+ writeStatus);
+                // if(writeStatus != "")
+                // {   
+                //     logger.LogInfo(writeStatus);
+                //     Scanner sc = new Scanner(System.in);
+                //     choice = sc.nextLine();
+                //     this.outputStream.writeUTF(choice);
 
-                }
+                // }
                 // if(choice.equalsIgnoreCase("no"))
                 // {
                 //     continue;
