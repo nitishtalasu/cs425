@@ -168,7 +168,7 @@ public class ReplicaList
         }
         for (ReplicaFile file : files) 
         {
-            if (file.FileName.equals("fileName"))
+            if (file.FileName.equals(fileName))
             {
                 files.remove(file);
             }
