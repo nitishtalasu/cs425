@@ -161,23 +161,6 @@ public class TcpClientModule
                 logger.LogInfo("[TCPClient] Connected to "+ address + ".");
                 
                 this.outputStream.writeUTF(MessageType.PUT.toString());
-                // String choice = "";
-                // String writeStatus = this.inputStream.readUTF();
-                // logger.LogInfo("[TCPClient] 1.  "+ writeStatus);
-                // if(writeStatus != "")
-                // {   
-                //     logger.LogInfo(writeStatus);
-                //     Scanner sc = new Scanner(System.in);
-                //     choice = sc.nextLine();
-                //     this.outputStream.writeUTF(choice);
-
-                // }
-                // if(choice.equalsIgnoreCase("no"))
-                // {
-                //     continue;
-                // }
-                
-                // generating files (for each server input) to store logs received from servers
                 this.outputStream.writeUTF(sdfsFileName);
                 String currentDir = System.getProperty("user.dir");
                 logger.LogInfo("Current directory"+ currentDir);

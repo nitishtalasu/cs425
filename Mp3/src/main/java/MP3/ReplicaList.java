@@ -257,45 +257,63 @@ public class ReplicaList
                 fileNames = node.sdfsFileNames;
                 nodes.remove(node);
                 break;
+
             }
         }
 
         List<ReplicaFile> filesToBeReplicated = new ArrayList<ReplicaFile>();
         for (ReplicaFile replicaFile : files) 
         {
-            for (String file : fileNames) 
+            // for (String file : fileNames) 
+            // {
+            //     if (file.equals(replicaFile.FileName))
+            //     {
+            //         replicaFile.ReplicaIpAddress.remove(ipAddress);
+            //         filesToBeReplicated.add(replicaFile);
+            //     }
+            // }
+
+            if (fileNames.contains(replicaFile.FileName))
             {
-                if (file.equals(replicaFile.FileName))
-                {
-                    replicaFile.ReplicaIpAddress.remove(ipAddress);
-                    filesToBeReplicated.add(replicaFile);
-                }
+                replicaFile.ReplicaIpAddress.remove(ipAddress);
+                filesToBeReplicated.add(replicaFile);
             }
         }
 
         for (ReplicaFile replicaFile : filesToBeReplicated) 
         {
-            int countOfCurrentReplicas = getReplicaIpAddress(replicaFile.FileName).size();
+            logger.LogInfo("[ReplicaList] [reReplicateDeletedNodeFiles] Files that have to be replicated: " + replicaFile.FileName);   
+        }
+
+        for (ReplicaFile replicaFile : filesToBeReplicated) 
+        {
+            int countOfCurrentReplicas = replicaFile.ReplicaIpAddress.size();
             List<ReplicaNode> possibleNewReplicaIpAddress = getReplicaMachines();
-            for(int i = countOfCurrentReplicas; i <= 4; i++)
+            for(int i = countOfCurrentReplicas; i < 4; i++)
             {
                 if (replicaFile.ReplicaIpAddress.isEmpty())
                 {
                     logger.LogError("[ReplicaList] There is no active replicas for this fileName" +
                         replicaFile.FileName);
+                        break;
                 }
+
+                String currentReplicaIp = replicaFile.ReplicaIpAddress.get(0);
+                String newReplicaIp = possibleNewReplicaIpAddress.get(i - countOfCurrentReplicas).ipAddress;
+                logger.LogInfo("[ReplicaList] [reReplicateDeletedNodeFiles] Replicating file " + replicaFile.FileName + " from " +
+                        currentReplicaIp + " to " + newReplicaIp);
 
                 if(replicateFile(
                     replicaFile.ReplicaIpAddress.get(0), 
                     possibleNewReplicaIpAddress.get(i - countOfCurrentReplicas).ipAddress, 
                     replicaFile.FileName))
                 {
-                    logger.LogInfo("[ReplicaList] Replicated file " + replicaFile.FileName + " to " +
+                    logger.LogInfo("[ReplicaList] [reReplicateDeletedNodeFiles] Replicated file " + replicaFile.FileName + " to " +
                         possibleNewReplicaIpAddress.get(i - countOfCurrentReplicas).ipAddress);
                 }
                 else
                 {
-                    logger.LogInfo("[ReplicaList] Failed to replicate file " + replicaFile.FileName + " to " +
+                    logger.LogInfo("[ReplicaList] [reReplicateDeletedNodeFiles] Failed to replicate file " + replicaFile.FileName + " to " +
                         possibleNewReplicaIpAddress.get(i - countOfCurrentReplicas).ipAddress);
                 }
             }

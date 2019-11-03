@@ -333,10 +333,13 @@ public class TcpMessagesRequestHandler extends Thread
         {
             String sdfsFileName = this.socketInputStream.readUTF();
             String ipAddressToReplicate = this.socketInputStream.readUTF();
+            logger.LogInfo("[TCPMessageRequestHandler] Received rereplication of file: "+ sdfsFileName + 
+                " to the replica " + ipAddressToReplicate);
             List<String> ipAddresses = new ArrayList<String>();
             ipAddresses.add(ipAddressToReplicate);
             TcpClientModule client = new TcpClientModule();
             client.putFiles(sdfsFileName, sdfsFileName, ipAddresses);
+            client.putSuccess(sdfsFileName);
         }
         catch(Exception e)
         {
