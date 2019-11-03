@@ -100,7 +100,9 @@ public class TcpClientModule
                 
                 this.outputStream.writeUTF(sdfsFileName);
                 // generating files (for each server input) to store logs received from servers
-                localWriteFile = new FileWriter("./localFile/"+localFileName);
+                String currentDir = System.getProperty("user.dir");
+                logger.LogInfo("Current directory"+ currentDir);
+                localWriteFile = new FileWriter("/src/main/java/MP3/localFile/"+localFileName);
 
                 //variable to check end of file
                 boolean eof = false;
@@ -108,10 +110,17 @@ public class TcpClientModule
                     try {
                         //read data sent by server, line-by-line, and write to file
                         String lineOutputs = this.inputStream.readUTF();
+                        if (lineOutputs.equals("EOF"))
+                        {
+                            eof = true;
+                            localWriteFile.close();
+                            break;
+                        }
                         localWriteFile.write(lineOutputs);
                         localWriteFile.write(System.getProperty("line.separator"));
                     } catch (EOFException e) {
                         eof = true;
+                        localWriteFile.close();
                         logger.LogInfo("Completed writing logs to file: "+localFileName);
                     }
                 } 
@@ -167,13 +176,18 @@ public class TcpClientModule
                 // }
                 
                 // generating files (for each server input) to store logs received from servers
-                localReadFile = new FileReader("./localFile/"+localFileName);
+                this.outputStream.writeUTF(sdfsFileName);
+                String currentDir = System.getProperty("user.dir");
+                logger.LogInfo("Current directory"+ currentDir);
+                localReadFile = new FileReader(currentDir+"/src/main/java/MP3/localFile/"+localFileName);
                 BufferedReader br = new BufferedReader(localReadFile);
                 // read line by line
                 String line;
                 while ((line = br.readLine()) != null) {
+                    logger.LogInfo(line);
                     this.outputStream.writeUTF(line);
                 }  
+                this.outputStream.writeUTF("EOF");
 
                 String reply = this.inputStream.readUTF();
                 logger.LogInfo("[TCPClient] 2.  "+ reply);

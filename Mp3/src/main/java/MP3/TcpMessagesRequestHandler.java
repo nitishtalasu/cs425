@@ -218,8 +218,9 @@ public class TcpMessagesRequestHandler extends Thread
         try 
         {
             String sdfsFileName = this.socketInputStream.readUTF();
-
-            localReadFile = new FileReader("./sdfsFile/"+sdfsFileName);
+            String currentDir = System.getProperty("user.dir");
+            logger.LogInfo("Current directory"+ currentDir);
+            localReadFile = new FileReader(currentDir+"/src/main/java/MP3/sdfsFile/"+sdfsFileName);
 
             //variable to check end of file
             BufferedReader br = new BufferedReader(localReadFile);
@@ -228,6 +229,7 @@ public class TcpMessagesRequestHandler extends Thread
             while ((line = br.readLine()) != null) {
                 this.socketOutputStream.writeUTF(line);
             }  
+            this.socketOutputStream.writeUTF("EOF");
         }
         catch(IOException e)
         {
@@ -242,7 +244,9 @@ public class TcpMessagesRequestHandler extends Thread
         try
         {
             String sdfsFileName = this.socketInputStream.readUTF();
-            localWriteFile = new FileWriter("./sdfsFile/"+sdfsFileName);
+            String currentDir = System.getProperty("user.dir");
+            logger.LogInfo("Current directory"+ currentDir);
+            localWriteFile = new FileWriter(currentDir+"/src/main/java/MP3/sdfsFile/"+sdfsFileName);
             boolean eof = false;
                 while (!eof) 
                 {
@@ -250,13 +254,20 @@ public class TcpMessagesRequestHandler extends Thread
                     {
                         //read data sent by server, line-by-line, and write to file
                         String lineOutputs = this.socketInputStream.readUTF();
+                        if (lineOutputs.equals("EOF"))
+                        {
+                            eof = true;
+                            localWriteFile.close();
+                            break;
+                        }
                         localWriteFile.write(lineOutputs);
                         localWriteFile.write(System.getProperty("line.separator"));
                     } 
                     catch (EOFException e) 
                     {
                         eof = true;
-                        reply = "NACK";
+                        // reply = "NACK";
+                        localWriteFile.close();
                         logger.LogInfo("Completed writing logs to file: "+sdfsFileName);
                     }
                 }
