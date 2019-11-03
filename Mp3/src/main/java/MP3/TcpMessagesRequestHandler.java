@@ -298,7 +298,9 @@ public class TcpMessagesRequestHandler extends Thread
         try
         {
             String sdfsFileName = this.socketInputStream.readUTF();
-            File file = new File(sdfsFileName);
+            String currentDir = System.getProperty("user.dir");
+            logger.LogInfo("Current directory"+ currentDir);
+            File file = new File(currentDir + "/src/main/java/MP3/sdfsFile/" +sdfsFileName);
             if(file.delete()) 
             { 
                 logger.LogInfo("[TCPMessageRequestHandler] File deleted successfully"); 
@@ -351,6 +353,7 @@ public class TcpMessagesRequestHandler extends Thread
                 logger.LogInfo("[TCPMessageRequestHandler] IpAddress: " + string);
            } 
            String json = this.toJson(addresses);
+           logger.LogInfo("[TCPMessageRequestHandler] Returning replicaIpAddress: " + json);
            this.socketOutputStream.writeUTF(json);
         }
         catch(IOException e) 
@@ -408,7 +411,7 @@ public class TcpMessagesRequestHandler extends Thread
            String sdfsFileName = this.socketInputStream.readUTF();
         //    List<String> addresses = ReplicaList.getReplicaIpAddress(sdfsFileName);
         //    String json = this.toJson(addresses);
-           ReplicaList.deleteReplicaFiles(sdfsFileName);
+           ReplicaList.deleteReplicaFile(sdfsFileName);
         }
         catch(IOException e) 
         {

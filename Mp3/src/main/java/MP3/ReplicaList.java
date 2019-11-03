@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 /**
@@ -17,9 +18,9 @@ public class ReplicaList
 
     private static ReplicaList replicaList = null;
 
-    private static volatile List<ReplicaNode> nodes;
+    private static volatile CopyOnWriteArrayList<ReplicaNode> nodes;
 
-    private static volatile List<ReplicaFile> files;
+    private static volatile CopyOnWriteArrayList<ReplicaFile> files;
 
     private static GrepLogger logger = GrepLogger.getInstance();
 
@@ -28,8 +29,8 @@ public class ReplicaList
         try
         {
             id = InetAddress.getLocalHost().getHostAddress();
-            nodes = new ArrayList<ReplicaNode>();
-            files = new ArrayList<ReplicaFile>();
+            nodes = new CopyOnWriteArrayList<ReplicaNode>();
+            files = new CopyOnWriteArrayList<ReplicaFile>();
             addSelfNode(id);
         } 
         catch (UnknownHostException e) 
@@ -390,14 +391,16 @@ public class ReplicaList
         {
             if(node.sdfsFileNames.contains(sdfsFileName))
             {
-                for (String file: node.sdfsFileNames)
-                {
-                    if(file.equals(sdfsFileName))
-                    {
-                        node.sdfsFileNames.remove(sdfsFileName);
-                    }
-                }
+                // for (String file: node.sdfsFileNames)
+                // {
+                //     if(file.equals(sdfsFileName))
+                //     {
+                //         node.sdfsFileNames.remove(sdfsFileName);
+                //     }
+                // }
+                node.sdfsFileNames.remove(sdfsFileName);
             }
+            
         }
 	}
 }

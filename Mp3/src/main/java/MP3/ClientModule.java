@@ -111,12 +111,12 @@ class ClientModule extends Thread
                         {   
                             sdfsFileName = command[1];
                             // call Leader and get addresses
-                            addresses = this.tcp.getAddressesFromLeader(sdfsFileName);
+                            addresses = this.tcp.getreplicasFromLeader(sdfsFileName);
                             if(addresses == null)
                                 logger.LogInfo("[Client: Delete] No replicas found");
                            
                             this.tcp.deleteFiles(sdfsFileName, addresses);
-                            this.tcp.deleteSucess(sdfsFileName);
+                            this.tcp.deleteSuccess(sdfsFileName);
                             
                         }
                         else if(command[0].equalsIgnoreCase("ls"))

@@ -30,7 +30,7 @@ class Leader
 
     public static void DeleteReplicas(String file)
     {
-        ReplicaList.deleteReplicaFiles(file);
+        //ReplicaList.deleteReplicaFiles(file);
     }
 }
 
