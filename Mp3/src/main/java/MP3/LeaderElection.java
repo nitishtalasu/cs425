@@ -67,6 +67,7 @@ class LeaderElection extends Thread
     private void LeaderElected()
     {
         SendLeaderElectedMessage();
+        //ReplicaList.clearReplicas();
         MembershipList.setLeaderIpAddress(MembershipList.getSelfNodeDetails().ipAddress);
         SendCoordinationMessage();
     }
@@ -136,6 +137,6 @@ class LeaderElection extends Thread
             logger.LogException("[LeaderElection] Connection failed to "+ ipAddress + ".", e);
         }
 
-        return null;
+        return "";
     }
 } 

@@ -338,7 +338,10 @@ public class ReplicaList
             {
                 if (file.FileName.equals(fileName))
                 {
-                    file.ReplicaIpAddress.add(ipAddress);
+                    if (!file.ReplicaIpAddress.contains(ipAddress))
+                    {
+                        file.ReplicaIpAddress.add(ipAddress);
+                    } 
                     fileExists = true;
                 }
             }
@@ -419,6 +422,19 @@ public class ReplicaList
                 node.sdfsFileNames.remove(sdfsFileName);
             }
             
+        }
+	}
+
+    public static void clearReplicas() 
+    {
+        files.clear();
+        String selfIp = MembershipList.getIpAddress(MembershipList.getSelfNode().id);
+        for (ReplicaNode node : nodes) 
+        {
+            if(!selfIp.equals(node.ipAddress))
+            {
+                nodes.remove(node);
+            }
         }
 	}
 }

@@ -201,6 +201,11 @@ public class TcpMessagesRequestHandler extends Thread
         String clientIpAddress = this.socket.getInetAddress().getHostAddress();
         //logger.logInfo("Blablabla " + clientIpAddress);
         MembershipList.setLeaderIpAddress(clientIpAddress);
+        String selfIp = MembershipList.getIpAddress(MembershipList.getSelfNode().id);
+        if (!selfIp.equals(clientIpAddress))
+        {
+            ReplicaList.clearReplicas();
+        }
         logger.LogInfo("[TcpMessageHandler] Newly elected leader: " + MembershipList.getLeaderIpAddress());
 
         return reply;
