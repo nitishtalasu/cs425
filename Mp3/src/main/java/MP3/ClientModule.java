@@ -5,7 +5,6 @@ import java.net.*;
 import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Thread for handling client inputs.
@@ -93,25 +92,20 @@ class ClientModule extends Thread
                             addresses = this.tcp.getreplicasFromLeader(sdfsFileName);
                             if(addresses == null)
                                 logger.LogInfo("[Client: Get] No replicas found");
-                            long startTime = System.currentTimeMillis();
+                           
                             this.tcp.getFiles(sdfsFileName, localFileName, addresses);
-                            long endTime = System.currentTimeMillis();
-                            logger.LogInfo("[GET] Time: "+ (endTime-startTime));
 
                         }
                         else if(command[0].equalsIgnoreCase("put"))
                         {   
-
                             sdfsFileName = command[2];
                             localFileName = command[1];
                             // call Leader and get addresses
                             addresses = this.tcp.getAddressesFromLeader(sdfsFileName);
                             if(addresses == null)
                                 logger.LogInfo("[Client: Put] No replicas found");
-                            long startTime = System.currentTimeMillis();
+
                             this.tcp.putFiles(sdfsFileName, localFileName, addresses);
-                            long endTime = System.currentTimeMillis();
-                            logger.LogInfo("[GET] Time: "+ (endTime-startTime));
                             this.tcp.putSuccess(sdfsFileName);
                            
                         }
@@ -122,10 +116,8 @@ class ClientModule extends Thread
                             addresses = this.tcp.getreplicasFromLeader(sdfsFileName);
                             if(addresses == null)
                                 logger.LogInfo("[Client: Delete] No replicas found");
-                            long startTime = System.currentTimeMillis();
+                           
                             this.tcp.deleteFiles(sdfsFileName, addresses);
-                            long endTime = System.currentTimeMillis();
-                            logger.LogInfo("[GET] Time: "+ (endTime-startTime));
                             this.tcp.deleteSuccess(sdfsFileName);
                             
                         }
