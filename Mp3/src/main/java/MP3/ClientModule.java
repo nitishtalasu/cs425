@@ -171,6 +171,16 @@ class ClientModule extends Thread
                             logger.LogInfo("[ClientInput] Leader: " + MembershipList.getLeaderIpAddress());
                             continue;
                         }
+                        else if(command[0].equalsIgnoreCase("Pr"))
+                        {
+                            ReplicaList.printReplicaNodes();
+                            continue;
+                        }
+                        else if(command[0].equalsIgnoreCase("Pf"))
+                        {
+                            ReplicaList.printReplicaFiles();
+                            continue;
+                        }
                         else if(command[0].equalsIgnoreCase("exit")) {
                             System.exit(0);
                         }

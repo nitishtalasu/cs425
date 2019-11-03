@@ -8,7 +8,9 @@
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.google.gson.Gson;
@@ -360,6 +362,10 @@ public class TcpMessagesRequestHandler extends Thread
         {
            String sdfsFileName = this.socketInputStream.readUTF();
            List<String> addresses = ReplicaList.getReplicaIpAddress(sdfsFileName);
+           Set<String> set = new LinkedHashSet<>();
+           set.addAll(addresses);
+           addresses.clear();
+           addresses.addAll(set);
            String json = this.toJson(addresses);
            logger.LogInfo("[TCPMessageRequestHandler] [GetReplicaList] Sending replica list as: " + json);
            this.socketOutputStream.writeUTF(json);

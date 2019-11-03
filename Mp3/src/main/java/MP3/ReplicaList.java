@@ -125,19 +125,34 @@ public class ReplicaList
             localId = InetAddress.getLocalHost().getHostAddress();
         }
         catch(UnknownHostException e){}
-
-        // ReplicaNode newNode = new ReplicaNode(localId, localId, fileName);
-        // logger.LogInfo(newNode.toString());
-        // logger.LogInfo(nodes.toString());
-        // nodes.add(newNode);
-        List<ReplicaNode> replicaNodes = getReplicaMachines();
+        
 
         List<String> replicaIpAddress = new ArrayList<String>();
+        ReplicaFile replicaFile;// = new ReplicaFile(fileName, replicaIpAddress);
+        boolean fileAlreadyExist = false;
+        for (ReplicaFile file : files) 
+        {
+            if(file.FileName.equals(fileName))
+            {
+                replicaIpAddress = file.ReplicaIpAddress; 
+                files.remove(file);
+            }
+        }
+
+        List<ReplicaNode> replicaNodes = getReplicaMachines();
+        int currentReplicas = replicaIpAddress.size();
         for (ReplicaNode node : replicaNodes) 
         {
+            if (currentReplicas >= 4)
+            {
+                break;
+            }
             replicaIpAddress.add(node.ipAddress);
+            currentReplicas++;
         }
-        ReplicaFile replicaFile = new ReplicaFile(fileName, replicaIpAddress);
+
+        replicaFile = new ReplicaFile(fileName, replicaIpAddress);
+        files.add(replicaFile);
 
         return replicaIpAddress;
     }
@@ -155,24 +170,54 @@ public class ReplicaList
 
     public static synchronized void replicationCompleted(String fileName)
     {
+        logger.LogInfo("[Replicalist][replicationCompleted] Entered replicationCompleted");
         for (ReplicaFile replicaFile : files) 
-
         {
+            logger.LogInfo("[Replicalist][replicationCompleted] fileName: " + replicaFile.FileName);
+            
             if (replicaFile.FileName.equals(fileName))
             {
                 replicaFile.updateStatus("Replicated");
+                for (String ip : replicaFile.ReplicaIpAddress)
+                {
+                    logger.LogInfo("[Replicalist][replicationCompleted] Ips: " + ip);
+                    boolean replicaNodeExists = false;
+                    ReplicaNode replicaNode = null;
+                    for (ReplicaNode node : nodes) 
+                    {
+                        if(node.ipAddress.equals("ip"))
+                        {
+                            replicaNodeExists = true;
+                            replicaNode = node;
+                            nodes.remove(node);
+                        }
+                    }
+
+                    if(replicaNodeExists)
+                    {
+                        replicaNode.sdfsFileNames.add(replicaFile.FileName);
+                    }
+                    else
+                    {
+                        replicaNode = new ReplicaNode(ip, ip, replicaFile.FileName);
+                    }
+                    nodes.add(replicaNode);
+                }
             }
+
         }
     }
 
     public static synchronized List<String> getReplicaIpAddress(String fileName)
     {
         List<String> replicaIpAddress = new ArrayList<String>();
+        logger.LogInfo("[Replicalist][getReplicaIpAddress] fileName: " + fileName);
         printReplicaNodes();
         for (ReplicaFile file : files) 
         {
-            if (file.equals(fileName))
+            if (file.FileName.equals(fileName))
             {
+                logger.LogInfo("[Replicalist][getReplicaIpAddress] FileName found");
                 replicaIpAddress = file.ReplicaIpAddress;
             }
         }
@@ -291,9 +336,10 @@ public class ReplicaList
     {
         logger.LogInfo("[ReplicaList] [AddNewFile] Printing nodes");
         printReplicaNodes();
+        MembershipNode selfNodeDetails = MembershipList.getSelfNodeDetails();
         for (ReplicaNode node : nodes) 
         {
-            if (node.id.equals(node.ipAddress))
+            if (node.id.equals(selfNodeDetails.ipAddress))
             {
                 logger.LogInfo("[ReplicaList] Adding file to the list " + sdfsFileName);
                 node.sdfsFileNames.add(sdfsFileName);
@@ -319,6 +365,19 @@ public class ReplicaList
             for (String file : node.sdfsFileNames) 
             {
                 logger.LogInfo("[ReplicaList] FileName: " + file);
+            }
+        }
+    }
+
+    public static void printReplicaFiles()
+    {
+        logger.LogInfo("[ReplicaList][printReplicaFiles] Printing replicafiles");
+        for (ReplicaFile file : files) 
+        {
+            logger.LogInfo("[ReplicaList][printReplicaFiles] Printing replicafile of fileName: " + file.FileName);
+            for (String ip : file.ReplicaIpAddress) 
+            {
+                logger.LogInfo("[ReplicaList][printReplicaFiles] Ip: " + ip);
             }
         }
     }
