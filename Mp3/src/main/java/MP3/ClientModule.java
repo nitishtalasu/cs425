@@ -116,6 +116,7 @@ class ClientModule extends Thread
                                 logger.LogInfo("[Client: Delete] No replicas found");
                            
                             this.tcp.deleteFiles(sdfsFileName, addresses);
+                            this.tcp.deleteSucess(sdfsFileName);
                             
                         }
                         else if(command[0].equalsIgnoreCase("ls"))

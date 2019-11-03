@@ -249,6 +249,29 @@ public class TcpClientModule
         this.closeSocket();
         return false;
     }
+    public void deleteSuccess(String sdfsFileName)
+    {
+        String ip = MembershipList.getLeaderIpAddress();
+        this.initializeStreams(ip);
+        try
+        {
+            this.outputStream.writeUTF(MessageType.DELETE_SUCCESS.toString());
+            this.outputStream.writeUTF(sdfsFileName);
+            
+            String reply = this.inputStream.readUTF();
+            if(reply.equals("OK"))
+            {
+                logger.LogInfo("[TCPClient] Addresses received."); 
+            }  
+        }
+        catch(IOException i) 
+        { 
+            logger.LogException("[TCPClient] Unable to receive file data.", i); 
+        } 
+        this.closeSocket();
+        
+        
+    }
 
     public void deleteFiles(String sdfsFileName, List<String> addresses)
     {   

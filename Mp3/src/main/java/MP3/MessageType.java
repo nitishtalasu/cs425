@@ -15,5 +15,6 @@ public enum MessageType
     LIST,
     REPLICALIST,
     REREPLICATE,
-    PUT_SUCCESS
+    PUT_SUCCESS,
+    DELETE_SUCCESS
 }

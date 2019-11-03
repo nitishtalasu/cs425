@@ -160,6 +160,10 @@ public class TcpMessagesRequestHandler extends Thread
                 reply = PutFilesSuccess();
                 break;
 
+            case DELETE_SUCCESS:
+                reply = DeleteFilesSuccess();
+                break;
+
             default:
                 logger.LogWarning("[TcpMessageHandler] Either failed to resolve message type. Or" +
                     "Forgot to add msgType: " + msgType);
@@ -303,6 +307,7 @@ public class TcpMessagesRequestHandler extends Thread
             { 
                 System.out.println("[TCPMessageRequestHandler] Failed to delete the file"); 
             } 
+            ReplicaList.deleteFileFromNode(sdfsFileName);
         }
         catch(IOException e) 
         {
@@ -387,6 +392,23 @@ public class TcpMessagesRequestHandler extends Thread
         //    List<String> addresses = ReplicaList.getReplicaIpAddress(sdfsFileName);
         //    String json = this.toJson(addresses);
            ReplicaList.replicationCompleted(sdfsFileName);
+        }
+        catch(IOException e) 
+        {
+            logger.LogException("[TCPMessageRequestHandler] Exception while deleting file", e); 
+        }
+        return reply;
+    }
+
+    private String DeleteFilesSuccess()
+    {
+        String reply = "OK";
+        try
+        {
+           String sdfsFileName = this.socketInputStream.readUTF();
+        //    List<String> addresses = ReplicaList.getReplicaIpAddress(sdfsFileName);
+        //    String json = this.toJson(addresses);
+           ReplicaList.deleteReplicaFiles(sdfsFileName);
         }
         catch(IOException e) 
         {
