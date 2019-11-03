@@ -31,7 +31,7 @@ package MP3;
 
             logger.LogInfo("[Main] Starting the failure detector");
             Thread failureThread = new FailureDetector();
-            failureThread.start();
+            //failureThread.start();
             
 
             logger.LogInfo("[Main] Starting the TCP Server");

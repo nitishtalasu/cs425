@@ -18,5 +18,6 @@ public enum MessageType
     REPLICALIST,
     REREPLICATE,
     PUT_SUCCESS,
-    DELETE_SUCCESS
+    DELETE_SUCCESS,
+    FILEELAPSED
 }
