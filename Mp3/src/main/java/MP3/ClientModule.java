@@ -139,7 +139,10 @@ class ClientModule extends Thread
                         else if(command[0].equalsIgnoreCase("ls"))
                         {   
                             sdfsFileName = command[1];
-                            ReplicaList.printReplicaFiles(sdfsFileName);
+                            addresses = this.tcp.getreplicasFromLeader(sdfsFileName);
+                            if(addresses == null)
+                                logger.LogInfo("[Client: Get] No replicas found");
+                            System.out.println(sdfsFileName+" is present in: "+addresses);
                             continue;
                         }
                         else if(command[0].equalsIgnoreCase("store"))
