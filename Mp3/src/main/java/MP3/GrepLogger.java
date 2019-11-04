@@ -91,7 +91,7 @@ public class GrepLogger {
      */
     public void LogInfo(String message)
     {
-        //logger.info(message);
+        logger.info(message);
     }
 
     /**

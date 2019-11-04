@@ -37,5 +37,10 @@ class Leader
     {
         //ReplicaList.deleteReplicaFiles(file);
     }
+
+    public static void CheckForReReplication() 
+    {   
+        ReplicaList.CheckForReReplication();
+	}
 }
 

@@ -93,7 +93,8 @@ class ClientModule extends Thread
                             if(addresses == null)
                                 logger.LogInfo("[Client: Get] No replicas found");
                            
-                            this.tcp.getFiles(sdfsFileName, localFileName, addresses);
+                            //this.tcp.getFiles(sdfsFileName, localFileName, addresses);
+                            this.tcp.getFilesParallel(sdfsFileName, localFileName, addresses);
 
                         }
                         else if(command[0].equalsIgnoreCase("put"))
@@ -118,8 +119,8 @@ class ClientModule extends Thread
                             if(addresses == null)
                                 logger.LogInfo("[Client: Put] No replicas found");
 
-                            this.tcp.putFiles(sdfsFileName, localFileName, addresses, "put");
-                            
+                            this.tcp.putFilesParallel(sdfsFileName, localFileName, addresses, "put");
+                            // this.tcp.putCorpus(sdfsFileName, localFileName, addresses);
                             this.tcp.putSuccess(sdfsFileName);
                            
                         }
@@ -131,7 +132,8 @@ class ClientModule extends Thread
                             if(addresses == null)
                                 logger.LogInfo("[Client: Delete] No replicas found");
                            
-                            this.tcp.deleteFiles(sdfsFileName, addresses);
+                            //this.tcp.deleteFiles(sdfsFileName, addresses);
+                            this.tcp.deleteFilesParallel(sdfsFileName, addresses);
                             this.tcp.deleteSuccess(sdfsFileName);
                             
                         }
@@ -158,6 +160,7 @@ class ClientModule extends Thread
                         else if(command[0].equalsIgnoreCase("Leave")) 
                         {
                             MembershipList.changeNodeStatus(node, MembershipNode.Status.LEFT);
+                            ReplicaList.clearReplicas();
                             msg = new Message(MessageType.LEAVE, nodeList);                           
                         }
                         else if(command[0].equalsIgnoreCase("PrintList")) 

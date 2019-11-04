@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 /**
@@ -21,7 +22,7 @@ public class MembershipList
 
     private static MembershipList membershipList = null;
 
-    private static volatile List<MembershipNode> nodes;
+    private static volatile CopyOnWriteArrayList<MembershipNode> nodes;
 
     private static GrepLogger logger = GrepLogger.getInstance();
 
@@ -30,7 +31,7 @@ public class MembershipList
         try
         {
             id = InetAddress.getLocalHost().getHostAddress()+ "_" + LocalDateTime.now();
-            nodes = new ArrayList<MembershipNode>();
+            nodes = new CopyOnWriteArrayList<MembershipNode>();
             Message msg = new Message();
             Message.Node node = msg.new Node(id, 1);
             addNode(node);
