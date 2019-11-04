@@ -261,6 +261,21 @@ public class ReplicaList
         return replicaIpAddress;
     }
 
+    public static void CheckForReReplication() 
+    {
+		List<ReplicaFile> filesToBeReplicated = new ArrayList<ReplicaFile>();
+        for (ReplicaFile file : files) 
+        {
+            if (file.ReplicaIpAddress.size() < 4)
+            {
+                filesToBeReplicated.add(file);
+                break;
+
+            }
+        }
+
+        reReplicateFiles(filesToBeReplicated);
+	}
 
     public static void reReplicateDeletedNodeFiles(String ipAddress) 
     {
@@ -279,22 +294,18 @@ public class ReplicaList
         List<ReplicaFile> filesToBeReplicated = new ArrayList<ReplicaFile>();
         for (ReplicaFile replicaFile : files) 
         {
-            // for (String file : fileNames) 
-            // {
-            //     if (file.equals(replicaFile.FileName))
-            //     {
-            //         replicaFile.ReplicaIpAddress.remove(ipAddress);
-            //         filesToBeReplicated.add(replicaFile);
-            //     }
-            // }
-
             if (fileNames.contains(replicaFile.FileName))
             {
                 replicaFile.ReplicaIpAddress.remove(ipAddress);
                 filesToBeReplicated.add(replicaFile);
             }
-        }
+        } 
 
+        reReplicateFiles(filesToBeReplicated);
+    }
+    
+    private static void reReplicateFiles(List<ReplicaFile> filesToBeReplicated)
+    {
         for (ReplicaFile replicaFile : filesToBeReplicated) 
         {
             logger.LogInfo("[ReplicaList] [reReplicateDeletedNodeFiles] Files that have to be replicated: " + replicaFile.FileName);   
@@ -332,7 +343,7 @@ public class ReplicaList
                 }
             }
         }
-	}
+    }
 
     private static boolean replicateFile(String currentReplica, String newReplicaIpAddress, String file) 
     {

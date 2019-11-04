@@ -162,6 +162,7 @@ class ClientModule extends Thread
                         else if(command[0].equalsIgnoreCase("Leave")) 
                         {
                             MembershipList.changeNodeStatus(node, MembershipNode.Status.LEFT);
+                            ReplicaList.clearReplicas();
                             msg = new Message(MessageType.LEAVE, nodeList);                           
                         }
                         else if(command[0].equalsIgnoreCase("PrintList")) 
