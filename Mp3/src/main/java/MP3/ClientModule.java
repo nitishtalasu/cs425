@@ -94,7 +94,8 @@ class ClientModule extends Thread
                             if(addresses == null)
                                 logger.LogInfo("[Client: Get] No replicas found");
                            
-                            this.tcp.getFiles(sdfsFileName, localFileName, addresses);
+                            //this.tcp.getFiles(sdfsFileName, localFileName, addresses);
+                            this.tcp.getFilesParallel(sdfsFileName, localFileName, addresses);
 
                         }
                         else if(command[0].equalsIgnoreCase("put"))
@@ -119,7 +120,7 @@ class ClientModule extends Thread
                             if(addresses == null)
                                 logger.LogInfo("[Client: Put] No replicas found");
 
-                            this.tcp.putFiles(sdfsFileName, localFileName, addresses, "put");
+                            this.tcp.putFilesParallel(sdfsFileName, localFileName, addresses, "put");
                             // this.tcp.putCorpus(sdfsFileName, localFileName, addresses);
                             this.tcp.putSuccess(sdfsFileName);
                            
@@ -132,7 +133,8 @@ class ClientModule extends Thread
                             if(addresses == null)
                                 logger.LogInfo("[Client: Delete] No replicas found");
                            
-                            this.tcp.deleteFiles(sdfsFileName, addresses);
+                            //this.tcp.deleteFiles(sdfsFileName, addresses);
+                            this.tcp.deleteFilesParallel(sdfsFileName, addresses);
                             this.tcp.deleteSuccess(sdfsFileName);
                             
                         }
