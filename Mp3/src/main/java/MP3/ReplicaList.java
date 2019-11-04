@@ -435,31 +435,45 @@ public class ReplicaList
     
     public static void printReplicaNodes()
     {
-        logger.LogInfo("[ReplicaList] Printing replicaNodes");
+        System.out.println("[ReplicaList] Printing replicaNodes");
         for (ReplicaNode node : nodes) 
         {
-            logger.LogInfo("[ReplicaList] Printing replicaNode of IP: " + node.ipAddress);
+            System.out.println("[ReplicaList] Printing replicaNode of IP: " + node.ipAddress);
             for (String file : node.sdfsFileNames) 
             {
-                logger.LogInfo("[ReplicaList] FileName: " + file);
+                System.out.println("[ReplicaList] FileName: " + file);
             }
         }
     }
 
     public static void printReplicaFiles(String sdfsFileName)
     {
-        logger.LogInfo("[ReplicaList][printReplicaFiles] Printing replicafiles");
+        System.out.println("[ReplicaList][printReplicaFiles] Printing replicafiles");
         for (ReplicaFile file : files) 
         {
             if(file.FileName.equalsIgnoreCase(sdfsFileName))
             {
-                logger.LogInfo("[ReplicaList][printReplicaFiles] Printing replicafile of fileName: " + file.FileName);
+                System.out.println("[ReplicaList][printReplicaFiles] Printing replicafile of fileName: " + file.FileName);
         
                 for (String ip : file.ReplicaIpAddress) 
                 {
-                    logger.LogInfo("[ReplicaList][printReplicaFiles] Ip: " + ip);
+                    System.out.println("[ReplicaList][printReplicaFiles] Ip: " + ip);
                 }
             }
+        }
+    }
+
+    public static void printReplicaFiles()
+    {
+        System.out.println("[ReplicaList][printReplicaFiles] Printing replicafiles");
+        for (ReplicaFile file : files) 
+        {
+                System.out.println("[ReplicaList][printReplicaFiles] Printing replicafile of fileName: " + file.FileName);
+        
+                for (String ip : file.ReplicaIpAddress) 
+                {
+                    System.out.println("[ReplicaList][printReplicaFiles] Ip: " + ip);
+                }
         }
     }
 

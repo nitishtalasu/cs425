@@ -170,7 +170,7 @@ class ClientModule extends Thread
                         else if(command[0].equalsIgnoreCase("PrintId"))
                         {
                             Message.Node selfNode = MembershipList.getSelfNode();
-                            logger.LogInfo("[ClientInput] Self Id: " + selfNode);
+                            System.out.println("[ClientInput] Self Id: " + selfNode);
                             continue;
                         }
                         else if(command[0].equalsIgnoreCase("PrintNeighbors"))
@@ -184,7 +184,7 @@ class ClientModule extends Thread
                         }
                         else if(command[0].equalsIgnoreCase("Pl"))
                         {
-                            logger.LogInfo("[ClientInput] Leader: " + MembershipList.getLeaderIpAddress());
+                            System.out.println("[ClientInput] Leader: " + MembershipList.getLeaderIpAddress());
                             continue;
                         }
                         else if(command[0].equalsIgnoreCase("Pr"))
@@ -192,6 +192,12 @@ class ClientModule extends Thread
                             ReplicaList.printReplicaNodes();
                             continue;
                         }
+                        else if(command[0].equalsIgnoreCase("Pf"))
+                        {
+                            ReplicaList.printReplicaFiles();
+                            continue;
+                        }
+                       
                        
                         else if(command[0].equalsIgnoreCase("exit")) {
                             System.exit(0);
