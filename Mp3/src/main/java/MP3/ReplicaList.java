@@ -83,6 +83,27 @@ public class ReplicaList
             }
         }
     }
+    public static synchronized List<String> getLocalReplicas() 
+    {
+        String ip = "";
+        try
+        {
+            ip = InetAddress.getLocalHost().getHostAddress();
+        }
+        catch (UnknownHostException e) 
+        {
+            logger.LogException("[MemnershipList] Failed to create the membership list object. ", e);
+        }
+        for (ReplicaNode var: nodes)
+        {
+            if(var.ipAddress.equals(ip))
+            {
+                return var.sdfsFileNames;
+            }
+        }
+
+        return null;
+    }
 
     public static synchronized void printLocalReplicas()
     {
