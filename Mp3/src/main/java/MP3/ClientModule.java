@@ -92,7 +92,7 @@ class ClientModule extends Thread
                             if(addresses == null)
                                 logger.LogInfo("[Client: Get] No replicas found");
                            
-                            //this.tcp.getFiles(sdfsFileName, localFileName, addresses);
+                            this.tcp.getFiles(sdfsFileName, localFileName, addresses);
                             this.tcp.getFilesParallel(sdfsFileName, localFileName, addresses);
 
                         }
