@@ -142,8 +142,10 @@ public class ReplicaList
         List<ReplicaNode> possibleReplicas = new ArrayList<ReplicaNode>();
         for (ReplicaNode node : nodes) 
         {
+            System.out.println("Node: "+ node.ipAddress);
             if (!replicaIps.contains(node.ipAddress))
             {
+                System.out.println("Different replica: "+ node.ipAddress);
                 possibleReplicas.add(node);
             }
         }
@@ -316,37 +318,37 @@ public class ReplicaList
     {
         for (ReplicaFile replicaFile : filesToBeReplicated) 
         {
-            logger.LogInfo("[ReplicaList] [reReplicateDeletedNodeFiles] Files that have to be replicated: " + replicaFile.FileName);   
+            System.out.println("[ReplicaList] [reReplicateDeletedNodeFiles] Files that have to be replicated: " + replicaFile.FileName);   
         }
 
         for (ReplicaFile replicaFile : filesToBeReplicated) 
         {
             int countOfCurrentReplicas = replicaFile.ReplicaIpAddress.size();
-            logger.LogError("[ReplicaList] The current replicas count for file " + replicaFile.FileName + " : " + countOfCurrentReplicas);
+            System.out.println("[ReplicaList] The current replicas count for file " + replicaFile.FileName + " : " + countOfCurrentReplicas);
             List<ReplicaNode> possibleNewReplicaIpAddress = getPossibleReplicaMachines(replicaFile.ReplicaIpAddress);
             for(int i = countOfCurrentReplicas; i < 4; i++)
             {
                 if (replicaFile.ReplicaIpAddress.isEmpty())
                 {
-                    logger.LogError("[ReplicaList] There is no active replicas for this fileName" +
+                    System.out.println("[ReplicaList] There is no active replicas for this fileName" +
                         replicaFile.FileName);
                         break;
                 }
 
                 String currentReplicaIp = replicaFile.ReplicaIpAddress.get(0);
                 String newReplicaIp = possibleNewReplicaIpAddress.get(i - countOfCurrentReplicas).ipAddress;
-                logger.LogInfo("[ReplicaList] [reReplicateDeletedNodeFiles] Replicating file " + replicaFile.FileName + " from " +
+                System.out.println("[ReplicaList] [reReplicateDeletedNodeFiles] Replicating file " + replicaFile.FileName + " from " +
                         currentReplicaIp + " to " + newReplicaIp);
 
                 replicaFile.ReplicaIpAddress.add(newReplicaIp);
                 if(replicateFile(currentReplicaIp, newReplicaIp, replicaFile.FileName))
                 {
-                    logger.LogInfo("[ReplicaList] [reReplicateDeletedNodeFiles] Replicated file " + replicaFile.FileName + " to " +
+                    System.out.println("[ReplicaList] [reReplicateDeletedNodeFiles] Replicated file " + replicaFile.FileName + " to " +
                         newReplicaIp); 
                 }
                 else
                 {
-                    logger.LogInfo("[ReplicaList] [reReplicateDeletedNodeFiles] Failed to replicate file " + replicaFile.FileName + " to " +
+                    System.out.println("[ReplicaList] [reReplicateDeletedNodeFiles] Failed to replicate file " + replicaFile.FileName + " to " +
                         possibleNewReplicaIpAddress.get(i - countOfCurrentReplicas).ipAddress);
                 }
             }
