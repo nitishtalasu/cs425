@@ -1,5 +1,9 @@
 package MP3;
-
+/*
+* The component performs leader election.
+* Whenever a leader election is triggered, this component sends messages such as coordination message,
+* election, elected messages, to elect a new leader.
+**/
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;

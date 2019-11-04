@@ -2,7 +2,7 @@ package MP3;
 
 
 /**
- * This class handles the operations requested by the clients.
+ * This class handles the TCP operations requested by the clients.
  * 
  * @author Nitish Talasu(ntalasu2@illinois.edu)
  */
@@ -79,22 +79,6 @@ public class TcpMessagesRequestHandler extends Thread
                 
                 // Creating the process with given client command.
                 logger.LogInfo("[TcpMessageHandler] Server received message type: " + msgType);
-                
-                // if (msgType.equals(MessageType.PUT))
-                // {
-                //     if(writeCount >= 1)
-                //     {
-                //         this.socketOutputStream.writeUTF("Another write in process. Continue?");
-                //         // ask user if they want to overwrite
-                //         String choice = this.socketInputStream.readUTF();
-                //         if (choice.equals("no"))
-                //         {
-                //             // send negative reply to TcpClientModule
-                //             continue;
-                //         }
-                //     }
-                //     writeCount++;
-                // }
                 
                 String reply = ProcessMessage(msgType);
 
@@ -203,7 +187,7 @@ public class TcpMessagesRequestHandler extends Thread
     {
         String reply = "OK";
         String clientIpAddress = this.socket.getInetAddress().getHostAddress();
-        //logger.logInfo("Blablabla " + clientIpAddress);
+        
         MembershipList.setLeaderIpAddress(clientIpAddress);
         String selfIp = MembershipList.getIpAddress(MembershipList.getSelfNode().id);
         if (!selfIp.equals(clientIpAddress))
@@ -224,7 +208,6 @@ public class TcpMessagesRequestHandler extends Thread
         {
             reply = new Gson().toJson(files);
         }
-        //this.socketOutputStream.writeUTF(json);
 
         return reply;
     }    
@@ -299,7 +282,6 @@ public class TcpMessagesRequestHandler extends Thread
                         {
                             eof = true;
                             localWriteFile.close();
-                            //logger.LogInfo("Completed writing logs to file: "+sdfsFileName);
                             break;
                         }
                         localWriteFile.write(lineOutputs);
@@ -428,8 +410,7 @@ public class TcpMessagesRequestHandler extends Thread
         try
         {
            String sdfsFileName = this.socketInputStream.readUTF();
-        //    List<String> addresses = ReplicaList.getReplicaIpAddress(sdfsFileName);
-        //    String json = this.toJson(addresses);
+        
            ReplicaList.replicationCompleted(sdfsFileName);
         }
         catch(IOException e) 
@@ -445,8 +426,7 @@ public class TcpMessagesRequestHandler extends Thread
         try
         {
            String sdfsFileName = this.socketInputStream.readUTF();
-        //    List<String> addresses = ReplicaList.getReplicaIpAddress(sdfsFileName);
-        //    String json = this.toJson(addresses);
+  
            ReplicaList.deleteReplicaFile(sdfsFileName);
         }
         catch(IOException e) 

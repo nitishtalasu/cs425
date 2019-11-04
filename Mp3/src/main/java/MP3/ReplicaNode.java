@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
 /**
- * Class for nodes in the membership list.
+ * Class for nodes in the replica list.
  */
 public class ReplicaNode implements Comparable<ReplicaNode>
 {

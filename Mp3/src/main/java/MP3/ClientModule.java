@@ -13,6 +13,11 @@ import java.util.ArrayList;
  * Leave     : To leave the system (Sends Leave message to its neighbors).
  * PrintList : To print the membership list.
  * PrintId   : To print the node Id.
+ * get sdfsfilename localfilename      : Get replicas of a file
+ * put localfilename sdfsfilename      : Write/update to replicas of a file
+ * delete sdfsfilename                 : Delete all replicas of a file
+ * ls sdfsfilename                     : list all addresses where a file is stored
+ * store     : list all files stored at current machine
  * Exit      : To exit the program.
  */
 class ClientModule extends Thread  
@@ -61,27 +66,22 @@ class ClientModule extends Thread
         {   
             System.out.println("Waiting for user input..");
             while(true) {
-                // String str = "";
                 try
                 {
                     String command[] = null;
                     
                     str = sc.nextLine();
-                    // logger.LogInfo("printing");
-                    // logger.LogInfo(str);
-                    // logger.LogInfo(command[0]);
-                    // logger.LogInfo(str);
                     if(str != null) {
-                        // String command[];
+                        
                         String sdfsFileName;
                         String localFileName;
                         List<String> addresses;
                         Message msg = null;
                         Message.Node node = MembershipList.getSelfNode();
-                        // MembershipList.printMembershipList();
+                        
                         List<Message.Node> nodeList = new ArrayList<Message.Node>();
                         nodeList.add(node);
-                        // logger.LogInfo(nodeList.toString());
+                       
                         command = str.split(" ");
                         logger.LogInfo(command[0]); 
                         if(command[0].equalsIgnoreCase("get"))
@@ -89,7 +89,6 @@ class ClientModule extends Thread
                             sdfsFileName = command[1];
                             localFileName = command[2];
                             // call Leader and get addresses
-                            
                             addresses = this.tcp.getreplicasFromLeader(sdfsFileName);
                             if(addresses == null)
                                 logger.LogInfo("[Client: Get] No replicas found");
@@ -101,7 +100,7 @@ class ClientModule extends Thread
                         {   
                             sdfsFileName = command[2];
                             localFileName = command[1];
-                            // call Leader and get addresses
+                           
                             long timeElapsedAfterFileInsert = this.tcp.getFileLastUpdatedTime(sdfsFileName);
                             if (timeElapsedAfterFileInsert <= 60000 && timeElapsedAfterFileInsert != -1)
                             {
@@ -114,13 +113,13 @@ class ClientModule extends Thread
                                 logger.LogInfo("[Client : Put] Aborting the file insertion.");
                                 continue;
                             }
-
+                             // call Leader and get addresses
                             addresses = this.tcp.getAddressesFromLeader(sdfsFileName);
                             if(addresses == null)
                                 logger.LogInfo("[Client: Put] No replicas found");
 
                             this.tcp.putFiles(sdfsFileName, localFileName, addresses, "put");
-                            // this.tcp.putCorpus(sdfsFileName, localFileName, addresses);
+                            
                             this.tcp.putSuccess(sdfsFileName);
                            
                         }
@@ -139,17 +138,14 @@ class ClientModule extends Thread
                         else if(command[0].equalsIgnoreCase("ls"))
                         {   
                             sdfsFileName = command[1];
-                            ReplicaList.printReplicas(sdfsFileName);
+                            ReplicaList.printReplicaFiles(sdfsFileName);
+                            continue;
                         }
                         else if(command[0].equalsIgnoreCase("store"))
                         {   
-                            sdfsFileName = command[1];
-                            List<String> fileNames = ReplicaList.getLocalReplicas();
-                            logger.LogInfo("The files in the current machine are: ");
-                            for(String filename: fileNames)
-                            {
-                                logger.LogInfo(filename);
-                            }
+                            
+                            ReplicaList.printLocalReplicas();
+                            continue;
                         }
                         else if (str.equalsIgnoreCase("Join")) 
                         {
@@ -194,11 +190,7 @@ class ClientModule extends Thread
                             ReplicaList.printReplicaNodes();
                             continue;
                         }
-                        else if(command[0].equalsIgnoreCase("Pf"))
-                        {
-                            ReplicaList.printReplicaFiles();
-                            continue;
-                        }
+                       
                         else if(command[0].equalsIgnoreCase("exit")) {
                             System.exit(0);
                         }

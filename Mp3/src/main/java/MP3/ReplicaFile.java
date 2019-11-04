@@ -1,5 +1,7 @@
 package MP3;
-
+/**
+ * Class for each replica file in a replica list.
+ */
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

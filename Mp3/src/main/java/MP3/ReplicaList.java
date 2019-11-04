@@ -11,8 +11,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 /**
- * Class for maintaing the membershiplist and operations on membershiplist nodes.
- * This keeps volatile object for membershipList so that each thread and can access it,
+ * Class for maintaing the ReplicaList and operations on replicalist nodes.
+ * This keeps volatile object for replicaList so that each thread can access it,
  * and methods are synchronized to handle concurrent accessing to the methods.
  */
 public class ReplicaList 
@@ -49,7 +49,7 @@ public class ReplicaList
             replicaList = new ReplicaList();
         }
     }
-
+    
     public static synchronized List<ReplicaNode> getReplicas(String sdfsFileName) 
     {
         List<ReplicaNode> replica = new ArrayList<ReplicaNode>();
@@ -83,27 +83,21 @@ public class ReplicaList
             }
         }
     }
-    
-    public static synchronized List<String> getLocalReplicas() 
+
+    public static synchronized void printLocalReplicas()
     {
-        String ip = "";
-        try
+        logger.LogInfo("[ReplicaList] Printing replicaNodes");
+        for (ReplicaNode node : nodes) 
         {
-            ip = InetAddress.getLocalHost().getHostAddress();
-        }
-        catch (UnknownHostException e) 
-        {
-            logger.LogException("[MemnershipList] Failed to create the membership list object. ", e);
-        }
-        for (ReplicaNode var: nodes)
-        {
-            if(var.ipAddress.equals(ip))
+            if(node.id.equals(id))
             {
-                return var.sdfsFileNames;
+                logger.LogInfo("[ReplicaList] Printing replicaNode of IP: " + node.ipAddress);
+                for (String file : node.sdfsFileNames) 
+                {
+                    logger.LogInfo("[ReplicaList] FileName: " + file);
+                }
             }
         }
-
-        return null;
     }
 
     public static synchronized List<ReplicaNode> getReplicaMachines() 
@@ -138,13 +132,6 @@ public class ReplicaList
 
     public static synchronized List<String> addReplicaFiles(String fileName)
     {
-        // String localId = "";
-        // try{
-        //     localId = InetAddress.getLocalHost().getHostAddress();
-        // }
-        // catch(UnknownHostException e){}
-        
-
         List<String> replicaIpAddress = new ArrayList<String>();
         ReplicaFile replicaFile;// = new ReplicaFile(fileName, replicaIpAddress);
         boolean fileAlreadyExist = false;
@@ -279,15 +266,6 @@ public class ReplicaList
         List<ReplicaFile> filesToBeReplicated = new ArrayList<ReplicaFile>();
         for (ReplicaFile replicaFile : files) 
         {
-            // for (String file : fileNames) 
-            // {
-            //     if (file.equals(replicaFile.FileName))
-            //     {
-            //         replicaFile.ReplicaIpAddress.remove(ipAddress);
-            //         filesToBeReplicated.add(replicaFile);
-            //     }
-            // }
-
             if (fileNames.contains(replicaFile.FileName))
             {
                 replicaFile.ReplicaIpAddress.remove(ipAddress);
@@ -425,15 +403,19 @@ public class ReplicaList
         }
     }
 
-    public static void printReplicaFiles()
+    public static void printReplicaFiles(String sdfsFileName)
     {
         logger.LogInfo("[ReplicaList][printReplicaFiles] Printing replicafiles");
         for (ReplicaFile file : files) 
         {
-            logger.LogInfo("[ReplicaList][printReplicaFiles] Printing replicafile of fileName: " + file.FileName);
-            for (String ip : file.ReplicaIpAddress) 
+            if(file.FileName.equalsIgnoreCase(sdfsFileName))
             {
-                logger.LogInfo("[ReplicaList][printReplicaFiles] Ip: " + ip);
+                logger.LogInfo("[ReplicaList][printReplicaFiles] Printing replicafile of fileName: " + file.FileName);
+        
+                for (String ip : file.ReplicaIpAddress) 
+                {
+                    logger.LogInfo("[ReplicaList][printReplicaFiles] Ip: " + ip);
+                }
             }
         }
     }
@@ -444,13 +426,6 @@ public class ReplicaList
         {
             if(node.sdfsFileNames.contains(sdfsFileName))
             {
-                // for (String file: node.sdfsFileNames)
-                // {
-                //     if(file.equals(sdfsFileName))
-                //     {
-                //         node.sdfsFileNames.remove(sdfsFileName);
-                //     }
-                // }
                 node.sdfsFileNames.remove(sdfsFileName);
             }
             

@@ -34,11 +34,13 @@ public class TcpClientModule
      */
     public TcpClientModule()
     { 
-        // this.socket = socket; 
-        // this.vmId = vmId;
         this.logger = GrepLogger.getInstance();
     } 
 
+    /**
+     * method to get addresses of replicas from leader
+     * 
+     */
     public List<String> getAddressesFromLeader(String sdfsFileName)
     {
         String ip = MembershipList.getLeaderIpAddress();
@@ -63,6 +65,10 @@ public class TcpClientModule
         return getListObject(json);
     }
 
+    /**
+     * method to send success message on writing replicas
+     * 
+     */
     public void putSuccess(String sdfsFileName)
     {
         String ip = MembershipList.getLeaderIpAddress();
@@ -87,6 +93,10 @@ public class TcpClientModule
         
     }
 
+    /**
+     * method to get replicas from different nodes
+     * 
+     */
     public void getFiles(String sdfsFileName, String localFileName, List<String> addresses)
     {   
         long startTime = System.currentTimeMillis();
@@ -152,6 +162,10 @@ public class TcpClientModule
             System.out.println("[TCPClient] Rereplication time for " + sdfsFileName + " : " + (endTime - startTime));
     }
 
+     /**
+     * method to put replicas into different nodes
+     * 
+     */
     public void putFiles(String sdfsFileName, String localFileName, List<String> addresses, String type)
     {   
         long startTime = System.currentTimeMillis();
@@ -179,7 +193,6 @@ public class TcpClientModule
                 // read line by line
                 String line;
                 while ((line = br.readLine()) != null) {
-                    //logger.LogInfo(line);
                     this.outputStream.writeUTF(line);
                 }  
                 this.outputStream.writeUTF("EOF");
@@ -213,25 +226,10 @@ public class TcpClientModule
             System.out.println("[TCPClient] Rereplication time for " + sdfsFileName + " : " + (endTime - startTime));
     }
 
-    // public void putCorpus(String sdfsFileName, String localFileName, List<String> addresses)
-    // {   
-    //     long startTime = System.currentTimeMillis();
-    //     String currentDir = System.getProperty("user.dir");
-    //     String path = currentDir+"/src/main/java/MP3/localFile/";
-    //     File[] f = new File(path).listFiles();
-    //     System.out.println(f);
-    //     int count = 0;
-    //     for (File file : f) {
-    //             if (file.isFile()) {
-    //                     putFiles(file.getName(), file.getName(), addresses);
-    //                     count++;
-    //             }
-    //     }
-    //     long endTime = System.currentTimeMillis();
-    //     System.out.println("[TCPClient: Corpus] Rereplication time : " + (endTime - startTime));
-    // }
-
-
+     /**
+     * method to re-replicate files on node failure
+     * 
+     */
     public boolean reReplicateFiles(String currentReplicaAddress, String sdfsFileName, String ipAddressToReplicate)
     {   
         this.initializeStreams(currentReplicaAddress);
@@ -267,6 +265,11 @@ public class TcpClientModule
         this.closeSocket();
         return false;
     }
+
+     /**
+     * method to send success message to leader on deleting replica
+     * 
+     */
     public void deleteSuccess(String sdfsFileName)
     {
         String ip = MembershipList.getLeaderIpAddress();
@@ -291,6 +294,10 @@ public class TcpClientModule
         
     }
 
+     /**
+     * method to delete replicas of file
+     * 
+     */
     public void deleteFiles(String sdfsFileName, List<String> addresses)
     {   
         long startTime = System.currentTimeMillis();
@@ -357,7 +364,6 @@ public class TcpClientModule
     {     
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         List<String> msg = gson.fromJson(jsonString, List.class);
-        //String jsonEmp = gson.toJson(emp);
 
         return msg;
     }

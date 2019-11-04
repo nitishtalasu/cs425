@@ -42,8 +42,6 @@ package MP3;
             Thread client = ClientModule.getInstance(serverPort);
             client.start();
 
-
-
             server.join();
             hbThread.join();
             failureThread.join();

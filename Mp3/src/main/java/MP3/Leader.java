@@ -1,4 +1,7 @@
 package MP3;
+/*
+*  Class for maintainng the Leader node and its related operations
+**/
 
 import java.util.List;
 
