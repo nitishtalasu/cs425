@@ -396,7 +396,7 @@ public class TcpClientModule
              
                 if(type.equals("replicate"))
                 {
-                    localReadFile = new FileReader(currentDir+"/src/main/java/MP3/sdfsFile/"+localFileName);
+                    localReadFile = new FileReader(currentDir+"/src/main/java/MP3/sdfsFile/"+sdfsFileName);
                 }
                 else
                 {
