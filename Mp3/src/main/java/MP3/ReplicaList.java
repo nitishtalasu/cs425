@@ -107,15 +107,15 @@ public class ReplicaList
 
     public static synchronized void printLocalReplicas()
     {
-        logger.LogInfo("[ReplicaList] Printing replicaNodes");
+        // logger.LogInfo("[ReplicaList] Printing replicaNodes");
         for (ReplicaNode node : nodes) 
         {
             if(node.id.equals(id))
             {
-                logger.LogInfo("[ReplicaList] Printing replicaNode of IP: " + node.ipAddress);
+                logger.LogInfo("Printing replicas in IP: " + node.ipAddress);
                 for (String file : node.sdfsFileNames) 
                 {
-                    logger.LogInfo("[ReplicaList] FileName: " + file);
+                    System.out.println("FileName: " + file);
                 }
             }
         }
