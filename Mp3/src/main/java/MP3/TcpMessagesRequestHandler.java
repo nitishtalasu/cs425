@@ -139,7 +139,7 @@ public class TcpMessagesRequestHandler extends Thread
                 break;
 
             case PUT:
-                reply = PutFiles();
+                reply = PutFiles("put");
                 break;
 
             case DELETE:
@@ -147,7 +147,7 @@ public class TcpMessagesRequestHandler extends Thread
                 break;
 
             case REREPLICATE:
-                reply = ReReplicateFile();
+                reply = ReReplicateFile("replicate");
                 break;
             
             case LIST:
@@ -277,7 +277,7 @@ public class TcpMessagesRequestHandler extends Thread
         return reply;
     }
 
-    private String PutFiles()
+    private String PutFiles(String type)
     {
         String reply = "OK";
         logger.LogInfo("[TCPMessageRequestHandler] Entered PutFile method.");
@@ -351,7 +351,7 @@ public class TcpMessagesRequestHandler extends Thread
         return reply;
     }
 
-    private String ReReplicateFile()
+    private String ReReplicateFile(String type)
     {
         String reply = "OK";
 
@@ -364,7 +364,7 @@ public class TcpMessagesRequestHandler extends Thread
             List<String> ipAddresses = new ArrayList<String>();
             ipAddresses.add(ipAddressToReplicate);
             TcpClientModule client = new TcpClientModule();
-            client.putFiles(sdfsFileName, sdfsFileName, ipAddresses);
+            client.putFiles(sdfsFileName, sdfsFileName, ipAddresses, type);
             client.putSuccess(sdfsFileName);
         }
         catch(Exception e)

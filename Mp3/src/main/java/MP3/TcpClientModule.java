@@ -152,7 +152,7 @@ public class TcpClientModule
             System.out.println("[TCPClient] Rereplication time for " + sdfsFileName + " : " + (endTime - startTime));
     }
 
-    public void putFiles(String sdfsFileName, String localFileName, List<String> addresses)
+    public void putFiles(String sdfsFileName, String localFileName, List<String> addresses, String type)
     {   
         long startTime = System.currentTimeMillis();
         for(String address: addresses) 
@@ -167,7 +167,14 @@ public class TcpClientModule
                 this.outputStream.writeUTF(sdfsFileName);
                 String currentDir = System.getProperty("user.dir");
                 logger.LogInfo("Current directory"+ currentDir);
-                localReadFile = new FileReader(currentDir+"/src/main/java/MP3/localFile/"+localFileName);
+                if(type.equals("replicate"))
+                {
+                    localReadFile = new FileReader(currentDir+"/src/main/java/MP3/sdfsFile/"+localFileName);
+                }
+                else
+                {
+                    localReadFile = new FileReader(currentDir+"/src/main/java/MP3/localFile/"+localFileName);
+                }
                 BufferedReader br = new BufferedReader(localReadFile);
                 // read line by line
                 String line;
@@ -205,6 +212,25 @@ public class TcpClientModule
             long endTime = System.currentTimeMillis();
             System.out.println("[TCPClient] Rereplication time for " + sdfsFileName + " : " + (endTime - startTime));
     }
+
+    // public void putCorpus(String sdfsFileName, String localFileName, List<String> addresses)
+    // {   
+    //     long startTime = System.currentTimeMillis();
+    //     String currentDir = System.getProperty("user.dir");
+    //     String path = currentDir+"/src/main/java/MP3/localFile/";
+    //     File[] f = new File(path).listFiles();
+    //     System.out.println(f);
+    //     int count = 0;
+    //     for (File file : f) {
+    //             if (file.isFile()) {
+    //                     putFiles(file.getName(), file.getName(), addresses);
+    //                     count++;
+    //             }
+    //     }
+    //     long endTime = System.currentTimeMillis();
+    //     System.out.println("[TCPClient: Corpus] Rereplication time : " + (endTime - startTime));
+    // }
+
 
     public boolean reReplicateFiles(String currentReplicaAddress, String sdfsFileName, String ipAddressToReplicate)
     {   
