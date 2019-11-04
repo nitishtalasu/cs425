@@ -6,8 +6,8 @@ package MP3;
 public enum FailureDuration
 {
     // time in milliseconds
-    FAIL("FAIL", 1000),
-    EXIT("EXIT", 2000);
+    FAIL("FAIL", 3000),
+    EXIT("EXIT", 6000);
 
     private final String key;
     private final Integer value;

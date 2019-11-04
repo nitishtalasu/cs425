@@ -119,8 +119,8 @@ class ClientModule extends Thread
                             if(addresses == null)
                                 logger.LogInfo("[Client: Put] No replicas found");
 
-                            // this.tcp.putFiles(sdfsFileName, localFileName, addresses);
-                            this.tcp.putCorpus(sdfsFileName, localFileName, addresses);
+                            this.tcp.putFiles(sdfsFileName, localFileName, addresses, "put");
+                            // this.tcp.putCorpus(sdfsFileName, localFileName, addresses);
                             this.tcp.putSuccess(sdfsFileName);
                            
                         }
