@@ -125,7 +125,7 @@ public class ReplicaList
     {
         int quorum = 4;
         List<ReplicaNode> replicaMachines = new ArrayList<ReplicaNode>();
-        printReplicaNodes();
+        // printReplicaNodes();
         Collections.sort(nodes, new SortByFiles());
         for (ReplicaNode var: nodes)
         {
@@ -256,7 +256,7 @@ public class ReplicaList
     {
         List<String> replicaIpAddress = new ArrayList<String>();
         logger.LogInfo("[Replicalist][getReplicaIpAddress] fileName: " + fileName);
-        printReplicaNodes();
+        // printReplicaNodes();
         for (ReplicaFile file : files) 
         {
             if (file.FileName.equals(fileName))
@@ -410,7 +410,7 @@ public class ReplicaList
     public static void addNewFile(String sdfsFileName) 
     {
         logger.LogInfo("[ReplicaList] [AddNewFile] Printing nodes");
-        printReplicaNodes();
+        // printReplicaNodes();
         MembershipNode selfNodeDetails = MembershipList.getSelfNodeDetails();
         for (ReplicaNode node : nodes) 
         {

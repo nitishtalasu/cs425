@@ -83,7 +83,7 @@ public class TcpMessagesRequestHandler extends Thread
                 String reply = ProcessMessage(msgType);
 
                 // Writing the reply to the stream.
-                logger.LogInfo("[TcpMessageHandler] Server sending reply: " + reply);
+               
                 this.socketOutputStream.writeUTF(reply);            
                 logger.LogInfo("[TcpMessageHandler] Client request has been served.");
             } 
@@ -202,7 +202,7 @@ public class TcpMessagesRequestHandler extends Thread
     private String CoordinationMessage() 
     {
         String reply = "";
-        ReplicaList.printReplicaNodes();
+        // ReplicaList.printReplicaNodes();
         List<String> files = ReplicaList.getLocalReplicas();
         if (files != null)
         {
@@ -219,7 +219,7 @@ public class TcpMessagesRequestHandler extends Thread
         {
             String sdfsFileName = this.socketInputStream.readUTF();
             String currentDir = System.getProperty("user.dir");
-            logger.LogInfo("Current directory"+ currentDir);
+ 
             localReadFile = new FileReader(currentDir+"/src/main/java/MP3/sdfsFile/"+sdfsFileName);
 
             //variable to check end of file
@@ -268,7 +268,7 @@ public class TcpMessagesRequestHandler extends Thread
         {
             String sdfsFileName = this.socketInputStream.readUTF();
             String currentDir = System.getProperty("user.dir");
-            logger.LogInfo("Current directory"+ currentDir);
+           
             localWriteFile = new FileWriter(currentDir+"/src/main/java/MP3/sdfsFile/"+sdfsFileName);
 
             boolean eof = false;
@@ -285,7 +285,7 @@ public class TcpMessagesRequestHandler extends Thread
                             break;
                         }
                         localWriteFile.write(lineOutputs);
-                       // logger.LogInfo("Received line from : "+lineOutputs);
+                       
                         localWriteFile.write(System.getProperty("line.separator"));
                     } 
                     catch (EOFException e) 
@@ -314,7 +314,7 @@ public class TcpMessagesRequestHandler extends Thread
         {
             String sdfsFileName = this.socketInputStream.readUTF();
             String currentDir = System.getProperty("user.dir");
-            logger.LogInfo("Current directory"+ currentDir);
+           
             File file = new File(currentDir + "/src/main/java/MP3/sdfsFile/" +sdfsFileName);
             if(file.delete()) 
             { 

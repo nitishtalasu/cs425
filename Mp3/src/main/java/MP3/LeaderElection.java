@@ -129,7 +129,7 @@ class LeaderElection extends Thread
         {
             Socket socket = new Socket(ipAddress, Ports.TCPPort.getValue());
             socket.setSoTimeout(100000);
-            logger.LogInfo("[LeaderElection] Connected to "+ ipAddress + ".");
+            // logger.LogInfo("[LeaderElection] Connected to "+ ipAddress + ".");
             DataInputStream inputStream = new DataInputStream(socket.getInputStream());	
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());	
             String reply;
@@ -139,7 +139,7 @@ class LeaderElection extends Thread
         }
         catch(Exception e)
         {
-            logger.LogException("[LeaderElection] Connection failed to "+ ipAddress + ".", e);
+            // logger.LogException("[LeaderElection] Connection failed to "+ ipAddress + ".", e);
         }
 
         return "";

@@ -83,7 +83,6 @@ class ClientModule extends Thread
                         nodeList.add(node);
                        
                         command = str.split(" ");
-                        logger.LogInfo(command[0]); 
                         if(command[0].equalsIgnoreCase("get"))
                         {   
                             sdfsFileName = command[1];
@@ -151,11 +150,8 @@ class ClientModule extends Thread
                         }
                         else if (str.equalsIgnoreCase("Join")) 
                         {
-                            logger.LogInfo("1");
                             MembershipList.changeNodeStatus(node, MembershipNode.Status.RUNNING);
-                            logger.LogInfo("2");
                             msg = new Message(MessageType.JOIN, nodeList);
-                            logger.LogInfo("3");
                         }
                         else if(command[0].equalsIgnoreCase("Leave")) 
                         {
@@ -206,7 +202,6 @@ class ClientModule extends Thread
                         
                         if (str.equalsIgnoreCase("JOIN")) 
                         {
-                            logger.LogInfo("HELLO");
                             String introducer_address = Introducer.IPADDRESS.getValue();
                             int introducerPort = Integer.parseInt(Introducer.PORT.getValue());
                             
@@ -228,9 +223,7 @@ class ClientModule extends Thread
                         for(MembershipNode neighbor: neighborList) {
         
                             String address = neighbor.ipAddress;
-                            System.out.println(address);
                             InetAddress neighborAddress = InetAddress.getByName(address);
-                            System.out.println(neighborAddress);
                             DatagramSocket client = new DatagramSocket();
                             DatagramPacket dp = new DatagramPacket(
                                 this.buffer, 

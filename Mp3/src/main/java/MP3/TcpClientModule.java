@@ -126,12 +126,16 @@ public class TcpClientModule
 
             if(amount == addresses.size())
             {
-                logger.LogInfo("[TcpClient: PutFileParallel] Successfully fetched the file: "+ sdfsFileName);
+                logger.LogInfo("[TcpClient: GetFileParallel] Successfully fetched the file: "+ sdfsFileName);
+            }
+            if(amount <= 2)
+            {
+                logger.LogInfo("[TcpClient: GetFileParallel] Quorum not met for: "+ sdfsFileName);
             }
         }
         catch(Exception e)
         {
-            logger.LogException("[TcpClient: PutFileParallel] failed to put files with ", e);
+            logger.LogException("[TcpClient: GetFileParallel] failed to put files with ", e);
         }
     }
 
@@ -149,7 +153,6 @@ public class TcpClientModule
             this.outputStream.writeUTF(sdfsFileName);
             // generating files (for each server input) to store logs received from servers
             String currentDir = System.getProperty("user.dir");
-            logger.LogInfo("Current directory"+ currentDir);
             localWriteFile = new FileWriter(currentDir + "/src/main/java/MP3/localFile/"+localFileName + "_" + address);
 
             //variable to check end of file
@@ -169,7 +172,7 @@ public class TcpClientModule
                 } catch (EOFException e) {
                     eof = true;
                     localWriteFile.close();
-                    logger.LogInfo("Completed writing logs to file: "+localFileName);
+                    logger.LogInfo("Completed writing to file: "+localFileName);
                 }
             } 
             String reply = this.inputStream.readUTF();
@@ -221,7 +224,6 @@ public class TcpClientModule
                 this.outputStream.writeUTF(sdfsFileName);
                 // generating files (for each server input) to store logs received from servers
                 String currentDir = System.getProperty("user.dir");
-                logger.LogInfo("Current directory"+ currentDir);
                 localWriteFile = new FileWriter(currentDir + "/src/main/java/MP3/localFile/"+localFileName);
 
                 //variable to check end of file
@@ -241,7 +243,7 @@ public class TcpClientModule
                     } catch (EOFException e) {
                         eof = true;
                         localWriteFile.close();
-                        logger.LogInfo("Completed writing logs to file: "+localFileName);
+                        logger.LogInfo("Completed writing to file: "+localFileName);
                     }
                 } 
                 String reply = this.inputStream.readUTF();
@@ -306,6 +308,12 @@ public class TcpClientModule
             {
                 logger.LogInfo("[TcpClient: PutFileParallel] Successfully inserted the file: "+ sdfsFileName);
             }
+            else if(amount <= 2)
+            {
+                logger.LogInfo("[TcpClient: PutFileParallel] Deleting files as quorum not met for the file: "+ sdfsFileName);
+                List<String> addr = getreplicasFromLeader(sdfsFileName);
+                deleteFilesParallel(sdfsFileName, addr);
+            }
         }
         catch(Exception e)
         {
@@ -325,7 +333,6 @@ public class TcpClientModule
             this.outputStream.writeUTF(MessageType.PUT.toString());
             this.outputStream.writeUTF(sdfsFileName);
             String currentDir = System.getProperty("user.dir");
-            logger.LogInfo("Current directory"+ currentDir);
             if(type.equals("replicate"))
             {
                 localReadFile = new FileReader(currentDir+"/src/main/java/MP3/sdfsFile/"+localFileName);
@@ -344,7 +351,6 @@ public class TcpClientModule
             this.outputStream.writeUTF("EOF");
 
             String reply = this.inputStream.readUTF();
-            logger.LogInfo("[TCPClient] 2.  "+ reply);
             if(reply.equals("OK"))
             {
                 logger.LogInfo("[TCPClient] File sent."); 
@@ -387,7 +393,7 @@ public class TcpClientModule
                 this.outputStream.writeUTF(MessageType.PUT.toString());
                 this.outputStream.writeUTF(sdfsFileName);
                 String currentDir = System.getProperty("user.dir");
-                logger.LogInfo("Current directory"+ currentDir);
+             
                 if(type.equals("replicate"))
                 {
                     localReadFile = new FileReader(currentDir+"/src/main/java/MP3/sdfsFile/"+localFileName);
@@ -405,7 +411,7 @@ public class TcpClientModule
                 this.outputStream.writeUTF("EOF");
 
                 String reply = this.inputStream.readUTF();
-                logger.LogInfo("[TCPClient] 2.  "+ reply);
+           
                 if(reply.equals("OK"))
                 {
                     logger.LogInfo("[TCPClient] File sent."); 

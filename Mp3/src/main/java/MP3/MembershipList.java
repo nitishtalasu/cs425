@@ -174,7 +174,7 @@ public class MembershipList
             nodes.remove(nodeIndex);
         }
         
-        logger.LogInfo("[MemnershipList] Membershiplist after node got deleted:");
+        logger.LogInfo("[MembershipList] Membershiplist after node got deleted:");
         printMembershipList();
     }
 
