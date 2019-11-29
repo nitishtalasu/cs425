@@ -279,7 +279,7 @@ public class ReplicaList
             if (file.ReplicaIpAddress.size() < 4)
             {
                 filesToBeReplicated.add(file);
-                break;
+                //break;
 
             }
         }
