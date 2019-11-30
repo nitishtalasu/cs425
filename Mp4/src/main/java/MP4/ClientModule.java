@@ -136,6 +136,30 @@ class ClientModule extends Thread
                             this.tcp.deleteSuccess(sdfsFileName);
                             
                         }
+                        else if(command[0].equalsIgnoreCase("maple"))
+                        {
+                            String mapleExe = command[1];
+                            int numOfMapleJobs = Integer.parseInt(command[2]);
+                            String intermediatePrefixName = command[3];
+                            String localFileDir = command[4];
+                            Maple.submitJob(mapleExe, numOfMapleJobs, intermediatePrefixName, localFileDir);
+                            continue;
+                        }
+                        else if(command[0].equalsIgnoreCase("juice"))
+                        {
+                            String juiceExe = command[1];
+                            String numOfJuiceJobs = command[2];
+                            String intermediatePrefixName = command[3];
+                            String fileOutput = command[4];
+                            String deleteIntermediateFilesOption = command[5];
+                            Juice.submitJob(
+                                juiceExe, 
+                                numOfJuiceJobs, 
+                                intermediatePrefixName, 
+                                fileOutput, 
+                                deleteIntermediateFilesOption);
+                            continue;
+                        }
                         else if(command[0].equalsIgnoreCase("ls"))
                         {   
                             sdfsFileName = command[1];
@@ -197,12 +221,12 @@ class ClientModule extends Thread
                             ReplicaList.printReplicaFiles();
                             continue;
                         }
-                       
-                       
-                        else if(command[0].equalsIgnoreCase("exit")) {
+                        else if(command[0].equalsIgnoreCase("exit")) 
+                        {
                             System.exit(0);
                         }
-                        else {
+                        else 
+                        {
                             logger.LogWarning("[ClientInput] Wrong command");
                             continue;
                         }

@@ -154,8 +154,32 @@ public class TcpMessagesRequestHandler extends Thread
                 reply = FileTimeElapsed();
                 break;
 
+            case FILELIST:
+                reply = GetFileNames();
+                break;
+
+            case MAPLE:
+                reply = MapleJob();
+                break;
+
             case MAPLETASK:
                 reply = MapleTask();
+                break;
+
+            case MAPLETASKCOMPLETED:
+                reply = CompleteMapleTask();
+                break;
+
+            case JUICE:
+                reply = JuiceJob();
+                break;
+
+            case JUICETASK:
+                reply = JuiceTask();
+                break;
+            
+            case JUICETASKCOMPLETED:
+                reply = CompleteJuiceTask();
                 break;
 
             default:
@@ -440,6 +464,55 @@ public class TcpMessagesRequestHandler extends Thread
         return reply;
     }
 
+    private String GetFileNames()
+    {
+        String reply = "OK";
+        try
+        {
+           String fileName = this.socketInputStream.readUTF();
+           List<String> files = ReplicaList.GetFileNames(fileName);
+           String json = this.toJson(files);
+           logger.LogInfo("[TCPMessageRequestHandler][GetFileNames] Sending replica file list as: " + json);
+           this.socketOutputStream.writeUTF(json);
+        }
+        catch(IOException e) 
+        {
+            logger.LogException("[TCPMessageRequestHandler] Exception while sending file list: ", e); 
+            reply = "NACK";
+        }
+        return reply;
+    }
+
+    private String MapleJob()
+    {
+        String reply = "OK";
+        try
+        {
+            String selfIp = this.socket.getLocalAddress().toString();
+            if (!selfIp.equals(Introducer.IPADDRESS.getValue()))
+            {
+                logger.LogInfo("[TCPMessageRequestHandler] Maple job message reached node " +
+                    "which is not introducer. So dropping it.");
+                reply = "NACK"; 
+            }
+
+            String mapleExeName = this.socketInputStream.readUTF();
+            String intermediatePrefix  = this.socketInputStream.readUTF();
+            String numOfMaples = this.socketInputStream.readUTF();
+
+            if(!Maple.createJob(mapleExeName, intermediatePrefix, numOfMaples))
+            {
+                reply = "NACK";
+            }
+        }
+        catch(IOException e) 
+        {
+            logger.LogException("[TCPMessageRequestHandler] Exception while creating the maple job: ", e); 
+        }
+
+        return reply;
+    }
+
     private String MapleTask()
     {
         String reply = "OK";
@@ -447,14 +520,121 @@ public class TcpMessagesRequestHandler extends Thread
         {
             String inputCommand = this.socketInputStream.readUTF();
 
-            if(!Maple.runTask(inputCommand))
+            Maple maple = new Maple(inputCommand);
+            maple.start();
+        }
+        catch(IOException e) 
+        {
+            logger.LogException("[TCPMessageRequestHandler] Exception while starting the maple task", e); 
+            reply = "NACK";
+        }
+
+        return reply;
+    }
+
+    private String CompleteMapleTask()
+    {
+        String reply = "OK";
+        try
+        {
+            String taskId = this.socketInputStream.readUTF();
+
+            String selfIp = this.socket.getLocalAddress().toString();
+            if (!selfIp.equals(Introducer.IPADDRESS.getValue()))
+            {
+                logger.LogInfo("[TCPMessageRequestHandler] Maple job message reached node " +
+                    "which is not introducer. So dropping it.");
+                reply = "NACK"; 
+            }
+
+            MapleJuiceList.changeTaskStatus(taskId, TaskStatus.FINISHED);
+        }
+        catch(IOException e) 
+        {
+            logger.LogException("[TCPMessageRequestHandler] Exception while completing the maple task", e); 
+            reply = "NACK";
+        }
+
+        return reply;
+    }
+
+    private String JuiceJob()
+    {
+        String reply = "OK";
+        try
+        {
+            String selfIp = this.socket.getLocalAddress().toString();
+            if (!selfIp.equals(Introducer.IPADDRESS.getValue()))
+            {
+                logger.LogInfo("[TCPMessageRequestHandler] Juice job message reached node " +
+                    "which is not introducer. So dropping it.");
+                reply = "NACK"; 
+            }
+
+            String juiceExe = this.socketInputStream.readUTF();
+            String intermediatePrefixName  = this.socketInputStream.readUTF();
+            String numOfJuiceTasks = this.socketInputStream.readUTF();
+            String fileOutput = this.socketInputStream.readUTF();
+            String deleteIntermediateFilesOption = this.socketInputStream.readUTF();
+
+            if(!Juice.createJob(
+                    juiceExe, 
+                    intermediatePrefixName, 
+                    numOfJuiceTasks, 
+                    fileOutput, 
+                    deleteIntermediateFilesOption))
             {
                 reply = "NACK";
             }
         }
         catch(IOException e) 
         {
-            logger.LogException("[TCPMessageRequestHandler] Exception while starting the maple task", e); 
+            logger.LogException("[TCPMessageRequestHandler] Exception while creating the juice job: ", e); 
+        }
+
+        return reply;
+    }
+
+    private String JuiceTask()
+    {
+        String reply = "OK";
+        try
+        {
+            String inputCommand = this.socketInputStream.readUTF();
+
+            Juice juice = new Juice(inputCommand);
+            juice.start();
+        }
+        catch(IOException e) 
+        {
+            logger.LogException("[TCPMessageRequestHandler] Exception while starting the juice task", e); 
+            reply = "NACK";
+        }
+
+        return reply;
+    }
+
+    private String CompleteJuiceTask()
+    {
+        String reply = "OK";
+        try
+        {
+            String taskId = this.socketInputStream.readUTF();
+
+            String selfIp = this.socket.getLocalAddress().toString();
+            if (!selfIp.equals(Introducer.IPADDRESS.getValue()))
+            {
+                logger.LogInfo("[TCPMessageRequestHandler] Juice job message reached node " +
+                    "which is not introducer. So dropping it.");
+                reply = "NACK"; 
+            }
+
+            MapleJuiceList.changeTaskStatus(taskId, TaskStatus.FINISHED);
+        }
+        catch(IOException e) 
+        {
+            logger.LogException("[TCPMessageRequestHandler] Exception while completing the juice task", e); 
+            reply = "NACK";
         }
 
         return reply;

@@ -2,12 +2,14 @@ package MP4;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+
 import MP4.TcpClientModule;
 
 /**
  * Class that handles the maple operations.
  */
-public class Juice
+public class Juice extends Thread
 {
     private static GrepLogger logger = GrepLogger.getInstance();
 
@@ -15,22 +17,29 @@ public class Juice
 
     private static String localFilesDir = "/src/main/java/MP4/localFile/";
 
+    private String command;
+
+    public Juice(String command)
+    {
+        this.command = command;
+    }
+
     /**
      * 1) Get the required files from SDFS.
      * 2) Read lines in batches of 10.
      * 3) Execute Maple task for each batch of lines.
      * 4) Create intermediate files for each key and PUT in SDFS.
-     * @param inputCommand Input command to execute.
-     * @return True if task executed otherwise false.
      */
-    public static boolean runTask(String inputCommand)
+    @Override
+    public void run()
     {
         try
         {
-            String[] args = inputCommand.split(" ");
-            String exeFileName = args[0];
-            String inputFileName = args[1];
-            String outputFileName = args[2];
+            String[] args = this.command.split(" ");
+            String taskId = args[0];
+            String exeFileName = args[1];
+            String inputFileName = args[2];
+            String outputFileName = args[3];
             String currentDir = System.getProperty("user.dir");
             String fileDir = currentDir + localFilesDir;
             getFile(exeFileName);
@@ -39,14 +48,18 @@ public class Juice
             logger.LogInfo("[Juice][runTask] Result : " + res.toString() );
             createFile(res, fileDir + "intermediatePrefixFileName_" + exeFileName);
             putFilesInSdfs("intermediatePrefixFileName_" + exeFileName, outputFileName);
+            sendFinishMessage(taskId);
         }
         catch(Exception e)
         {
             logger.LogException("[Maple][runTask] Failed with: ", e);
-            return false;
         }
-        
-        return true;
+    }
+
+    private static void sendFinishMessage(String taskId) 
+    {
+        logger.LogInfo("[Maple][sendFinishMessage] Sending finish message for task: " + taskId);
+        client.completeJuiceTask(taskId);
     }
 
     private static List<String> executeCommand(String exeFileName, String fileName) throws IOException 
@@ -135,4 +148,88 @@ public class Juice
        }
        return result;
      }
+
+	public static void submitJob(
+        String juiceExe, 
+        String numOfJuiceJobs, 
+        String intermediatePrefixName, 
+        String fileOutput,
+        String deleteIntermediateFilesOption) 
+    {
+        logger.LogInfo("[Juice][submitJob] Submitting job: " + juiceExe + ", " + 
+            numOfJuiceJobs + ", " + intermediatePrefixName + ", " + fileOutput + ", " + 
+            deleteIntermediateFilesOption + ", ");
+        int ret =   client.submitJuiceJob(
+                        juiceExe, 
+                        numOfJuiceJobs, 
+                        intermediatePrefixName, 
+                        fileOutput, 
+                        deleteIntermediateFilesOption);
+        if (ret == 1)
+        {
+            logger.LogInfo("[Juice][submitJob] Job submitted successfully");
+        }
+        else
+        {
+            logger.LogError("[Juice][submitJob] Job submission failed");
+        }
+    }
+
+    public static boolean createJob(
+        String juiceExe, 
+        String intermediatePrefixName, 
+        String numOfJuiceTasks,
+        String fileOutput, 
+        String deleteIntermediateFilesOption) 
+    {
+        List<String> inputFiles = client.getFileNamesFromLeader(intermediatePrefixName);
+        // TODO : check for range partitioning.
+        List<String> workersIpAddress = getWorkers(numOfJuiceTasks);
+        List<JuiceTask> tasks = new ArrayList<JuiceTask>();
+        int count = 0;
+        for (String inputFile : inputFiles) 
+        {
+            tasks.add(new JuiceTask(juiceExe, intermediatePrefixName, inputFile, fileOutput, workersIpAddress.get(count)));
+            count = (count + 1) % workersIpAddress.size();
+        }
+
+        JuiceJob job = new JuiceJob(juiceExe, tasks, intermediatePrefixName ,deleteIntermediateFilesOption);
+        MapleJuiceList.addJobsAndTasks(job, tasks, workersIpAddress);
+        return true;
+    }
+    
+    private static List<String> getWorkers(String numOfJuices)
+    {
+        int numOfTasks = Integer.parseInt(numOfJuices);
+        List<MembershipNode> nodes = MembershipList.getMembershipNodes();
+        List<String> workerIps = new ArrayList<String>();
+        int count = 0;
+        while(count != numOfTasks)
+        {
+            int random = ThreadLocalRandom.current().nextInt(0, nodes.size());
+            MembershipNode node = nodes.get(random);
+            if (workerIps.contains(node.ipAddress))
+            {
+                continue;
+            }
+            workerIps.add(node.ipAddress);
+            count++;
+        }
+
+        return workerIps;
+    }
+
+    public static void deleteIntermediateFiles(String intermediatePrefix) 
+    {
+        List<String> inputFiles = client.getFileNamesFromLeader(intermediatePrefix);
+        for (String file : inputFiles) 
+        {
+            List<String> addresses = client.getreplicasFromLeader(file);
+            client.deleteFilesParallel(file, addresses);
+            client.deleteSuccess(file);
+        }
+
+	}
 }
+
+	

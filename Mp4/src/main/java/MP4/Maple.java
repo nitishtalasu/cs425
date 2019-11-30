@@ -1,13 +1,18 @@
 package MP4;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+
 import MP4.TcpClientModule;
 
 /**
  * Class that handles the maple operations.
  */
-public class Maple
+public class Maple extends Thread
 {
     private static GrepLogger logger = GrepLogger.getInstance();
 
@@ -15,22 +20,29 @@ public class Maple
 
     private static String localFilesDir = "/src/main/java/MP4/localFile/";
 
+    private String command;
+
+    public Maple(String command)
+    {
+        this.command = command;
+    }
+
     /**
      * 1) Get the required files from SDFS.
      * 2) Read lines in batches of 10.
      * 3) Execute Maple task for each batch of lines.
      * 4) Create intermediate files for each key and PUT in SDFS.
-     * @param inputCommand Input command to execute.
-     * @return True if task executed otherwise false.
      */
-    public static boolean runTask(String inputCommand)
+    @Override
+    public void run()
     {
         try
         {
-            String[] args = inputCommand.split(" ");
-            String exeFileName = args[0];
-            String inputFileName = args[1];
-            String intermediatePrefixFileName = args[2];
+            String[] args = this.command.split(" ");
+            String taskId = args[0];
+            String exeFileName = args[1];
+            String inputFileName = args[2];
+            String intermediatePrefixFileName = args[3];
             String currentDir = System.getProperty("user.dir");
             String fileDir = currentDir + localFilesDir;
             getFile(exeFileName);
@@ -38,14 +50,18 @@ public class Maple
             List<String> res = executeCommand(fileDir + exeFileName, fileDir + inputFileName);
             Set<String> keysProcessed = createFiles(res, fileDir + intermediatePrefixFileName);
             putFilesInSdfs(keysProcessed, intermediatePrefixFileName);
+            sendFinishMessage(taskId);
         }
         catch(Exception e)
         {
             logger.LogException("[Maple][runTask] Failed with: ", e);
-            return false;
         }
-        
-        return true;
+    }
+
+    private static void sendFinishMessage(String taskId) 
+    {
+        logger.LogInfo("[Maple][sendFinishMessage] Sending finish message for task: " + taskId);
+        client.completeMapleTask(taskId);
     }
 
     private static List<String> executeCommand(String exeFileName, String fileName) throws IOException 
@@ -106,9 +122,8 @@ public class Maple
         {
             // call Leader and get addresses
             String fileName = intermediatePrefixFileName + "_" + key;
-            List<String> addresses = client.getAddressesFromLeader(fileName);
-            client.putFilesParallel(fileName, fileName, addresses, "put");
-            client.putSuccess(fileName);
+            logger.LogInfo("[Maple][putFileInSdfs] Putting file in SDFS with name: " + fileName);
+            putFile(fileName, fileName);
         }
     }
 
@@ -141,4 +156,83 @@ public class Maple
        }
        return result;
      }
+
+	public static void submitJob(
+        String mapleExe, 
+        int numOfMapleTasks, 
+        String intermediatePrefixName,
+        String localFileDir) 
+    {
+        putFile(mapleExe, mapleExe);
+        putAllFilesInDir(localFileDir, mapleExe);
+        if (client.submitMapleJob(mapleExe, intermediatePrefixName, numOfMapleTasks) == 1)
+        {
+            logger.LogInfo("[Maple][submitJob] Job submitted successfully.");
+        }
+        else
+        {
+            logger.LogError("[Maple][submitJob] Job submission failed.");
+        }
+    }
+
+    public static boolean createJob(String mapleExeName, String intermediatePrefix, String numOfMaples) 
+    {
+        List<String> inputFiles = client.getFileNamesFromLeader(mapleExeName);
+        List<String> workersIpAddress = getWorkers(numOfMaples);
+        List<MapleTask> tasks = new ArrayList<MapleTask>();
+        int count = 0;
+        for (String inputFile : inputFiles) 
+        {
+            tasks.add(new MapleTask(mapleExeName, inputFile, intermediatePrefix, workersIpAddress.get(count)));
+            count = (count + 1) % workersIpAddress.size();
+        }
+
+        MapleJob job = new MapleJob(mapleExeName, tasks);
+        MapleJuiceList.addJobsAndTasks(job, tasks, workersIpAddress);
+        return true;
+	}
+
+    private static void putAllFilesInDir(String dir, String mapleExeName)
+    {
+        logger.LogInfo("[Maple][putAllFilesInDir] Putting all files in SDFS of directory: " + dir);
+        File[] files = new File(dir).listFiles();
+        for (File file : files) 
+        {
+            logger.LogInfo("[Maple][putAllFilesInDir] putting file: " + file.getName());
+            if (file.isFile()) 
+            {
+                String fileName = file.getName();
+                putFile(mapleExeName + "_" + fileName, fileName);
+            }
+        }
+    }
+
+    private static void putFile(String sdfsName, String localName)
+    {
+        List<String> addresses = client.getAddressesFromLeader(sdfsName);
+        client.putFilesParallel(sdfsName, localName, addresses, "put");
+        client.putSuccess(sdfsName);
+    }
+
+    private static List<String> getWorkers(String numOfMaples)
+    {
+        int numOfTasks = Integer.parseInt(numOfMaples);
+        List<MembershipNode> nodes = MembershipList.getMembershipNodes();
+        List<String> workerIps = new ArrayList<String>();
+        int count = 0;
+        while(count != numOfTasks)
+        {
+            int random = ThreadLocalRandom.current().nextInt(0, nodes.size());
+            MembershipNode node = nodes.get(random);
+            if (workerIps.contains(node.ipAddress))
+            {
+                continue;
+            }
+            workerIps.add(node.ipAddress);
+            count++;
+        }
+
+        return workerIps;
+    }
+
 }

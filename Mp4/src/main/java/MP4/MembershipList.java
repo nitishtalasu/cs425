@@ -6,7 +6,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Logger;
 
 /**
@@ -26,12 +28,15 @@ public class MembershipList
 
     private static GrepLogger logger = GrepLogger.getInstance();
 
+    private static volatile CopyOnWriteArraySet<String> workersIpAddress;
+
     private MembershipList() 
     {
         try
         {
             id = InetAddress.getLocalHost().getHostAddress()+ "_" + LocalDateTime.now();
             nodes = new CopyOnWriteArrayList<MembershipNode>();
+            workersIpAddress = new CopyOnWriteArraySet<String>();
             Message msg = new Message();
             Message.Node node = msg.new Node(id, 1);
             addNode(node);
@@ -139,6 +144,7 @@ public class MembershipList
         }
 
         nodes.add(newNode);
+        workersIpAddress.add(getIpAddress(node.id));
         Collections.sort(nodes);
     }
 
@@ -172,6 +178,7 @@ public class MembershipList
         if(nodeIndex != -1)
         {
             nodes.remove(nodeIndex);
+            workersIpAddress.remove(getIpAddress(node.id));
         }
         
         logger.LogInfo("[MembershipList] Membershiplist after node got deleted:");
@@ -471,5 +478,20 @@ public class MembershipList
         }
 
 		return isHigher;
-	}
+    }
+    
+    public static synchronized Set<String> getWorkersIpAddress() 
+    {
+        return workersIpAddress;
+    }
+
+    public static synchronized void addWorkersIpAddress(String workerIpAddress)
+    {
+        workersIpAddress.add(workerIpAddress);
+    }
+
+    public static synchronized void removeWorkersIpAddress(String workerIpAddress)
+    {
+        workersIpAddress.remove(workerIpAddress);
+    }
 }

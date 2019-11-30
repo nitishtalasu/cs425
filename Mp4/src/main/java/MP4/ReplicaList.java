@@ -514,5 +514,19 @@ public class ReplicaList
             }
         }
 		return timeElapsed;
-	}
+    }
+    
+    public static synchronized List<String> GetFileNames(String fileName)
+    {
+        List<String> fileNames = new ArrayList<String>();
+        for (ReplicaFile replicaFile : files) 
+        {
+            if (replicaFile.FileName.contains(fileName))
+            {
+                fileNames.add(replicaFile.FileName);
+            }
+        }
+
+        return fileNames;
+    }
 }

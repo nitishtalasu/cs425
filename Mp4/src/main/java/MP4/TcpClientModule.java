@@ -68,6 +68,30 @@ public class TcpClientModule
         return getListObject(json);
     }
 
+    public List<String> getFileNamesFromLeader(String fileName)
+    {
+        String ip = MembershipList.getLeaderIpAddress();
+        String json = "";
+        this.initializeStreams(ip);
+        try
+        {
+            this.outputStream.writeUTF(MessageType.FILELIST.toString());
+            this.outputStream.writeUTF(fileName);
+            json = this.inputStream.readUTF();
+            String reply = this.inputStream.readUTF();
+            if(reply.equals("OK"))
+            {
+                logger.LogInfo("[TCPClient] FileNames received."); 
+            }  
+        }
+        catch(IOException i) 
+        { 
+            logger.LogException("[TCPClient] Unable to receive files data.", i); 
+        } 
+        this.closeSocket();
+        return getListObject(json);
+    }
+
     /**
      * method to send success message on writing replicas
      * 
@@ -605,6 +629,209 @@ public class TcpClientModule
         catch(IOException i) 
         { 
             logger.LogException("[TCPClient] Unable to delete file.", i); 
+            ret = 0;
+        } 
+        this.closeSocket();
+
+        return ret;
+    }
+
+    public int submitMapleJob(String mapleExeName, String intermediatePrefix,  int numOfMaples)
+    {
+        int ret = 1;
+        this.initializeStreams(Introducer.IPADDRESS.getValue());
+        try
+        {
+            logger.LogInfo("[TCPClient][submitMapleJob] Connected to "+ Introducer.IPADDRESS.getValue() + ".");
+            
+            this.outputStream.writeUTF(MessageType.MAPLE.toString());
+            this.outputStream.writeUTF(mapleExeName);
+            this.outputStream.writeUTF(intermediatePrefix);
+            this.outputStream.writeUTF(String.valueOf(numOfMaples));
+            String reply = this.inputStream.readUTF();
+            if(reply.equals("OK"))
+            {
+                logger.LogInfo("[TCPClient][submitMapleJob] Maple job submitted."); 
+            }
+            else
+            {
+                ret = 0;
+            }
+        } 
+        catch(Exception e) 
+        { 
+            logger.LogException("[TCPClient] [submitMapleJob] Maple job submission failed: ", e); 
+            ret = 0;
+        } 
+        this.closeSocket();
+
+        return ret;
+    }
+
+    public int submitMapleTask(
+        String taskId,
+        String ipAddress, 
+        String mapleExeName, 
+        String inputFile,
+        String intermediatePrefix)
+    {
+        int ret = 1;
+        this.initializeStreams(ipAddress);
+        try
+        {
+            logger.LogInfo("[TCPClient][submitMapleTask] Connected to "+ ipAddress + ".");
+            
+            this.outputStream.writeUTF(MessageType.MAPLETASK.toString());
+            String command = taskId + " " + mapleExeName + " " + inputFile + " " + intermediatePrefix;
+            this.outputStream.writeUTF(command);
+            String reply = this.inputStream.readUTF();
+            if(reply.equals("OK"))
+            {
+                logger.LogInfo("[TCPClient][submitMapleTask] Maple task submitted."); 
+            }
+            else
+            {
+                ret = 0;
+            }
+        } 
+        catch(Exception e) 
+        { 
+            logger.LogException("[TCPClient][submitMapleTask] Maple task submission failed: ", e); 
+            ret = 0;
+        } 
+        this.closeSocket();
+
+        return ret;
+    }
+
+    public int completeMapleTask(String taskId)
+    {
+        int ret = 1;
+        this.initializeStreams(Introducer.IPADDRESS.getValue());
+        try
+        {
+            logger.LogInfo("[TCPClient][completeMapleTask] Connected to "+ Introducer.IPADDRESS.getValue() + ".");
+            
+            this.outputStream.writeUTF(MessageType.MAPLETASKCOMPLETED.toString());
+            this.outputStream.writeUTF(taskId);
+            String reply = this.inputStream.readUTF();
+            if(reply.equals("OK"))
+            {
+                logger.LogInfo("[TCPClient][completeMapleTask] Sent Maple task completion message."); 
+            }
+            else
+            {
+                ret = 0;
+            }
+        } 
+        catch(Exception e) 
+        { 
+            logger.LogException("[TCPClient][completeMapleTask] Maple task completion message failed: ", e); 
+            ret = 0;
+        } 
+        this.closeSocket();
+
+        return ret;
+    }
+
+    public int submitJuiceJob(
+        String juiceExe, 
+        String numOfJuiceJobs, 
+        String intermediatePrefixName, 
+        String fileOutput,
+        String deleteIntermediateFilesOption) 
+    {
+        int ret = 1;
+        this.initializeStreams(Introducer.IPADDRESS.getValue());
+        try
+        {
+            logger.LogInfo("[TCPClient][submitJuiceJob] Connected to "+ Introducer.IPADDRESS.getValue() + ".");
+            
+            this.outputStream.writeUTF(MessageType.JUICE.toString());
+            this.outputStream.writeUTF(juiceExe);
+            this.outputStream.writeUTF(intermediatePrefixName);
+            this.outputStream.writeUTF(numOfJuiceJobs);
+            this.outputStream.writeUTF(fileOutput);
+            this.outputStream.writeUTF(deleteIntermediateFilesOption);
+            String reply = this.inputStream.readUTF();
+            if(reply.equals("OK"))
+            {
+                logger.LogInfo("[TCPClient][submitJuiceJob] Maple job submitted."); 
+            }
+            else
+            {
+                ret = 0;
+            }
+        } 
+        catch(Exception e) 
+        { 
+            logger.LogException("[TCPClient][submitJuiceJob] Maple job submission failed: ", e); 
+            ret = 0;
+        } 
+        this.closeSocket();
+
+        return ret;
+    }
+    
+    public int submitJuiceTask(
+        String taskId,
+        String ipAddress, 
+        String juiceExeName, 
+        String inputFileName, 
+        String outputFileName)
+    {
+        int ret = 1;
+        this.initializeStreams(ipAddress);
+        try
+        {
+            logger.LogInfo("[TCPClient][submitJuiceTask] Connected to "+ ipAddress + ".");
+            
+            this.outputStream.writeUTF(MessageType.JUICETASK.toString());
+            String command = taskId + " " + juiceExeName + " " + inputFileName + " " + outputFileName;
+            this.outputStream.writeUTF(command);
+            String reply = this.inputStream.readUTF();
+            if(reply.equals("OK"))
+            {
+                logger.LogInfo("[TCPClient][submitJuiceTask] Juice task submitted."); 
+            }
+            else
+            {
+                ret = 0;
+            }
+        } 
+        catch(Exception e) 
+        { 
+            logger.LogException("[TCPClient][submitJuiceTask] Juice task submission failed: ", e); 
+            ret = 0;
+        } 
+        this.closeSocket();
+
+        return ret;
+    }
+
+    public int completeJuiceTask(String taskId)
+    {
+        int ret = 1;
+        this.initializeStreams(Introducer.IPADDRESS.getValue());
+        try
+        {
+            logger.LogInfo("[TCPClient][completeJuiceTask] Connected to "+ Introducer.IPADDRESS.getValue() + ".");
+            
+            this.outputStream.writeUTF(MessageType.JUICETASKCOMPLETED.toString());
+            this.outputStream.writeUTF(taskId);
+            String reply = this.inputStream.readUTF();
+            if(reply.equals("OK"))
+            {
+                logger.LogInfo("[TCPClient][completeJuiceTask] Sent Juice task completion message."); 
+            }
+            else
+            {
+                ret = 0;
+            }
+        } 
+        catch(Exception e) 
+        { 
+            logger.LogException("[TCPClient][completeJuiceTask] Juice task completion message failed: ", e); 
             ret = 0;
         } 
         this.closeSocket();
