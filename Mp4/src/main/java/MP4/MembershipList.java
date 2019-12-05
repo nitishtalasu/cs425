@@ -1,10 +1,13 @@
 package MP4;
 
+import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -34,7 +37,29 @@ public class MembershipList
     {
         try
         {
-            id = InetAddress.getLocalHost().getHostAddress()+ "_" + LocalDateTime.now();
+            // try {
+            //     Enumeration<NetworkInterface> networkInterfaces = NetworkInterface
+            //             .getNetworkInterfaces();
+            //     while (networkInterfaces.hasMoreElements()) {
+            //         NetworkInterface ni = (NetworkInterface) networkInterfaces
+            //                 .nextElement();
+            //         Enumeration<InetAddress> nias = ni.getInetAddresses();
+            //         while(nias.hasMoreElements()) {
+            //             InetAddress ia= (InetAddress) nias.nextElement();
+            //             if (!ia.isLinkLocalAddress() 
+            //              && !ia.isLoopbackAddress()
+            //              && ia instanceof Inet4Address) {
+            //                 System.out.println("addtess is "+ ia);
+            //                 id = ia.getHostAddress();
+                            
+            //             }
+            //         }
+            //     }
+            // } catch (Exception e) {
+            //     // LOG.error("unable to get current IP " + e.getMessage(), e);
+            // }
+            // id = InetAddress.getLocalHost().getHostAddress()+ "_" + LocalDateTime.now();
+            id = "192.168.0.2";
             nodes = new CopyOnWriteArrayList<MembershipNode>();
             workersIpAddress = new CopyOnWriteArraySet<String>();
             Message msg = new Message();
@@ -44,7 +69,7 @@ public class MembershipList
             if(getIpAddress(id).equals(Introducer.IPADDRESS.getValue()))
                 getLeaderIpAddress();
         } 
-        catch (UnknownHostException e) 
+        catch (Exception e) 
         {
             logger.LogException("[MemnershipList] Failed to create the membership list object. ", e);
         }

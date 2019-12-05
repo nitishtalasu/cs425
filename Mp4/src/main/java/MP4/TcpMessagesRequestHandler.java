@@ -261,9 +261,7 @@ public class TcpMessagesRequestHandler extends Thread
 
             myFile = new File(currentDir+"/src/main/java/MP4/sdfsFile/"+sdfsFileName);
             byte[] buffer; 
-            receiver = new ServerSocket(Ports.TCPPort.getValue());
-            // this.socket = receiver.accept();
-            System.out.println("Accepted connection from : " + receiver.accept());
+            
             FileInputStream fis = new FileInputStream(myFile);
             BufferedInputStream in = new BufferedInputStream(fis);
             long fileLength = myFile.length(); 

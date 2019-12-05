@@ -331,14 +331,14 @@ public class TcpClientModule
             { 
                 logger.LogException("[TCPClient] Unable to receive file data.", e); 
             } 
-            try
-            {
-                this.localWriteFile.close();
-            }
-            catch(Exception e)
-            {
-                logger.LogException("[TCPClient] Unable to close write file", e); 
-            }
+            // try
+            // {
+            //     this.localWriteFile.close();
+            // }
+            // catch(Exception e)
+            // {
+            //     logger.LogException("[TCPClient] Unable to close write file", e); 
+            // }
             this.closeSocket();
         }
             long endTime = System.currentTimeMillis();
@@ -421,9 +421,8 @@ public class TcpClientModule
 
 
             byte[] buffer; 
-            receiver = new ServerSocket(Ports.TCPPort.getValue());
-            socket = receiver.accept();
-            System.out.println("Accepted connection from : " + socket);
+            
+            // System.out.println("Accepted connection from : " + socket);
             FileInputStream fis = new FileInputStream(myFile);
             BufferedInputStream in = new BufferedInputStream(fis);
             long fileLength = myFile.length(); 
@@ -439,6 +438,7 @@ public class TcpClientModule
                 buffer = new byte[size]; 
                 in.read(buffer, 0, size); 
                 out.write(buffer);
+                System.out.println(buffer.toString());
                 System.out.print("Sending file ... "+(current*100)/fileLength+"% complete!");
             }   
             out.flush();
@@ -471,15 +471,15 @@ public class TcpClientModule
             logger.LogException("[TCPClient] Unable to put file data.", i);
             ret = 0;
         } 
-        try
-        {
-            this.localReadFile.close();
-        }
-        catch(Exception e) 
-        { 
-            logger.LogException("[TCPClient] Unable to close read file", e); 
-            ret = 0;
-        } 
+        // try
+        // {
+        //     this.localReadFile.close();
+        // }
+        // catch(Exception e) 
+        // { 
+        //     logger.LogException("[TCPClient] Unable to close read file", e); 
+        //     ret = 0;
+        // } 
         this.closeSocket();
         return ret;
     }
