@@ -258,12 +258,12 @@ public class TcpMessagesRequestHandler extends Thread
             localReadFile = new FileReader(currentDir+"/src/main/java/MP4/sdfsFile/"+sdfsFileName);
 
 
-            
+
             myFile = new File(currentDir+"/src/main/java/MP4/sdfsFile/"+sdfsFileName);
             byte[] buffer; 
             receiver = new ServerSocket(Ports.TCPPort.getValue());
-            socket = receiver.accept();
-            System.out.println("Accepted connection from : " + socket);
+            // this.socket = receiver.accept();
+            System.out.println("Accepted connection from : " + receiver.accept());
             FileInputStream fis = new FileInputStream(myFile);
             BufferedInputStream in = new BufferedInputStream(fis);
             long fileLength = myFile.length(); 
