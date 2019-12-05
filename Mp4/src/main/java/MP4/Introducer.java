@@ -5,7 +5,7 @@ package MP4;
 public enum Introducer
 {
 
-    IPADDRESS("ipaddress", "192.168.0.2"),
+    IPADDRESS("ipaddress", "172.22.154.195"),
     PORT("port", "5500");
 
     private final String key;
