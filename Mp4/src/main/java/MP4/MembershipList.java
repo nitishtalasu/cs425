@@ -37,29 +37,8 @@ public class MembershipList
     {
         try
         {
-            // try {
-            //     Enumeration<NetworkInterface> networkInterfaces = NetworkInterface
-            //             .getNetworkInterfaces();
-            //     while (networkInterfaces.hasMoreElements()) {
-            //         NetworkInterface ni = (NetworkInterface) networkInterfaces
-            //                 .nextElement();
-            //         Enumeration<InetAddress> nias = ni.getInetAddresses();
-            //         while(nias.hasMoreElements()) {
-            //             InetAddress ia= (InetAddress) nias.nextElement();
-            //             if (!ia.isLinkLocalAddress() 
-            //              && !ia.isLoopbackAddress()
-            //              && ia instanceof Inet4Address) {
-            //                 System.out.println("addtess is "+ ia);
-            //                 id = ia.getHostAddress();
-                            
-            //             }
-            //         }
-            //     }
-            // } catch (Exception e) {
-            //     // LOG.error("unable to get current IP " + e.getMessage(), e);
-            // }
-            // id = InetAddress.getLocalHost().getHostAddress()+ "_" + LocalDateTime.now();
-            id = "192.168.0.2";
+           
+            id = InetAddress.getLocalHost().getHostAddress()+ "_" + LocalDateTime.now();
             nodes = new CopyOnWriteArrayList<MembershipNode>();
             workersIpAddress = new CopyOnWriteArraySet<String>();
             Message msg = new Message();
