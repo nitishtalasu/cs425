@@ -81,7 +81,6 @@ public class Maple extends Thread
         BufferedReader processOutputReader =
             new BufferedReader(new InputStreamReader(process.getInputStream())); 
         
-        // Reads from buffer and sends back to the client in socket output stream.
         String outputLine;
         List<String> res = new ArrayList<String>();
         while ((outputLine = processOutputReader.readLine()) != null)
