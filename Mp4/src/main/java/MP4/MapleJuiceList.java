@@ -191,10 +191,12 @@ public class MapleJuiceList
         jobsToWorkerPool.remove(exeName);
     }
 
-    public static synchronized void addJobsAndTasks(Job newJob, List<Task> newTasks, List<String> workerpool) 
+    public static synchronized void addJobsAndTasks(Job newJob, List<? extends Task> newTasks, List<String> workerpool) 
     {
         addJob(newJob);
-        addTasks(newTasks);
+
+        List<Task> baseClassTasksList = new ArrayList<Task>(newTasks);
+        addTasks(baseClassTasksList);
         jobsToWorkerPool.put(newJob.exeName, workerpool);
         jobsToTask.put(newJob.exeName, newTasks.size());
     }
