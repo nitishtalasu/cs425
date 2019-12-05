@@ -9,6 +9,7 @@ package MP4;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -47,6 +48,12 @@ public class TcpMessagesRequestHandler extends Thread
     private FileWriter localWriteFile = null;
 
     private FileReader localReadFile = null;
+
+    private File myFile = null;
+
+    private OutputStream out = null;
+
+    private ServerSocket receiver = null;
 
     private int writeCount = 0;
   
@@ -250,14 +257,43 @@ public class TcpMessagesRequestHandler extends Thread
  
             localReadFile = new FileReader(currentDir+"/src/main/java/MP4/sdfsFile/"+sdfsFileName);
 
+
+            
+            myFile = new File(currentDir+"/src/main/java/MP4/sdfsFile/"+sdfsFileName);
+            byte[] buffer; 
+            receiver = new ServerSocket(Ports.TCPPort.getValue());
+            socket = receiver.accept();
+            System.out.println("Accepted connection from : " + socket);
+            FileInputStream fis = new FileInputStream(myFile);
+            BufferedInputStream in = new BufferedInputStream(fis);
+            long fileLength = myFile.length(); 
+            long current = 0;
+            while(current!=fileLength){ 
+                int size = 10000;
+                if(fileLength - current >= size)
+                    current += size;    
+                else{ 
+                    size = (int)(fileLength - current); 
+                    current = fileLength;
+                } 
+                buffer = new byte[size]; 
+                in.read(buffer, 0, size); 
+                out.write(buffer);
+                System.out.print("Sending file ... "+(current*100)/fileLength+"% complete!");
+            }   
+            out.flush();
+            out.close();
+            in.close();
+           
+
             //variable to check end of file
-            BufferedReader br = new BufferedReader(localReadFile);
+            // BufferedReader br = new BufferedReader(localReadFile);
             // read line by line
-            String line;
-            while ((line = br.readLine()) != null) {
-                this.socketOutputStream.writeUTF(line);
-            }  
-            this.socketOutputStream.writeUTF("EOF");
+            // String line;
+            // while ((line = br.readLine()) != null) {
+            //     this.socketOutputStream.writeUTF(line);
+            // }  
+            // this.socketOutputStream.writeUTF("EOF");
         }
         catch(IOException e)
         {
@@ -299,31 +335,52 @@ public class TcpMessagesRequestHandler extends Thread
            
             localWriteFile = new FileWriter(currentDir+"/src/main/java/MP4/sdfsFile/"+sdfsFileName, true);
 
-            boolean eof = false;
-                while (!eof) 
-                {
-                    try 
-                    {
-                        //read data sent by server, line-by-line, and write to file
-                        String lineOutputs = this.socketInputStream.readUTF();
-                        if (lineOutputs.equals("EOF"))
-                        {
-                            eof = true;
-                            localWriteFile.close();
-                            break;
-                        }
-                        localWriteFile.write(lineOutputs);
+            File test = new File(currentDir+"/src/main/java/MP4/sdfsFile/"+sdfsFileName);
+            int maxsize = 999999999;
+            int byteread;
+            int current = 0;
+            // byte[] buffer = new byte[maxsize];
+            
+            InputStream is = socket.getInputStream();
+            // File test = new File("D:\\AtomSetup.exe");
+            test.createNewFile();
+            FileOutputStream fos = new FileOutputStream(test);
+            BufferedOutputStream out = new BufferedOutputStream(fos);
+            byte[] buffer = new byte[16384];
+
+            while ((byteread = is.read(buffer, 0, buffer.length)) != -1) {
+                out.write(buffer, 0, byteread);
+            }
+            
+            out.flush();
+            fos.close();
+            is.close();
+
+            // boolean eof = false;
+            //     while (!eof) 
+            //     {
+            //         try 
+            //         {
+            //             //read data sent by server, line-by-line, and write to file
+            //             String lineOutputs = this.socketInputStream.readUTF();
+            //             if (lineOutputs.equals("EOF"))
+            //             {
+            //                 eof = true;
+            //                 localWriteFile.close();
+            //                 break;
+            //             }
+            //             localWriteFile.write(lineOutputs);
                        
-                        localWriteFile.write(System.getProperty("line.separator"));
-                    } 
-                    catch (EOFException e) 
-                    {
-                        eof = true;
-                        reply = "NACK";
-                        localWriteFile.close();
-                        logger.LogInfo("Completed writing logs to file: "+sdfsFileName);
-                    }
-                }
+            //             localWriteFile.write(System.getProperty("line.separator"));
+            //         } 
+            //         catch (EOFException e) 
+            //         {
+            //             eof = true;
+            //             reply = "NACK";
+            //             localWriteFile.close();
+            //             logger.LogInfo("Completed writing logs to file: "+sdfsFileName);
+            //         }
+            //     }
 
             ReplicaList.addNewFile(sdfsFileName);
         }
