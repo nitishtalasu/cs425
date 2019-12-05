@@ -276,11 +276,10 @@ public class TcpMessagesRequestHandler extends Thread
                 } 
                 buffer = new byte[size]; 
                 in.read(buffer, 0, size); 
-                out.write(buffer);
+                this.socketOutputStream.write(buffer);
                 System.out.print("Sending file ... "+(current*100)/fileLength+"% complete!");
             }   
-            out.flush();
-            out.close();
+            this.socketOutputStream.flush();
             in.close();
            
 
@@ -342,17 +341,17 @@ public class TcpMessagesRequestHandler extends Thread
             InputStream is = socket.getInputStream();
             // File test = new File("D:\\AtomSetup.exe");
             test.createNewFile();
-            FileOutputStream fos = new FileOutputStream(test);
+            FileOutputStream fos = new FileOutputStream(test, true);
             BufferedOutputStream out = new BufferedOutputStream(fos);
             byte[] buffer = new byte[16384];
 
-            while ((byteread = is.read(buffer, 0, buffer.length)) != -1) {
+            while ((byteread = this.socketInputStream.read(buffer, 0, buffer.length)) != -1) {
                 out.write(buffer, 0, byteread);
             }
             
             out.flush();
             fos.close();
-            is.close();
+           
 
             // boolean eof = false;
             //     while (!eof) 

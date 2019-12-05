@@ -189,20 +189,20 @@ public class TcpClientModule
             int current = 0;
             // byte[] buffer = new byte[maxsize];
            
-            InputStream is = socket.getInputStream();
+            // InputStream is = socket.getInputStream();
             // File test = new File("D:\\AtomSetup.exe");
             test.createNewFile();
             FileOutputStream fos = new FileOutputStream(test);
             BufferedOutputStream out = new BufferedOutputStream(fos);
             byte[] buffer = new byte[16384];
 
-            while ((byteread = is.read(buffer, 0, buffer.length)) != -1) {
+            while ((byteread = this.inputStream.read(buffer, 0, buffer.length)) != -1) {
               out.write(buffer, 0, byteread);
             }
             
             out.flush();
             fos.close();
-            is.close();
+           
 
 
             //variable to check end of file
@@ -437,13 +437,12 @@ public class TcpClientModule
                 } 
                 buffer = new byte[size]; 
                 in.read(buffer, 0, size); 
-                out.write(buffer);
+                this.outputStream.write(buffer);
                 System.out.println(buffer.toString());
                 System.out.print("Sending file ... "+(current*100)/fileLength+"% complete!");
             }   
-            out.flush();
-            out.close();
-            in.close();
+            this.outputStream.flush();
+           
            
             System.out.println("Finished sending");
             // BufferedReader br = new BufferedReader(localReadFile);
