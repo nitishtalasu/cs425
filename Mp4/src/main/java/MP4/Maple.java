@@ -7,6 +7,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.apache.commons.io.FilenameUtils;
+
 import MP4.TcpClientModule;
 
 /**
@@ -205,7 +207,7 @@ public class Maple extends Thread
         for (File file : files) 
         {
             logger.LogInfo("[Maple][putAllFilesInDir] putting file: " + file.getName());
-            if (file.isFile()) 
+            if (file.isFile() && FilenameUtils.getExtension(file.getName()).equals("txt")) 
             {
                 String fileName = file.getName();
                 putFile(mapleExeName + "_" + fileName, fileName);
