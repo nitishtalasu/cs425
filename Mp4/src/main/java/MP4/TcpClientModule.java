@@ -283,7 +283,7 @@ public class TcpClientModule
             System.out.println("[TCPClient] Rereplication time for " + sdfsFileName + " : " + (endTime - startTime));
     }
 
-    public void putFilesParallel(
+    public boolean putFilesParallel(
         final String sdfsFileName,
         final String localFileName,
         final List<String> addresses,
@@ -326,12 +326,16 @@ public class TcpClientModule
                 logger.LogInfo("[TcpClient: PutFileParallel] Deleting files as quorum not met for the file: "+ sdfsFileName);
                 List<String> addr = getreplicasFromLeader(sdfsFileName);
                 deleteFilesParallel(sdfsFileName, addr);
+                return false;
             }
         }
         catch(Exception e)
         {
             logger.LogException("[TcpClient: PutFileParallel] failed to put files with ", e);
+            return false;
         }
+
+        return true;
     }
 
     public int putFileParallel(String sdfsFileName, String localFileName, String address, String type)

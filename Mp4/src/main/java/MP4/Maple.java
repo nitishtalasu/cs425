@@ -47,8 +47,8 @@ public class Maple extends Thread
             String fileDir = currentDir + localFilesDir;
             getFile(exeFileName);
             getFile(inputFileName);
-            List<String> res = executeCommand(fileDir + exeFileName, fileDir + inputFileName);
-            Set<String> keysProcessed = createFiles(res, fileDir + intermediatePrefixFileName);
+            List<String> res = executeCommand(fileDir + "\\" + exeFileName, fileDir+ "\\" + inputFileName);
+            Set<String> keysProcessed = createFiles(res, fileDir + "\\" + intermediatePrefixFileName);
             putFilesInSdfs(keysProcessed, intermediatePrefixFileName);
             sendFinishMessage(taskId);
         }
@@ -73,9 +73,11 @@ public class Maple extends Thread
         // Creating the process with given client command.
         logger.LogInfo("[Maple][executeCommand] Server executing the process with command: " + commandArgs);
         ProcessBuilder processBuilder = new ProcessBuilder(commandArgs);
-        //Runtime rt = Runtime.getRuntime();
+        Runtime rt = Runtime.getRuntime();
         //Process process = rt.exec(commandArgs);
-        Process process = processBuilder.start();
+        //Process process = processBuilder.start();
+        String[] command2 = {"/bin/sh","-c", "java " + exeFileName + " " + fileName};
+        Process process = rt.exec(command2);
         
         // Buffer for reading the ouput from stream. 
         BufferedReader processOutputReader =
@@ -209,8 +211,14 @@ public class Maple extends Thread
     private static void putFile(String sdfsName, String localName)
     {
         List<String> addresses = client.getAddressesFromLeader(sdfsName);
-        client.putFilesParallel(sdfsName, localName, addresses, "put");
-        client.putSuccess(sdfsName);
+        if(client.putFilesParallel(sdfsName, localName, addresses, "put"))
+        {
+            client.putSuccess(sdfsName);
+        }
+        else
+        {
+            logger.LogError("[Maple][putFile] File insertion failed for" + sdfsName);
+        }
     }
 
     private static List<String> getWorkers(String numOfMaples)

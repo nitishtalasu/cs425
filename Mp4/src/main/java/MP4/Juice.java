@@ -44,9 +44,9 @@ public class Juice extends Thread
             String fileDir = currentDir + localFilesDir;
             getFile(exeFileName);
             getFile(inputFileName);
-            List<String> res = executeCommand(fileDir + exeFileName, fileDir + inputFileName);
+            List<String> res = executeCommand(fileDir + "\\" + exeFileName, fileDir+ "\\" + inputFileName);
             logger.LogInfo("[Juice][runTask] Result : " + res.toString() );
-            createFile(res, fileDir + "intermediatePrefixFileName_" + exeFileName);
+            createFile(res, fileDir+ "\\" + "intermediatePrefixFileName_" + exeFileName);
             putFilesInSdfs("intermediatePrefixFileName_" + exeFileName, outputFileName);
             sendFinishMessage(taskId);
         }
@@ -71,9 +71,11 @@ public class Juice extends Thread
         // Creating the process with given client command.
         logger.LogInfo("[Juice][executeCommand] Server executing the process with command: " + commandArgs);
         ProcessBuilder processBuilder = new ProcessBuilder(commandArgs);
-        //Runtime rt = Runtime.getRuntime();
+        Runtime rt = Runtime.getRuntime();
         //Process process = rt.exec(commandArgs);
-        Process process = processBuilder.start();
+        //Process process = processBuilder.start();
+        String[] command2 = {"/bin/sh","-c", "java " + exeFileName + " " + fileName};
+        Process process = rt.exec(command2);
         
         // Buffer for reading the ouput from stream. 
         BufferedReader processOutputReader =
@@ -115,8 +117,14 @@ public class Juice extends Thread
     {
         // call Leader and get addresses
         List<String> addresses = client.getAddressesFromLeader(outputFileName);
-        client.putFilesParallel(outputFileName, intermediatePrefixFileName, addresses, "put");
-        client.putSuccess(outputFileName);
+        if(client.putFilesParallel(outputFileName, intermediatePrefixFileName, addresses, "put"))
+        {
+            client.putSuccess(outputFileName);
+        }
+        else
+        {
+            logger.LogError("[Juice][putFile] File insertion failed for" + outputFileName);
+        }
     }
 
     /**
