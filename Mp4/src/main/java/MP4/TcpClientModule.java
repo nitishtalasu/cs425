@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.net.ServerSocket;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.*;
@@ -258,6 +259,7 @@ public class TcpClientModule
                 int read = 0;
                 long count = 0;
                 long length = this.inputStream.readLong();
+                String reply = "";
                 while(count != length && (read = this.inputStream.read(buffer)) != -1)
                 {
                     if (count + read <= length)
@@ -267,12 +269,20 @@ public class TcpClientModule
                     else
                     {
                         fout.write(buffer, 0, (int)(length - count ));
+                        byte[] slice = Arrays.copyOfRange(buffer, (int)(length - count), read);
+                        reply = new String(slice);
+                        logger.LogInfo("[TcpClientModule][getFiles] reply:" + reply );
                     }
                     
                     count += read;
                 }
                 fout.close();
-                String reply = this.inputStream.readUTF();
+
+                if (length < count)
+                {
+                    reply = this.inputStream.readUTF();
+                }
+                
                 if(reply.equals("OK"))
                 {
                     logger.LogInfo("[TCPClient] File received."); 
