@@ -33,8 +33,11 @@ package MP4;
             logger.LogInfo("[Main] Starting the failure detector");
             Thread failureThread = new FailureDetector();
             failureThread.start();
-            
 
+            logger.LogInfo("[Main] Starting the failure detector");
+            Thread mapleJuiceThread = new MapleJuiceHandler();
+            mapleJuiceThread.start();
+            
             logger.LogInfo("[Main] Starting the TCP Server");
             Thread tcpServer = TcpServerModule.getInstance(Ports.TCPPort.getValue());
             tcpServer.start();
@@ -46,6 +49,7 @@ package MP4;
             server.join();
             hbThread.join();
             failureThread.join();
+            mapleJuiceThread.join();
             client.join();
             logger.LogInfo("[Main] closing progam");
 
