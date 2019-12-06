@@ -241,4 +241,19 @@ public class MapleJuiceList
         }
     }
 
+    public static void printJobsAndTasks() 
+    {
+        System.out.println("printing jobs");
+        for (Job job : jobs) 
+        {
+            System.out.println("Job Name:" + job.exeName + "\tStatus: " + job.status.toString());
+        }
+
+        for (Task task : tasks) 
+        {
+            System.out.println("Task job:" + task.exeFileName + "\tStatus: " + task.status.toString() +
+                "\tId: " + task.taskId + "\tWorker Ip: " + task.workerIp);
+        }
+	}
+
 }

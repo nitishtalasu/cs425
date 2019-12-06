@@ -221,6 +221,11 @@ class ClientModule extends Thread
                             ReplicaList.printReplicaFiles();
                             continue;
                         }
+                        else if(command[0].equalsIgnoreCase("Pj"))
+                        {
+                            MapleJuiceList.printJobsAndTasks();
+                            continue;
+                        }
                         else if(command[0].equalsIgnoreCase("exit")) 
                         {
                             System.exit(0);
