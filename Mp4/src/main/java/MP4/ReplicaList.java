@@ -523,7 +523,10 @@ public class ReplicaList
         List<String> fileNames = new ArrayList<String>();
         for (ReplicaFile replicaFile : files) 
         {
-            if (replicaFile.FileName.contains(fileName) && FilenameUtils.getExtension(fileName).equals(fileExtension))
+            logger.LogInfo("[ReplicaList][getfileNames] Filename and extension: " +  
+                replicaFile.FileName + " and " + FilenameUtils.getExtension(replicaFile.FileName));
+            if (replicaFile.FileName.contains(fileName) && 
+                FilenameUtils.getExtension(replicaFile.FileName).equals(fileExtension))
             {
                 fileNames.add(replicaFile.FileName);
             }
