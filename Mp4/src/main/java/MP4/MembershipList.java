@@ -1,10 +1,13 @@
 package MP4;
 
+import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -34,6 +37,7 @@ public class MembershipList
     {
         try
         {
+           
             id = InetAddress.getLocalHost().getHostAddress()+ "_" + LocalDateTime.now();
             nodes = new CopyOnWriteArrayList<MembershipNode>();
             workersIpAddress = new CopyOnWriteArraySet<String>();
@@ -44,7 +48,7 @@ public class MembershipList
             if(getIpAddress(id).equals(Introducer.IPADDRESS.getValue()))
                 getLeaderIpAddress();
         } 
-        catch (UnknownHostException e) 
+        catch (Exception e) 
         {
             logger.LogException("[MemnershipList] Failed to create the membership list object. ", e);
         }

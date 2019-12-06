@@ -269,14 +269,14 @@ public class TcpClientModule
             { 
                 logger.LogException("[TCPClient] Unable to receive file data.", e); 
             } 
-            try
-            {
-                this.localWriteFile.close();
-            }
-            catch(Exception e)
-            {
-                logger.LogException("[TCPClient] Unable to close write file", e); 
-            }
+            // try
+            // {
+            //     this.localWriteFile.close();
+            // }
+            // catch(Exception e)
+            // {
+            //     logger.LogException("[TCPClient] Unable to close write file", e); 
+            // }
             this.closeSocket();
         }
             long endTime = System.currentTimeMillis();
