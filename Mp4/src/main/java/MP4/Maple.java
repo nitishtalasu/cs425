@@ -49,7 +49,7 @@ public class Maple extends Thread
             String fileDir = currentDir + localFilesDir;
             getFile(exeFileName);
             getFile(inputFileName);
-            List<String> res = executeCommand(fileDir + exeFileName, fileDir + inputFileName);
+            List<String> res = executeCommand(fileDir , exeFileName, fileDir + inputFileName);
             Set<String> keysProcessed = createFiles(res, fileDir + intermediatePrefixFileName);
             putFilesInSdfs(keysProcessed, intermediatePrefixFileName);
             sendFinishMessage(taskId);
@@ -66,7 +66,7 @@ public class Maple extends Thread
         client.completeMapleTask(taskId);
     }
 
-    private static List<String> executeCommand(String exeFileName, String fileName) throws IOException 
+    private static List<String> executeCommand(String dir, String exeFileName, String fileName) throws IOException 
     {
         List<String> commandArgs = new ArrayList<String>();
         commandArgs.add(exeFileName);
@@ -78,7 +78,8 @@ public class Maple extends Thread
         Runtime rt = Runtime.getRuntime();
         //Process process = rt.exec(commandArgs);
         //Process process = processBuilder.start();
-        String[] command2 = {"/bin/sh","-c", "java " + exeFileName + " " + fileName};
+        exeFileName = exeFileName.substring(0, exeFileName.lastIndexOf("."));
+        String[] command2 = {"/bin/sh","-c", "java -classpath " + dir + " "+ exeFileName + " " + fileName};
         Process process = rt.exec(command2);
         
         // Buffer for reading the ouput from stream. 
