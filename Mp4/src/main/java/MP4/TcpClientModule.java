@@ -278,7 +278,7 @@ public class TcpClientModule
                 }
                 fout.close();
 
-                if (length < count)
+                if (length == count)
                 {
                     reply = this.inputStream.readUTF();
                 }
