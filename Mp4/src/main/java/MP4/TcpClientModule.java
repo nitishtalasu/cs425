@@ -260,7 +260,15 @@ public class TcpClientModule
                 long length = this.inputStream.readLong();
                 while(count != length && (read = this.inputStream.read(buffer)) != -1)
                 {
-                    fout.write(buffer, 0, read);
+                    if (count + read <= length)
+                    {
+                        fout.write(buffer, 0, read);
+                    }
+                    else
+                    {
+                        fout.write(buffer, 0, (int)(length - count ));
+                    }
+                    
                     count += read;
                 }
                 fout.close();
