@@ -257,6 +257,7 @@ public class TcpMessagesRequestHandler extends Thread
  
             //localReadFile = new FileReader(currentDir+"/src/main/java/MP4/sdfsFile/"+sdfsFileName);
             myFile = new File(currentDir+"/src/main/java/MP4/sdfsFile/"+sdfsFileName);
+            this.socketOutputStream.writeLong(myFile.length());
             DataInputStream in = new DataInputStream(new FileInputStream(myFile));
             byte[] arr = new byte[1024 * 1024];
             int len = 0;
@@ -267,16 +268,6 @@ public class TcpMessagesRequestHandler extends Thread
             this.socketOutputStream.flush();  
             in.close();         
             System.out.println("Finished sending");
-           
-
-            //variable to check end of file
-            // BufferedReader br = new BufferedReader(localReadFile);
-            // read line by line
-            // String line;
-            // while ((line = br.readLine()) != null) {
-            //     this.socketOutputStream.writeUTF(line);
-            // }  
-            // this.socketOutputStream.writeUTF("EOF");
         }
         catch(IOException e)
         {
@@ -323,11 +314,14 @@ public class TcpMessagesRequestHandler extends Thread
             bufferSize=socket.getReceiveBufferSize();
             FileOutputStream fout = new FileOutputStream(test, true);
             byte[] buffer = new byte[bufferSize];
-            int read;
+            int read = 0;
+            long count = 0;
+            long length = this.socketInputStream.readLong();
             logger.LogInfo("[TCPMessageRequestHandler] Started reading file.");
-            while((read = this.socketInputStream.read(buffer)) != -1)
+            while(count != length && (read = this.socketInputStream.read(buffer)) != -1)
             {
                 fout.write(buffer, 0, read);
+                count += read;
             }
             fout.close();
             logger.LogInfo("[TCPMessageRequestHandler] Completed reading file.");

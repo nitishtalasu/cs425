@@ -188,10 +188,13 @@ public class TcpClientModule
             bufferSize=socket.getReceiveBufferSize();
             FileOutputStream fout = new FileOutputStream(test);
             byte[] buffer = new byte[bufferSize];
-            int read;
-            while((read = this.inputStream.read(buffer)) != -1)
+            int read = 0;
+            long count = 0;
+            long length = this.inputStream.readLong();
+            while(count != length && (read = this.inputStream.read(buffer)) != -1)
             {
                 fout.write(buffer, 0, read);
+                count += read;
             }
             fout.close();
 
@@ -251,13 +254,15 @@ public class TcpClientModule
                 bufferSize=socket.getReceiveBufferSize();
                 FileOutputStream fout = new FileOutputStream(test);
                 byte[] buffer = new byte[bufferSize];
-                int read;
-                while((read = this.inputStream.read(buffer)) != -1)
+                int read = 0;
+                long count = 0;
+                long length = this.inputStream.readLong();
+                while(count != length && (read = this.inputStream.read(buffer)) != -1)
                 {
                     fout.write(buffer, 0, read);
+                    count += read;
                 }
                 fout.close();
-
                 String reply = this.inputStream.readUTF();
                 if(reply.equals("OK"))
                 {
@@ -361,7 +366,7 @@ public class TcpClientModule
                 myFile = new File(currentDir+"/src/main/java/MP4/localFile/"+localFileName);
             }
 
-
+            this.outputStream.writeLong(myFile.length());
             DataInputStream in = new DataInputStream(new FileInputStream(myFile));
             byte[] arr = new byte[1024 * 1024];
             int len = 0;
@@ -429,7 +434,7 @@ public class TcpClientModule
                     myFile = new File(currentDir+"/src/main/java/MP4/localFile/"+localFileName);
                 }
     
-    
+                this.outputStream.writeLong(myFile.length());
                 DataInputStream in = new DataInputStream(new FileInputStream(myFile));
                 byte[] arr = new byte[1024 * 1024];
                 int len = 0;

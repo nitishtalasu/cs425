@@ -180,6 +180,11 @@ public class Maple extends Thread
     {
         List<String> inputFiles = client.getFileNamesFromLeader(mapleExeName);
         List<String> workersIpAddress = getWorkers(numOfMaples);
+        for (String workerIp : workersIpAddress) 
+        {
+            logger.LogInfo("[Maple][createJob] One of the worker is " + workerIp);
+        }
+        
         List<MapleTask> tasks = new ArrayList<MapleTask>();
         int count = 0;
         for (String inputFile : inputFiles) 
@@ -227,6 +232,8 @@ public class Maple extends Thread
         List<MembershipNode> nodes = MembershipList.getMembershipNodes();
         List<String> workerIps = new ArrayList<String>();
         int count = 0;
+
+        // TODO check for condition if numOfMaples are less than nodes.
         while(count != numOfTasks)
         {
             int random = ThreadLocalRandom.current().nextInt(0, nodes.size());

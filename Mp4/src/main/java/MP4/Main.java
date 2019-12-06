@@ -24,6 +24,7 @@ package MP4;
             server.start();
             MembershipList.initializeMembershipList();
             ReplicaList.initializeReplicaList();
+            MapleJuiceList.initializeMapleJuiceList();
 
             logger.LogInfo("[Main] Starting the heartbeat handler");
             Thread hbThread = new HeartBeatThread();
