@@ -190,7 +190,7 @@ public class Juice extends Thread
         String fileOutput, 
         String deleteIntermediateFilesOption) 
     {
-        List<String> inputFiles = client.getFileNamesFromLeader(intermediatePrefixName);
+        List<String> inputFiles = client.getFileNamesFromLeader(intermediatePrefixName, "");
         // TODO : check for range partitioning.
         List<String> workersIpAddress = getWorkers(numOfJuiceTasks);
         List<JuiceTask> tasks = new ArrayList<JuiceTask>();
@@ -229,7 +229,7 @@ public class Juice extends Thread
 
     public static void deleteIntermediateFiles(String intermediatePrefix) 
     {
-        List<String> inputFiles = client.getFileNamesFromLeader(intermediatePrefix);
+        List<String> inputFiles = client.getFileNamesFromLeader(intermediatePrefix, "");
         for (String file : inputFiles) 
         {
             List<String> addresses = client.getreplicasFromLeader(file);
