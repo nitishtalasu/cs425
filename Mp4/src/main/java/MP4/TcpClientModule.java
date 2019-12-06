@@ -274,14 +274,7 @@ public class TcpClientModule
             { 
                 logger.LogException("[TCPClient] Unable to receive file data.", e); 
             } 
-            // try
-            // {
-            //     this.localWriteFile.close();
-            // }
-            // catch(Exception e)
-            // {
-            //     logger.LogException("[TCPClient] Unable to close write file", e); 
-            // }
+        
             this.closeSocket();
         }
             long endTime = System.currentTimeMillis();
@@ -394,15 +387,7 @@ public class TcpClientModule
             logger.LogException("[TCPClient] Unable to put file data.", i);
             ret = 0;
         } 
-        try
-        {
-            this.localReadFile.close();
-        }
-        catch(Exception e) 
-        { 
-            logger.LogException("[TCPClient] Unable to close read file", e); 
-            ret = 0;
-        }
+
 
         this.closeSocket();
         return ret;
@@ -460,14 +445,7 @@ public class TcpClientModule
             { 
                 logger.LogException("[TCPClient] Unable to put file data.", i); 
             } 
-            try
-            {
-                this.localReadFile.close();
-            }
-            catch(Exception e) 
-            { 
-                logger.LogException("[TCPClient] Unable to close read file", e); 
-            } 
+        
             this.closeSocket();
         }
             long endTime = System.currentTimeMillis();
