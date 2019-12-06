@@ -491,9 +491,13 @@ public class TcpMessagesRequestHandler extends Thread
         String reply = "OK";
         try
         {
-            String selfIp = this.socket.getLocalAddress().toString();
+            String selfIp = MembershipList.getSelfNode().id;
+            selfIp = MembershipList.getIpAddress(selfIp);
+            logger.LogInfo("[TCPMessageRequestHandler][MapleJob] selfIp:" + selfIp);
+            logger.LogInfo("[TCPMessageRequestHandler][MapleJob] Introducer Ip:" + Introducer.IPADDRESS.getValue());
             if (!selfIp.equals(Introducer.IPADDRESS.getValue()))
             {
+
                 logger.LogInfo("[TCPMessageRequestHandler] Maple job message reached node " +
                     "which is not introducer. So dropping it.");
                 reply = "NACK"; 
@@ -542,7 +546,8 @@ public class TcpMessagesRequestHandler extends Thread
         {
             String taskId = this.socketInputStream.readUTF();
 
-            String selfIp = this.socket.getLocalAddress().toString();
+            String selfIp = MembershipList.getSelfNode().id;
+            selfIp = MembershipList.getIpAddress(selfIp);
             if (!selfIp.equals(Introducer.IPADDRESS.getValue()))
             {
                 logger.LogInfo("[TCPMessageRequestHandler] Maple job message reached node " +
@@ -566,7 +571,8 @@ public class TcpMessagesRequestHandler extends Thread
         String reply = "OK";
         try
         {
-            String selfIp = this.socket.getLocalAddress().toString();
+            String selfIp = MembershipList.getSelfNode().id;
+            selfIp = MembershipList.getIpAddress(selfIp);
             if (!selfIp.equals(Introducer.IPADDRESS.getValue()))
             {
                 logger.LogInfo("[TCPMessageRequestHandler] Juice job message reached node " +
@@ -624,7 +630,8 @@ public class TcpMessagesRequestHandler extends Thread
         {
             String taskId = this.socketInputStream.readUTF();
 
-            String selfIp = this.socket.getLocalAddress().toString();
+            String selfIp = MembershipList.getSelfNode().id;
+            selfIp = MembershipList.getIpAddress(selfIp);
             if (!selfIp.equals(Introducer.IPADDRESS.getValue()))
             {
                 logger.LogInfo("[TCPMessageRequestHandler] Juice job message reached node " +
