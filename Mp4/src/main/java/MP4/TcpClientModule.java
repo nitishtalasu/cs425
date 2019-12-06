@@ -85,7 +85,7 @@ public class TcpClientModule
             String reply = this.inputStream.readUTF();
             if(reply.equals("OK"))
             {
-                logger.LogInfo("[TCPClient] FileNames received."); 
+                logger.LogInfo("[TCPClient] FileNames received." + json); 
             }  
         }
         catch(IOException i) 

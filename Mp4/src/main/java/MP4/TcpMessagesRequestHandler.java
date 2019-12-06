@@ -324,38 +324,15 @@ public class TcpMessagesRequestHandler extends Thread
             FileOutputStream fout = new FileOutputStream(test, true);
             byte[] buffer = new byte[bufferSize];
             int read;
+            logger.LogInfo("[TCPMessageRequestHandler] Started reading file.");
             while((read = this.socketInputStream.read(buffer)) != -1)
             {
                 fout.write(buffer, 0, read);
             }
             fout.close();
-            
+            logger.LogInfo("[TCPMessageRequestHandler] Completed reading file.");
 
-            // boolean eof = false;
-            //     while (!eof) 
-            //     {
-            //         try 
-            //         {
-            //             //read data sent by server, line-by-line, and write to file
-            //             String lineOutputs = this.socketInputStream.readUTF();
-            //             if (lineOutputs.equals("EOF"))
-            //             {
-            //                 eof = true;
-            //                 localWriteFile.close();
-            //                 break;
-            //             }
-            //             localWriteFile.write(lineOutputs);
-                       
-            //             localWriteFile.write(System.getProperty("line.separator"));
-            //         } 
-            //         catch (EOFException e) 
-            //         {
-            //             eof = true;
-            //             reply = "NACK";
-            //             localWriteFile.close();
-            //             logger.LogInfo("Completed writing logs to file: "+sdfsFileName);
-            //         }
-            //     }
+            
 
             ReplicaList.addNewFile(sdfsFileName);
         }
