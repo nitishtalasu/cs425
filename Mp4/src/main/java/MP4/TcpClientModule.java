@@ -72,7 +72,7 @@ public class TcpClientModule
         return getListObject(json);
     }
 
-    public List<String> getFileNamesFromLeader(String fileName)
+    public List<String> getFileNamesFromLeader(String fileName, String fileExtension)
     {
         String ip = MembershipList.getLeaderIpAddress();
         String json = "";
@@ -81,6 +81,7 @@ public class TcpClientModule
         {
             this.outputStream.writeUTF(MessageType.FILELIST.toString());
             this.outputStream.writeUTF(fileName);
+            this.outputStream.writeUTF(fileExtension);
             json = this.inputStream.readUTF();
             String reply = this.inputStream.readUTF();
             if(reply.equals("OK"))

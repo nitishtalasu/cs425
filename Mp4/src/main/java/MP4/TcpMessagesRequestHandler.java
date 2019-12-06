@@ -473,7 +473,8 @@ public class TcpMessagesRequestHandler extends Thread
         try
         {
            String fileName = this.socketInputStream.readUTF();
-           List<String> files = ReplicaList.GetFileNames(fileName);
+           String fileExtension = this.socketInputStream.readUTF();
+           List<String> files = ReplicaList.GetFileNames(fileName, fileExtension);
            String json = this.toJson(files);
            logger.LogInfo("[TCPMessageRequestHandler][GetFileNames] Sending replica file list as: " + json);
            this.socketOutputStream.writeUTF(json);

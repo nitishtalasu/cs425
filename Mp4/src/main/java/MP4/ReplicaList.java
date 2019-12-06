@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.FilenameUtils;
+
 /**
  * Class for maintaing the ReplicaList and operations on replicalist nodes.
  * This keeps volatile object for replicaList so that each thread can access it,
@@ -516,12 +518,12 @@ public class ReplicaList
 		return timeElapsed;
     }
     
-    public static synchronized List<String> GetFileNames(String fileName)
+    public static synchronized List<String> GetFileNames(String fileName, String fileExtension)
     {
         List<String> fileNames = new ArrayList<String>();
         for (ReplicaFile replicaFile : files) 
         {
-            if (replicaFile.FileName.contains(fileName))
+            if (replicaFile.FileName.contains(fileName) && FilenameUtils.getExtension(fileName).equals(fileExtension))
             {
                 fileNames.add(replicaFile.FileName);
             }

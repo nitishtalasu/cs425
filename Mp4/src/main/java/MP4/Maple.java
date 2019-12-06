@@ -180,7 +180,7 @@ public class Maple extends Thread
 
     public static boolean createJob(String mapleExeName, String intermediatePrefix, String numOfMaples) 
     {
-        List<String> inputFiles = client.getFileNamesFromLeader(mapleExeName);
+        List<String> inputFiles = client.getFileNamesFromLeader(mapleExeName, "txt");
         List<String> workersIpAddress = getWorkers(numOfMaples);
         for (String workerIp : workersIpAddress) 
         {
