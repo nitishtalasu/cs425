@@ -177,58 +177,23 @@ public class TcpClientModule
 
             logger.LogInfo("[TCPClient] Connected to "+ address + ".");
             
-            this.outputStream.writeUTF(MessageType.GET.toString());
-            
+            this.outputStream.writeUTF(MessageType.GET.toString());           
             this.outputStream.writeUTF(sdfsFileName);
+
             // generating files (for each server input) to store logs received from servers
             String currentDir = System.getProperty("user.dir");
             localWriteFile = new FileWriter(currentDir + "/src/main/java/MP4/localFile/"+localFileName + "_" + address);
-            File test = new File(currentDir + "/src/main/java/MP4/localFile/"+localFileName + "_" + address);
-            int maxsize = 999999999;
-            int byteread;
-            int current = 0;
-            // byte[] buffer = new byte[maxsize];
-           
-            InputStream is = socket.getInputStream();
-            // File test = new File("D:\\AtomSetup.exe");
-            test.createNewFile();
-            FileOutputStream fos = new FileOutputStream(test);
-            BufferedOutputStream out = new BufferedOutputStream(fos);
-            byte[] buffer = new byte[16384];
-
-            while ((byteread = is.read(buffer, 0, buffer.length)) != -1) {
-              out.write(buffer, 0, byteread);
+            File test = new File(currentDir + "/src/main/java/MP4/localFile/"+localFileName + "_" + address);     
+            int bufferSize=0;
+            bufferSize=socket.getReceiveBufferSize();
+            FileOutputStream fout = new FileOutputStream(test);
+            byte[] buffer = new byte[bufferSize];
+            int read;
+            while((read = this.inputStream.read(buffer)) != -1)
+            {
+                fout.write(buffer, 0, read);
             }
-            
-            out.flush();
-            fos.close();
-            is.close();
-
-
-            //variable to check end of file
-            // boolean eof = false;
-            // while (!eof) {
-            //     try {
-            //         //read data sent by server, line-by-line, and write to file
-            //         String lineOutputs = this.inputStream.readUTF();
-            //         if (lineOutputs.equals("EOF"))
-            //         {
-            //             eof = true;
-            //             localWriteFile.close();
-            //             break;
-            //         }
-            //         localWriteFile.write(lineOutputs);
-            //         localWriteFile.write(System.getProperty("line.separator"));
-            //     } catch (EOFException e) {
-            //         eof = true;
-            //         localWriteFile.close();
-            //         logger.LogInfo("Completed writing to file: "+localFileName);
-            //     }
-            // } 
-
-
-
-
+            fout.close();
 
             String reply = this.inputStream.readUTF();
             if(reply.equals("OK"))
@@ -274,52 +239,25 @@ public class TcpClientModule
 
                 logger.LogInfo("[TCPClient] Connected to "+ address + ".");
                 
-                this.outputStream.writeUTF(MessageType.GET.toString());
-                
+                this.outputStream.writeUTF(MessageType.GET.toString());               
                 this.outputStream.writeUTF(sdfsFileName);
+
                 // generating files (for each server input) to store logs received from servers
                 String currentDir = System.getProperty("user.dir");
                 localWriteFile = new FileWriter(currentDir + "/src/main/java/MP4/localFile/"+localFileName);
-                File test = new File(currentDir + "/src/main/java/MP4/localFile/"+localFileName + "_" + address);
-                int maxsize = 999999999;
-                int byteread;
-                int current = 0;
-                // byte[] buffer = new byte[maxsize];
-               
-                InputStream is = socket.getInputStream();
-                // File test = new File("D:\\AtomSetup.exe");
-                test.createNewFile();
-                FileOutputStream fos = new FileOutputStream(test);
-                BufferedOutputStream out = new BufferedOutputStream(fos);
-                byte[] buffer = new byte[16384];
-    
-                while ((byteread = is.read(buffer, 0, buffer.length)) != -1) {
-                  out.write(buffer, 0, byteread);
-                }
                 
-                out.flush();
-                fos.close();
-                is.close();
-                //variable to check end of file
-                // boolean eof = false;
-                // while (!eof) {
-                //     try {
-                //         //read data sent by server, line-by-line, and write to file
-                //         String lineOutputs = this.inputStream.readUTF();
-                //         if (lineOutputs.equals("EOF"))
-                //         {
-                //             eof = true;
-                //             localWriteFile.close();
-                //             break;
-                //         }
-                //         localWriteFile.write(lineOutputs);
-                //         localWriteFile.write(System.getProperty("line.separator"));
-                //     } catch (EOFException e) {
-                //         eof = true;
-                //         localWriteFile.close();
-                //         logger.LogInfo("Completed writing to file: "+localFileName);
-                //     }
-                // } 
+                File test = new File(currentDir+"/src/main/java/MP4/localFile/"+localFileName);
+                int bufferSize=0;
+                bufferSize=socket.getReceiveBufferSize();
+                FileOutputStream fout = new FileOutputStream(test);
+                byte[] buffer = new byte[bufferSize];
+                int read;
+                while((read = this.inputStream.read(buffer)) != -1)
+                {
+                    fout.write(buffer, 0, read);
+                }
+                fout.close();
+
                 String reply = this.inputStream.readUTF();
                 if(reply.equals("OK"))
                 {
@@ -420,40 +358,16 @@ public class TcpClientModule
             }
 
 
-            byte[] buffer; 
-            receiver = new ServerSocket(Ports.TCPPort.getValue());
-            socket = receiver.accept();
-            System.out.println("Accepted connection from : " + socket);
-            FileInputStream fis = new FileInputStream(myFile);
-            BufferedInputStream in = new BufferedInputStream(fis);
-            long fileLength = myFile.length(); 
-            long current = 0;
-            while(current!=fileLength){ 
-                int size = 10000;
-                if(fileLength - current >= size)
-                    current += size;    
-                else{ 
-                    size = (int)(fileLength - current); 
-                    current = fileLength;
-                } 
-                buffer = new byte[size]; 
-                in.read(buffer, 0, size); 
-                out.write(buffer);
-                System.out.print("Sending file ... "+(current*100)/fileLength+"% complete!");
-            }   
-            out.flush();
-            out.close();
-            in.close();
-           
+            DataInputStream in = new DataInputStream(new FileInputStream(myFile));
+            byte[] arr = new byte[1024 * 1024];
+            int len = 0;
+            while((len = in.read(arr)) != -1)
+            {
+                this.outputStream.write(arr, 0, len);
+            }
+            this.outputStream.flush();  
+            in.close();         
             System.out.println("Finished sending");
-            // BufferedReader br = new BufferedReader(localReadFile);
-            // // read line by line
-            // String line;
-            // while ((line = br.readLine()) != null) {
-            //     //logger.LogInfo(line);
-            //     this.outputStream.writeUTF(line);
-            // }  
-            // this.outputStream.writeUTF("EOF");
 
             String reply = this.inputStream.readUTF();
             if(reply.equals("OK"))
@@ -479,7 +393,8 @@ public class TcpClientModule
         { 
             logger.LogException("[TCPClient] Unable to close read file", e); 
             ret = 0;
-        } 
+        }
+
         this.closeSocket();
         return ret;
     }
@@ -511,42 +426,18 @@ public class TcpClientModule
                 }
     
     
-                byte[] buffer; 
-                receiver = new ServerSocket(Ports.TCPPort.getValue());
-                socket = receiver.accept();
-                System.out.println("Accepted connection from : " + socket);
-                FileInputStream fis = new FileInputStream(myFile);
-                BufferedInputStream in = new BufferedInputStream(fis);
-                long fileLength = myFile.length(); 
-                long current = 0;
-                while(current!=fileLength){ 
-                    int size = 10000;
-                    if(fileLength - current >= size)
-                        current += size;    
-                    else{ 
-                        size = (int)(fileLength - current); 
-                        current = fileLength;
-                    } 
-                    buffer = new byte[size]; 
-                    in.read(buffer, 0, size); 
-                    out.write(buffer);
-                    System.out.print("Sending file ... "+(current*100)/fileLength+"% complete!");
-                }   
-                out.flush();
-                out.close();
-                in.close();
-               
+                DataInputStream in = new DataInputStream(new FileInputStream(myFile));
+                byte[] arr = new byte[1024 * 1024];
+                int len = 0;
+                while((len = in.read(arr)) != -1)
+                {
+                    this.outputStream.write(arr, 0, len);
+                }
+                this.outputStream.flush();  
+                in.close();         
                 System.out.println("Finished sending");
-                // BufferedReader br = new BufferedReader(localReadFile);
-                // // read line by line
-                // String line;
-                // while ((line = br.readLine()) != null) {
-                //     this.outputStream.writeUTF(line);
-                // }  
-                // this.outputStream.writeUTF("EOF");
-
-                String reply = this.inputStream.readUTF();
-           
+        
+                String reply = this.inputStream.readUTF();   
                 if(reply.equals("OK"))
                 {
                     logger.LogInfo("[TCPClient] File sent."); 

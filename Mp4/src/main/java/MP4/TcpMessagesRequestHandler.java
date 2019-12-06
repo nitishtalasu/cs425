@@ -255,35 +255,18 @@ public class TcpMessagesRequestHandler extends Thread
             String sdfsFileName = this.socketInputStream.readUTF();
             String currentDir = System.getProperty("user.dir");
  
-            localReadFile = new FileReader(currentDir+"/src/main/java/MP4/sdfsFile/"+sdfsFileName);
-
-
-
+            //localReadFile = new FileReader(currentDir+"/src/main/java/MP4/sdfsFile/"+sdfsFileName);
             myFile = new File(currentDir+"/src/main/java/MP4/sdfsFile/"+sdfsFileName);
-            byte[] buffer; 
-            receiver = new ServerSocket(Ports.TCPPort.getValue());
-            // this.socket = receiver.accept();
-            System.out.println("Accepted connection from : " + receiver.accept());
-            FileInputStream fis = new FileInputStream(myFile);
-            BufferedInputStream in = new BufferedInputStream(fis);
-            long fileLength = myFile.length(); 
-            long current = 0;
-            while(current!=fileLength){ 
-                int size = 10000;
-                if(fileLength - current >= size)
-                    current += size;    
-                else{ 
-                    size = (int)(fileLength - current); 
-                    current = fileLength;
-                } 
-                buffer = new byte[size]; 
-                in.read(buffer, 0, size); 
-                out.write(buffer);
-                System.out.print("Sending file ... "+(current*100)/fileLength+"% complete!");
-            }   
-            out.flush();
-            out.close();
-            in.close();
+            DataInputStream in = new DataInputStream(new FileInputStream(myFile));
+            byte[] arr = new byte[1024 * 1024];
+            int len = 0;
+            while((len = in.read(arr)) != -1)
+            {
+                this.socketOutputStream.write(arr, 0, len);
+            }
+            this.socketOutputStream.flush();  
+            in.close();         
+            System.out.println("Finished sending");
            
 
             //variable to check end of file
@@ -336,25 +319,17 @@ public class TcpMessagesRequestHandler extends Thread
             localWriteFile = new FileWriter(currentDir+"/src/main/java/MP4/sdfsFile/"+sdfsFileName, true);
 
             File test = new File(currentDir+"/src/main/java/MP4/sdfsFile/"+sdfsFileName);
-            int maxsize = 999999999;
-            int byteread;
-            int current = 0;
-            // byte[] buffer = new byte[maxsize];
-            
-            InputStream is = socket.getInputStream();
-            // File test = new File("D:\\AtomSetup.exe");
-            test.createNewFile();
-            FileOutputStream fos = new FileOutputStream(test);
-            BufferedOutputStream out = new BufferedOutputStream(fos);
-            byte[] buffer = new byte[16384];
-
-            while ((byteread = is.read(buffer, 0, buffer.length)) != -1) {
-                out.write(buffer, 0, byteread);
+            int bufferSize=0;
+            bufferSize=socket.getReceiveBufferSize();
+            FileOutputStream fout = new FileOutputStream(test, true);
+            byte[] buffer = new byte[bufferSize];
+            int read;
+            while((read = this.socketInputStream.read(buffer)) != -1)
+            {
+                fout.write(buffer, 0, read);
             }
+            fout.close();
             
-            out.flush();
-            fos.close();
-            is.close();
 
             // boolean eof = false;
             //     while (!eof) 
