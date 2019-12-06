@@ -49,8 +49,8 @@ public class Maple extends Thread
             String fileDir = currentDir + localFilesDir;
             getFile(exeFileName);
             getFile(inputFileName);
-            List<String> res = executeCommand(fileDir + "\\" + exeFileName, fileDir+ "\\" + inputFileName);
-            Set<String> keysProcessed = createFiles(res, fileDir + "\\" + intermediatePrefixFileName);
+            List<String> res = executeCommand(fileDir + exeFileName, fileDir + inputFileName);
+            Set<String> keysProcessed = createFiles(res, fileDir + intermediatePrefixFileName);
             putFilesInSdfs(keysProcessed, intermediatePrefixFileName);
             sendFinishMessage(taskId);
         }
@@ -109,6 +109,12 @@ public class Maple extends Thread
             br.write(line + System.getProperty("line.separator"));
             br.close();
             fr.close();
+        }
+
+        // TODO remove this 
+        for (String string : keysProcessed) 
+        {
+            System.out.println("[Maple][createFiles] one of the processe key:" + string);
         }
 
         return keysProcessed;
