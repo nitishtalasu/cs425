@@ -53,6 +53,7 @@ public class Maple extends Thread
             Set<String> keysProcessed = createFiles(res, fileDir + intermediatePrefixFileName);
             putFilesInSdfs(keysProcessed, intermediatePrefixFileName);
             sendFinishMessage(taskId);
+            deleteLocalFiles(fileDir, keysProcessed, intermediatePrefixFileName);
         }
         catch(Exception e)
         {
@@ -134,6 +135,18 @@ public class Maple extends Thread
             String fileName = intermediatePrefixFileName + "_" + key;
             logger.LogInfo("[Maple][putFileInSdfs] Putting file in SDFS with name: " + fileName);
             putFile(fileName, fileName);
+        }
+    }
+
+    private void deleteLocalFiles(String dir, Set<String> keysProcessed, String intermediatePrefixFileName) 
+    {
+        logger.LogInfo("[Maple][deleteLocalFiles] Deleting all local files of the task directory: " + dir);
+        
+        for (String key : keysProcessed)
+        {
+            String fileName = intermediatePrefixFileName + "_" + key;
+            File file = new File(dir + fileName);
+            file.delete();
         }
     }
 
@@ -226,6 +239,7 @@ public class Maple extends Thread
             }
         }
     }
+    
 
     private static void putFile(String sdfsName, String localName)
     {

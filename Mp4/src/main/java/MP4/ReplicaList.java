@@ -6,7 +6,9 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
@@ -157,14 +159,14 @@ public class ReplicaList
 
     public static synchronized List<String> addReplicaFiles(String fileName)
     {
-        List<String> replicaIpAddress = new ArrayList<String>();
+        Set<String> replicaIpAddress = new HashSet<String>();
         ReplicaFile replicaFile;// = new ReplicaFile(fileName, replicaIpAddress);
         boolean fileAlreadyExist = false;
         for (ReplicaFile file : files) 
         {
             if(file.FileName.equals(fileName))
             {
-                replicaIpAddress = file.ReplicaIpAddress; 
+                replicaIpAddress = new HashSet<String>(file.ReplicaIpAddress); 
                 files.remove(file);
             }
         }
@@ -182,10 +184,11 @@ public class ReplicaList
             currentReplicas++;
         }
 
-        replicaFile = new ReplicaFile(fileName, replicaIpAddress);
+        List<String> ipAddress = new ArrayList<String>(replicaIpAddress);
+        replicaFile = new ReplicaFile(fileName, ipAddress);
         files.add(replicaFile);
 
-        return replicaIpAddress;
+        return ipAddress;
     }
 
     public static synchronized void deleteReplicaFile(String fileName)
@@ -213,10 +216,10 @@ public class ReplicaList
 
     public static synchronized void replicationCompleted(String fileName)
     {
-        logger.LogInfo("[Replicalist][replicationCompleted] Entered replicationCompleted");
+        logger.LogInfo("[Replicalist][replicationCompleted] Entered replicationCompleted" + fileName);
         for (ReplicaFile replicaFile : files) 
         {
-            logger.LogInfo("[Replicalist][replicationCompleted] fileName: " + replicaFile.FileName);
+            //logger.LogInfo("[Replicalist][replicationCompleted] fileName: " + replicaFile.FileName);
             
             if (replicaFile.FileName.equals(fileName))
             {
