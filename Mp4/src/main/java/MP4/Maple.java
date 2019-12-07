@@ -201,9 +201,14 @@ public class Maple extends Thread
             tasks.add(new MapleTask(mapleExeName, inputFile, intermediatePrefix, workersIpAddress.get(count)));
             count = (count + 1) % workersIpAddress.size();
         }
-
+        
         MapleJob job = new MapleJob(mapleExeName, tasks);
         MapleJuiceList.addJobsAndTasks(job, tasks, workersIpAddress);
+        MapleJuiceList.printJobsAndTasks();
+        try{
+            Thread.sleep(30000);
+        }
+        catch(Exception e){}
         return true;
 	}
 
