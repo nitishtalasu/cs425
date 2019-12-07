@@ -216,10 +216,10 @@ public class ReplicaList
 
     public static synchronized void replicationCompleted(String fileName)
     {
-        logger.LogInfo("[Replicalist][replicationCompleted] Entered replicationCompleted");
+        logger.LogInfo("[Replicalist][replicationCompleted] Entered replicationCompleted" + fileName);
         for (ReplicaFile replicaFile : files) 
         {
-            logger.LogInfo("[Replicalist][replicationCompleted] fileName: " + replicaFile.FileName);
+            //logger.LogInfo("[Replicalist][replicationCompleted] fileName: " + replicaFile.FileName);
             
             if (replicaFile.FileName.equals(fileName))
             {
