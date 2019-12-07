@@ -170,6 +170,7 @@ public class Juice extends Thread
         logger.LogInfo("[Juice][submitJob] Submitting job: " + juiceExe + ", " + 
             numOfJuiceJobs + ", " + intermediatePrefixName + ", " + fileOutput + ", " + 
             deleteIntermediateFilesOption + ", ");
+        putFile(juiceExe, juiceExe);
         int ret =   client.submitJuiceJob(
                         juiceExe, 
                         numOfJuiceJobs, 
@@ -251,7 +252,20 @@ public class Juice extends Thread
             client.deleteSuccess(file);
         }
 
-	}
+    }
+    
+    private static void putFile(String sdfsName, String localName)
+    {
+        List<String> addresses = client.getAddressesFromLeader(sdfsName);
+        if(client.putFilesParallel(sdfsName, localName, addresses, "put"))
+        {
+            client.putSuccess(sdfsName);
+        }
+        else
+        {
+            logger.LogError("[Juice][putFile] File insertion failed for" + sdfsName);
+        }
+    }
 }
 
 	
