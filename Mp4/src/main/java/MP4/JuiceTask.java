@@ -20,6 +20,7 @@ public class JuiceTask extends Task
             this.workerIp, 
             this.exeFileName, 
             this.inputFile, 
-            this.outputFile);
+            this.outputFile,
+            this.finishedKeys);
 	}
 }

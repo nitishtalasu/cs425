@@ -254,6 +254,20 @@ public class MapleJuiceList
             System.out.println("Task job:" + task.exeFileName + "\tStatus: " + task.status.toString() +
                 "\tId: " + task.taskId + "\tWorker Ip: " + task.workerIp);
         }
-	}
+    }
+    
+    public static void addProcessedKeys(String taskId, String key)
+    {
+        for (Task task : tasks) 
+        {
+            if (task.taskId.equals(taskId) && !task.finishedKeys.contains(key))
+            {
+                logger.LogInfo("[MapleJuiceList][addProcessedKeys] Adding key " + key +
+                    " to task with Id: " + task.taskId);
+                task.finishedKeys.add(key);
+                return;
+            }
+        }
+    }
 
 }

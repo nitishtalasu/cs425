@@ -23,10 +23,12 @@ public class Maple extends Thread
     private static String localFilesDir = "/src/main/java/MP4/localFile/";
 
     private String command;
+    private List<String> processedKeys;
 
-    public Maple(String command)
+    public Maple(String command, String processedKeysJson)
     {
         this.command = command;
+        this.processedKeys = TcpClientModule.getListObject(processedKeysJson);
     }
 
     /**
@@ -51,7 +53,7 @@ public class Maple extends Thread
             getFile(inputFileName);
             List<String> res = executeCommand(fileDir , exeFileName, fileDir + inputFileName);
             Set<String> keysProcessed = createFiles(res, fileDir + intermediatePrefixFileName);
-            putFilesInSdfs(keysProcessed, intermediatePrefixFileName);
+            putFilesInSdfs(taskId, keysProcessed, intermediatePrefixFileName, processedKeys);
             sendFinishMessage(taskId);
             deleteLocalFiles(fileDir, keysProcessed, intermediatePrefixFileName);
         }
@@ -127,14 +129,29 @@ public class Maple extends Thread
      * @param keysProcessed Keys to be prcoessed
      * @param intermediatePrefixFileName intermediate prefix file name
      */
-    private static void putFilesInSdfs(Set<String> keysProcessed, String intermediatePrefixFileName) 
+    private static void putFilesInSdfs(
+        String taskId, 
+        Set<String> keysProcessed, 
+        String intermediatePrefixFileName,
+        List<String> processedKeys) 
     {
         for (String key : keysProcessed) 
         {
             // call Leader and get addresses
             String fileName = intermediatePrefixFileName + "_" + key;
-            logger.LogInfo("[Maple][putFileInSdfs] Putting file in SDFS with name: " + fileName);
-            putFile(fileName, fileName);
+            if(!processedKeys.contains(fileName))
+            {
+                logger.LogInfo("[Maple][putFileInSdfs] Putting file in SDFS with name: " + fileName);
+                if (putFile(fileName, fileName) == 1)
+                {
+                    client.putProcessedKey(taskId, fileName);
+                }
+            }
+            else
+            {
+                logger.LogInfo("[Maple][putFileInSdfs] Skipping file in SDFS as already processed: " + fileName);
+            }
+            
         }
     }
 
@@ -218,10 +235,7 @@ public class Maple extends Thread
         MapleJob job = new MapleJob(mapleExeName, tasks);
         MapleJuiceList.addJobsAndTasks(job, tasks, workersIpAddress);
         MapleJuiceList.printJobsAndTasks();
-        try{
-            Thread.sleep(30000);
-        }
-        catch(Exception e){}
+
         return true;
 	}
 
@@ -241,16 +255,19 @@ public class Maple extends Thread
     }
     
 
-    private static void putFile(String sdfsName, String localName)
+    private static int putFile(String sdfsName, String localName)
     {
         List<String> addresses = client.getAddressesFromLeader(sdfsName);
         if(client.putFilesParallel(sdfsName, localName, addresses, "put"))
         {
             client.putSuccess(sdfsName);
+            //client.putProcessedKey(sdfsName);
+            return 1;
         }
         else
         {
             logger.LogError("[Maple][putFile] File insertion failed for" + sdfsName);
+            return 0;
         }
     }
 

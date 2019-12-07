@@ -189,6 +189,10 @@ public class TcpMessagesRequestHandler extends Thread
                 reply = CompleteJuiceTask();
                 break;
 
+            case ADDPROCESSEDKEY:
+                reply = AddProcessedKey();
+                break;
+
             default:
                 logger.LogWarning("[TcpMessageHandler] Either failed to resolve message type. Or" +
                     "Forgot to add msgType: " + msgType);
@@ -527,8 +531,9 @@ public class TcpMessagesRequestHandler extends Thread
         try
         {
             String inputCommand = this.socketInputStream.readUTF();
+            String processedKeysJson = this.socketInputStream.readUTF();
 
-            Maple maple = new Maple(inputCommand);
+            Maple maple = new Maple(inputCommand, processedKeysJson);
             maple.start();
         }
         catch(IOException e) 
@@ -610,9 +615,9 @@ public class TcpMessagesRequestHandler extends Thread
         String reply = "OK";
         try
         {
-            String inputCommand = this.socketInputStream.readUTF();
-
-            Juice juice = new Juice(inputCommand);
+            String inputCommand = this.socketInputStream.readUTF();     
+            String processedKeysJson = this.socketInputStream.readUTF();
+            Juice juice = new Juice(inputCommand, processedKeysJson);
             juice.start();
         }
         catch(IOException e) 
@@ -641,6 +646,33 @@ public class TcpMessagesRequestHandler extends Thread
             }
 
             MapleJuiceList.changeTaskStatus(taskId, TaskStatus.FINISHED);
+        }
+        catch(IOException e) 
+        {
+            logger.LogException("[TCPMessageRequestHandler] Exception while completing the juice task", e); 
+            reply = "NACK";
+        }
+
+        return reply;
+    }
+
+    private String AddProcessedKey()
+    {
+        String reply = "OK";
+        try
+        {
+            String taskId = this.socketInputStream.readUTF();
+            String key = this.socketInputStream.readUTF();
+            String selfIp = MembershipList.getSelfNode().id;
+            selfIp = MembershipList.getIpAddress(selfIp);
+            if (!selfIp.equals(Introducer.IPADDRESS.getValue()))
+            {
+                logger.LogInfo("[TCPMessageRequestHandler] Juice job message reached node " +
+                    "which is not introducer. So dropping it.");
+                reply = "NACK"; 
+            }
+
+            MapleJuiceList.addProcessedKeys(taskId, key);
         }
         catch(IOException e) 
         {

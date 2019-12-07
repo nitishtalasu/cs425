@@ -18,7 +18,8 @@ public class MapleTask extends Task
             this.workerIp, 
             this.exeFileName, 
             this.inputFileName, 
-            this.intermediatePrefixName);
+            this.intermediatePrefixName,
+            this.finishedKeys);
 	}
 
 }

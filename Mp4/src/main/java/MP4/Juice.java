@@ -18,10 +18,12 @@ public class Juice extends Thread
     private static String localFilesDir = "/src/main/java/MP4/localFile/";
 
     private String command;
+    private List<String> processedKeys;
 
-    public Juice(String command)
+    public Juice(String command, String processedKeysJson)
     {
         this.command = command;
+        this.processedKeys = TcpClientModule.getListObject(processedKeysJson);
     }
 
     /**
@@ -47,7 +49,7 @@ public class Juice extends Thread
             List<String> res = executeCommand(fileDir, exeFileName, fileDir + inputFileName);
             logger.LogInfo("[Juice][runTask] Result : " + res.toString() );
             createFile(res, fileDir + "intermediatePrefixFileName_" + exeFileName);
-            putFilesInSdfs("intermediatePrefixFileName_" + exeFileName, outputFileName);
+            putFilesInSdfs(taskId, "intermediatePrefixFileName_" + exeFileName, outputFileName, processedKeys);
             sendFinishMessage(taskId);
             String fileName = "intermediatePrefixFileName_" + exeFileName;
             File file = new File(fileDir + fileName);
@@ -116,7 +118,7 @@ public class Juice extends Thread
      * @param keysProcessed Keys to be prcoessed
      * @param intermediatePrefixFileName intermediate prefix file name
      */
-    private static void putFilesInSdfs(String intermediatePrefixFileName, String outputFileName) 
+    private static void putFilesInSdfs(String taskId, String intermediatePrefixFileName, String outputFileName, List<String> processedKeys) 
     {
         // call Leader and get addresses
         List<String> addresses = client.getAddressesFromLeader(outputFileName);
@@ -197,10 +199,7 @@ public class Juice extends Thread
         List<String> inputFiles = client.getFileNamesFromLeader(intermediatePrefixName, "");
         System.out.println("Input Files to Juice");
         System.out.println(inputFiles);
-        try{
-            Thread.sleep(30000);
-        }
-        catch(Exception e){}
+        
         // TODO : check for range partitioning.
         List<String> workersIpAddress = getWorkers(numOfJuiceTasks);
         List<JuiceTask> tasks = new ArrayList<JuiceTask>();

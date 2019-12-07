@@ -27,4 +27,5 @@ public enum MessageType
     JUICE,
     JUICETASK,
     JUICETASKCOMPLETED,
+    ADDPROCESSEDKEY
 }

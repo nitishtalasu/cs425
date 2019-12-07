@@ -680,7 +680,8 @@ public class TcpClientModule
         String ipAddress, 
         String mapleExeName, 
         String inputFile,
-        String intermediatePrefix)
+        String intermediatePrefix,
+        List<String> processedKeys)
     {
         int ret = 1;
         this.initializeStreams(ipAddress);
@@ -691,6 +692,7 @@ public class TcpClientModule
             this.outputStream.writeUTF(MessageType.MAPLETASK.toString());
             String command = taskId + " " + mapleExeName + " " + inputFile + " " + intermediatePrefix;
             this.outputStream.writeUTF(command);
+            this.outputStream.writeUTF(toJson(processedKeys));
             String reply = this.inputStream.readUTF();
             if(reply.equals("OK"))
             {
@@ -785,7 +787,8 @@ public class TcpClientModule
         String ipAddress, 
         String juiceExeName, 
         String inputFileName, 
-        String outputFileName)
+        String outputFileName,
+        List<String> processedKeys)
     {
         int ret = 1;
         this.initializeStreams(ipAddress);
@@ -796,6 +799,7 @@ public class TcpClientModule
             this.outputStream.writeUTF(MessageType.JUICETASK.toString());
             String command = taskId + " " + juiceExeName + " " + inputFileName + " " + outputFileName;
             this.outputStream.writeUTF(command);
+            this.outputStream.writeUTF(toJson(processedKeys));
             String reply = this.inputStream.readUTF();
             if(reply.equals("OK"))
             {
@@ -846,6 +850,37 @@ public class TcpClientModule
         return ret;
     }
 
+    public int putProcessedKey(String taskId, String sdfsFileName)
+    {
+        int ret = 1;
+        this.initializeStreams(Introducer.IPADDRESS.getValue());
+        try
+        {
+            logger.LogInfo("[TCPClient][putProcessedKey] Connected to "+ Introducer.IPADDRESS.getValue() + ".");
+            
+            this.outputStream.writeUTF(MessageType.ADDPROCESSEDKEY.toString());
+            this.outputStream.writeUTF(taskId);
+            this.outputStream.writeUTF(sdfsFileName);
+            String reply = this.inputStream.readUTF();
+            if(reply.equals("OK"))
+            {
+                logger.LogInfo("[TCPClient][putProcessedKey] Processed key added successfully : " + sdfsFileName); 
+            }
+            else
+            {
+                ret = 0;
+            }
+        } 
+        catch(Exception e) 
+        { 
+            logger.LogException("[TCPClient][putProcessedKey] Adding processed key failed: ", e); 
+            ret = 0;
+        } 
+        this.closeSocket();
+
+        return ret;
+    }
+
      /**
      * Initializes the socket and its input and output streams.
      */
@@ -885,6 +920,14 @@ public class TcpClientModule
         List<String> msg = gson.fromJson(jsonString, List.class);
 
         return msg;
+    }
+
+    public static String toJson(List<String> msg)
+    {     
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String json = gson.toJson(msg);
+
+        return json;
     }
 
     public List<String> getreplicasFromLeader(String sdfsFileName) 
@@ -941,6 +984,6 @@ public class TcpClientModule
         this.closeSocket();
 
         return timeElapsed;
-	}
+    }
 }
 
