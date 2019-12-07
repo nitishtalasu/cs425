@@ -44,9 +44,9 @@ public class Juice extends Thread
             String fileDir = currentDir + localFilesDir;
             getFile(exeFileName);
             getFile(inputFileName);
-            List<String> res = executeCommand(fileDir + "\\" + exeFileName, fileDir+ "\\" + inputFileName);
+            List<String> res = executeCommand(fileDir, exeFileName, fileDir + inputFileName);
             logger.LogInfo("[Juice][runTask] Result : " + res.toString() );
-            createFile(res, fileDir+ "\\" + "intermediatePrefixFileName_" + exeFileName);
+            createFile(res, fileDir + "intermediatePrefixFileName_" + exeFileName);
             putFilesInSdfs("intermediatePrefixFileName_" + exeFileName, outputFileName);
             sendFinishMessage(taskId);
         }
@@ -62,7 +62,7 @@ public class Juice extends Thread
         client.completeJuiceTask(taskId);
     }
 
-    private static List<String> executeCommand(String exeFileName, String fileName) throws IOException 
+    private static List<String> executeCommand(String dir, String exeFileName, String fileName) throws IOException 
     {
         List<String> commandArgs = new ArrayList<String>();
         commandArgs.add(exeFileName);
@@ -74,7 +74,7 @@ public class Juice extends Thread
         Runtime rt = Runtime.getRuntime();
         //Process process = rt.exec(commandArgs);
         //Process process = processBuilder.start();
-        String[] command2 = {"/bin/sh","-c", "java " + exeFileName + " " + fileName};
+        String[] command2 = {"/bin/sh","-c", "java -classpath " + dir + " " + exeFileName + " " + fileName};
         Process process = rt.exec(command2);
         
         // Buffer for reading the ouput from stream. 
