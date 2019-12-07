@@ -214,10 +214,7 @@ public class Juice extends Thread
         JuiceJob job = new JuiceJob(juiceExe, tasks, intermediatePrefixName ,deleteIntermediateFilesOption);
         MapleJuiceList.addJobsAndTasks(job, tasks, workersIpAddress);
         MapleJuiceList.printJobsAndTasks();
-        try{
-            Thread.sleep(30000);
-        }
-        catch(Exception e){}
+        
         return true;
     }
     
