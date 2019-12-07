@@ -191,6 +191,12 @@ public class Juice extends Thread
         String deleteIntermediateFilesOption) 
     {
         List<String> inputFiles = client.getFileNamesFromLeader(intermediatePrefixName, "");
+        System.out.println("Input Files to Juice");
+        System.out.println(inputFiles);
+        try{
+            Thread.sleep(30000);
+        }
+        catch(Exception e){}
         // TODO : check for range partitioning.
         List<String> workersIpAddress = getWorkers(numOfJuiceTasks);
         List<JuiceTask> tasks = new ArrayList<JuiceTask>();
@@ -203,6 +209,11 @@ public class Juice extends Thread
 
         JuiceJob job = new JuiceJob(juiceExe, tasks, intermediatePrefixName ,deleteIntermediateFilesOption);
         MapleJuiceList.addJobsAndTasks(job, tasks, workersIpAddress);
+        MapleJuiceList.printJobsAndTasks();
+        try{
+            Thread.sleep(30000);
+        }
+        catch(Exception e){}
         return true;
     }
     
