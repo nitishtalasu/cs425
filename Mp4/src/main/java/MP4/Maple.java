@@ -65,7 +65,7 @@ public class Maple extends Thread
 
     private static void sendFinishMessage(String taskId) 
     {
-        logger.LogInfo("[Maple][sendFinishMessage] Sending finish message for task: " + taskId);
+        System.out.println("[Maple][sendFinishMessage] Sending finish message for task: " + taskId);
         client.completeMapleTask(taskId);
     }
 
@@ -76,7 +76,7 @@ public class Maple extends Thread
         commandArgs.add(fileName);
         
         // Creating the process with given client command.
-        logger.LogInfo("[Maple][executeCommand] Server executing the process with command: " + commandArgs);
+        System.out.println("[Maple][executeCommand] Server executing the process with command: " + commandArgs);
         ProcessBuilder processBuilder = new ProcessBuilder(commandArgs);
         Runtime rt = Runtime.getRuntime();
         //Process process = rt.exec(commandArgs);
@@ -135,13 +135,14 @@ public class Maple extends Thread
         String intermediatePrefixFileName,
         List<String> processedKeys) 
     {
+        System.out.println("[Maple][putFileInSdfs] processedKeys: " + processedKeys);
         for (String key : keysProcessed) 
         {
             // call Leader and get addresses
             String fileName = intermediatePrefixFileName + "_" + key;
             if(!processedKeys.contains(fileName))
             {
-                logger.LogInfo("[Maple][putFileInSdfs] Putting file in SDFS with name: " + fileName);
+                System.out.println("[Maple][putFileInSdfs] Putting file in SDFS with name: " + fileName);
                 if (putFile(fileName, fileName) == 1)
                 {
                     client.putProcessedKey(taskId, fileName);
@@ -149,7 +150,7 @@ public class Maple extends Thread
             }
             else
             {
-                logger.LogInfo("[Maple][putFileInSdfs] Skipping file in SDFS as already processed: " + fileName);
+                System.out.println("[Maple][putFileInSdfs] Skipping file in SDFS as already processed: " + fileName);
             }
             
         }
@@ -157,7 +158,7 @@ public class Maple extends Thread
 
     private void deleteLocalFiles(String dir, Set<String> keysProcessed, String intermediatePrefixFileName) 
     {
-        logger.LogInfo("[Maple][deleteLocalFiles] Deleting all local files of the task directory: " + dir);
+        System.out.println("[Maple][deleteLocalFiles] Deleting all local files of the task directory: " + dir);
         
         for (String key : keysProcessed)
         {
@@ -207,7 +208,7 @@ public class Maple extends Thread
         putAllFilesInDir(localFileDir, mapleExe);
         if (client.submitMapleJob(mapleExe, intermediatePrefixName, numOfMapleTasks) == 1)
         {
-            logger.LogInfo("[Maple][submitJob] Job submitted successfully.");
+            System.out.println("[Maple][submitJob] Job submitted successfully.");
         }
         else
         {
@@ -221,7 +222,7 @@ public class Maple extends Thread
         List<String> workersIpAddress = getWorkers(numOfMaples);
         for (String workerIp : workersIpAddress) 
         {
-            logger.LogInfo("[Maple][createJob] One of the worker is " + workerIp);
+            System.out.println("[Maple][createJob] One of the worker is " + workerIp);
         }
         
         List<MapleTask> tasks = new ArrayList<MapleTask>();
@@ -241,11 +242,11 @@ public class Maple extends Thread
 
     private static void putAllFilesInDir(String dir, String mapleExeName)
     {
-        logger.LogInfo("[Maple][putAllFilesInDir] Putting all files in SDFS of directory: " + dir);
+        System.out.println("[Maple][putAllFilesInDir] Putting all files in SDFS of directory: " + dir);
         File[] files = new File(dir).listFiles();
         for (File file : files) 
         {
-            logger.LogInfo("[Maple][putAllFilesInDir] putting file: " + file.getName());
+            System.out.println("[Maple][putAllFilesInDir] putting file: " + file.getName());
             if (file.isFile() && FilenameUtils.getExtension(file.getName()).equals("txt")) 
             {
                 String fileName = file.getName();

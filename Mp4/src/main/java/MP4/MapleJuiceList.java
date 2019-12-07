@@ -117,8 +117,8 @@ public class MapleJuiceList
         {
             if (task.taskId.equals(taskId))
             {
-                logger.LogInfo("[MapleJuiceList][changeTaskStatus] Changing task status for Id: " + task.taskId + 
-                    " to: " + status.toString());
+                System.out.println("[MapleJuiceList][changeTaskStatus] Changing task status for Id: " + task.taskId + 
+                " from:" + task.status.toString() + " to: " + status.toString());
                 task.status = status;
                 taskExists = true;
                 break;
@@ -138,7 +138,7 @@ public class MapleJuiceList
         {
             if (task.taskId.equals(taskId))
             {
-                logger.LogInfo("[MapleJuiceList][updateTaskWorkerIp] Changing task worker Ip for Id: " + task.taskId + 
+                System.out.println("[MapleJuiceList][updateTaskWorkerIp] Changing task worker Ip for Id: " + task.taskId + 
                     " to: " + newWorkerIp);
                 task.workerIp = newWorkerIp;
                 taskExists = true;
@@ -158,7 +158,7 @@ public class MapleJuiceList
         {
             if (job.exeName.equals(exeName))
             {
-                logger.LogInfo("[MapleJuiceList][removeJob] Removing job with name: " + job.exeName);
+                System.out.println("[MapleJuiceList][removeJob] Removing job with name: " + job.exeName);
                 job.deleteIntermediateFiles();
                 jobs.remove(job);
                 jobsToTask.remove(exeName);
