@@ -44,7 +44,8 @@ public class MapleJuiceHandler extends Thread
                     {
                         logger.LogInfo("[MapleJuiceHandler] Removing task from the list with Id: " + task.taskId);
                         this.runningWorkers.remove(task.workerIp);
-                        if (jobsToFinishedTasks.contains(task.exeFileName))
+
+                        if (jobsToFinishedTasks.containsKey(task.exeFileName))
                         {
                             int oldValue = jobsToFinishedTasks.get(task.exeFileName);
                             jobsToFinishedTasks.replace(task.exeFileName, oldValue, oldValue + 1);
@@ -54,6 +55,7 @@ public class MapleJuiceHandler extends Thread
                             jobsToFinishedTasks.put(task.exeFileName, 1);
                         }
 
+                        MapleJuiceList.removeTask(task.taskId);
                         MapleJuiceList.checkJobCompletion(task.exeFileName, jobsToFinishedTasks.get(task.exeFileName));
                         continue; 
                     }
@@ -130,7 +132,11 @@ public class MapleJuiceHandler extends Thread
                         {
                             task.submit();
                             runningWorkers.add(task.workerIp);
-                            MapleJuiceList.changeTaskStatus(task.taskId, TaskStatus.STARTED);
+                            System.out.println(task.status);
+                            if(task.status != TaskStatus.FINISHED)
+                            {
+                                MapleJuiceList.changeTaskStatus(task.taskId, TaskStatus.STARTED);
+                            }
                             if (!runningJobs.contains(task.exeFileName))
                             {
                                 MapleJuiceList.changeJobStatus(task.exeFileName, TaskStatus.STARTED);

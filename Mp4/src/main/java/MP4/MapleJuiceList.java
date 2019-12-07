@@ -176,11 +176,11 @@ public class MapleJuiceList
             {
                 logger.LogInfo("[MapleJuiceList][removeTask] Removing task with Id: " + task.taskId);
                 tasks.remove(task);
-                if (jobsToTask.contains(task.exeFileName))
-                {
-                    int oldValue = jobsToTask.get(task.exeFileName);
-                    jobsToTask.replace(task.exeFileName, oldValue, oldValue - 1);
-                }
+                // if (jobsToTask.contains(task.exeFileName))
+                // {
+                //     int oldValue = jobsToTask.get(task.exeFileName);
+                //     jobsToTask.replace(task.exeFileName, oldValue, oldValue - 1);
+                // }
                 return;
             }
         }
