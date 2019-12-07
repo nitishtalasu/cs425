@@ -77,6 +77,7 @@ public class Juice extends Thread
         Runtime rt = Runtime.getRuntime();
         //Process process = rt.exec(commandArgs);
         //Process process = processBuilder.start();
+        exeFileName = exeFileName.substring(0, exeFileName.lastIndexOf("."));
         String[] command2 = {"/bin/sh","-c", "java -classpath " + dir + " " + exeFileName + " " + fileName};
         Process process = rt.exec(command2);
         
