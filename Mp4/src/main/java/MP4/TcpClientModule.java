@@ -412,6 +412,118 @@ public class TcpClientModule
         return ret;
     }
 
+    public boolean appendFilesParallel(
+        final String sdfsFileName,
+        final String localFileName,
+        final List<String> addresses,
+        final String type)
+    {
+        try
+        {
+            int threadNum = 4;
+            ExecutorService executor = Executors.newFixedThreadPool(threadNum);
+            List<FutureTask<Integer>> taskList = new ArrayList<FutureTask<Integer>>();
+            for (int i = 0; i < addresses.size(); i++) 
+            {
+                final String address = addresses.get(i);
+                FutureTask<Integer> futureTask_1 = new FutureTask<Integer>(new Callable<Integer>() {
+                    @Override
+                    public Integer call() 
+                    {
+                        TcpClientModule client = new TcpClientModule();
+                        return client.appendFileParallel(sdfsFileName, localFileName, address , type);
+                    }
+                });
+                taskList.add(futureTask_1);
+                executor.execute(futureTask_1);
+            }
+
+            int amount = 0;
+            for (int j = 0; j < addresses.size(); j++)
+            {
+                FutureTask<Integer> futureTask = taskList.get(j);
+                amount += futureTask.get();
+            }
+            executor.shutdown();
+
+            if(amount == addresses.size())
+            {
+                logger.LogInfo("[TcpClient: appendFilesParallel] Successfully inserted the file: "+ sdfsFileName);
+            }
+            else if(amount <= 2)
+            {
+                logger.LogInfo("[TcpClient: appendFilesParallel] Deleting files as quorum not met for the file: "+ sdfsFileName);
+                List<String> addr = getreplicasFromLeader(sdfsFileName);
+                deleteFilesParallel(sdfsFileName, addr);
+                return false;
+            }
+        }
+        catch(Exception e)
+        {
+            logger.LogException("[TcpClient: appendFilesParallel] failed to put files with ", e);
+            return false;
+        }
+
+        return true;
+    }
+
+    public int appendFileParallel(String sdfsFileName, String localFileName, String address, String type)
+    {
+        this.initializeStreams(address);
+        int ret = 1;
+        try
+        { 
+            // sends VM log ID and user input to server
+            logger.LogInfo("[TCPClient: appendFileParallel] Connected to "+ address + ".");
+            
+            this.outputStream.writeUTF(MessageType.APPEND.toString());
+            this.outputStream.writeUTF(sdfsFileName);
+            String currentDir = System.getProperty("user.dir");
+            if(type.equals("replicate"))
+            {
+                // localReadFile = new FileReader(currentDir+"/src/main/java/MP4/sdfsFile/"+localFileName);
+                myFile = new File(currentDir+"/src/main/java/MP4/sdfsFile/"+localFileName);
+            }
+            else
+            {
+                // localReadFile = new FileReader(currentDir+"/src/main/java/MP4/localFile/"+localFileName);
+                myFile = new File(currentDir+"/src/main/java/MP4/localFile/"+localFileName);
+            }
+
+            this.outputStream.writeLong(myFile.length());
+            DataInputStream in = new DataInputStream(new FileInputStream(myFile));
+            byte[] arr = new byte[1024 * 1024];
+            int len = 0;
+            while((len = in.read(arr)) != -1)
+            {
+                this.outputStream.write(arr, 0, len);
+            }
+            this.outputStream.flush();  
+            in.close();         
+            System.out.println("appendFileParallel: Finished sending");
+
+            String reply = this.inputStream.readUTF();
+            if(reply.equals("OK"))
+            {
+                logger.LogInfo("[TCPClient appendFileParallel] File sent."); 
+            }
+            else
+            {
+                ret = 0;
+                logger.LogError("[TCPClient] File not sent."); 
+            }
+        } 
+        catch(Exception i) 
+        { 
+            logger.LogException("[TCPClient] Unable to put file data.", i);
+            ret = 0;
+        } 
+
+
+        this.closeSocket();
+        return ret;
+    }
+
     public void putFiles(String sdfsFileName, String localFileName, List<String> addresses, String type)
     {   
         long startTime = System.currentTimeMillis();

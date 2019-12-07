@@ -13,6 +13,7 @@ public enum MessageType
     COORDINATION,
     GET,
     PUT,
+    APPEND,
     DELETE,
     LIST,
     REPLICALIST,
