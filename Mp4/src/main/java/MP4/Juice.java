@@ -49,6 +49,9 @@ public class Juice extends Thread
             createFile(res, fileDir + "intermediatePrefixFileName_" + exeFileName);
             putFilesInSdfs("intermediatePrefixFileName_" + exeFileName, outputFileName);
             sendFinishMessage(taskId);
+            String fileName = "intermediatePrefixFileName_" + exeFileName;
+            File file = new File(fileDir + fileName);
+            file.delete();
         }
         catch(Exception e)
         {
@@ -88,7 +91,6 @@ public class Juice extends Thread
         {
             res.add(outputLine);
         }
-
         return res;
     }
 
