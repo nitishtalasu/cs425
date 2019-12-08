@@ -320,7 +320,7 @@ public class TcpMessagesRequestHandler extends Thread
             File test = new File(currentDir+"/src/main/java/MP4/sdfsFile/"+sdfsFileName);
             int bufferSize=0;
             bufferSize=socket.getReceiveBufferSize();
-            FileOutputStream fout = new FileOutputStream(test);
+            FileOutputStream fout = new FileOutputStream(test, true);
             byte[] buffer = new byte[bufferSize];
             int read = 0;
             long count = 0;
