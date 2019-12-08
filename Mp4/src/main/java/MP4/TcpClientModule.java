@@ -431,6 +431,7 @@ public class TcpClientModule
                 {
                     // localReadFile = new FileReader(currentDir+"/src/main/java/MP4/sdfsFile/"+localFileName);
                     myFile = new File(currentDir+"/src/main/java/MP4/sdfsFile/"+localFileName);
+                    System.out.println("[TcpClientModule: putfiles] Replicating from sdfsfile : " + localFileName);
                 }
                 else
                 {
