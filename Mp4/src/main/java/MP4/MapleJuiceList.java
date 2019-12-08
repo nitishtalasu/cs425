@@ -262,7 +262,7 @@ public class MapleJuiceList
         {
             if (task.taskId.equals(taskId) && !task.finishedKeys.contains(key))
             {
-                logger.LogInfo("[MapleJuiceList][addProcessedKeys] Adding key " + key +
+                System.out.println("[MapleJuiceList][addProcessedKeys] Adding key " + key +
                     " to task with Id: " + task.taskId);
                 task.finishedKeys.add(key);
                 return;
