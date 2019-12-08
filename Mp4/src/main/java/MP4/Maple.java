@@ -262,7 +262,7 @@ public class Maple extends Thread
     private static int putFile(String sdfsName, String localName)
     {
         List<String> addresses = client.getAddressesFromLeader(sdfsName);
-        if(client.appendFilesParallel(sdfsName, localName, addresses, "put"))
+        if(client.putFilesParallel(sdfsName, localName, addresses, "put"))
         {
             client.putSuccess(sdfsName);
             //client.putProcessedKey(sdfsName);
