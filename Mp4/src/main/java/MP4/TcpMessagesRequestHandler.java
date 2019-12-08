@@ -132,6 +132,10 @@ public class TcpMessagesRequestHandler extends Thread
             case PUT:
                 reply = PutFiles("put");
                 break;
+            
+            case APPEND:
+                reply = AppendFiles();
+                break;
 
             case DELETE:
                 reply = DeleteFile();
@@ -311,7 +315,47 @@ public class TcpMessagesRequestHandler extends Thread
             String sdfsFileName = this.socketInputStream.readUTF();
             String currentDir = System.getProperty("user.dir");
            
-            localWriteFile = new FileWriter(currentDir+"/src/main/java/MP4/sdfsFile/"+sdfsFileName, true);
+            localWriteFile = new FileWriter(currentDir+"/src/main/java/MP4/sdfsFile/"+sdfsFileName);
+
+            File test = new File(currentDir+"/src/main/java/MP4/sdfsFile/"+sdfsFileName);
+            int bufferSize=0;
+            bufferSize=socket.getReceiveBufferSize();
+            FileOutputStream fout = new FileOutputStream(test);
+            byte[] buffer = new byte[bufferSize];
+            int read = 0;
+            long count = 0;
+            long length = this.socketInputStream.readLong();
+            logger.LogInfo("[TCPMessageRequestHandler] Started reading file.");
+            while(count != length && (read = this.socketInputStream.read(buffer)) != -1)
+            {
+                fout.write(buffer, 0, read);
+                count += read;
+            }
+            fout.close();
+            logger.LogInfo("[TCPMessageRequestHandler] Completed reading file.");
+
+            
+
+            ReplicaList.addNewFile(sdfsFileName);
+        }
+        catch(IOException e) 
+        {
+            reply = "NACK";
+            logger.LogException("[TCPMessageRequestHandler] Unable to put file data.", e); 
+        }
+        return reply;
+    }
+
+    private synchronized String AppendFiles()
+    {
+        String reply = "OK";
+        logger.LogInfo("[TCPMessageRequestHandler] Entered PutFile method.");
+        try
+        {
+            String sdfsFileName = this.socketInputStream.readUTF();
+            String currentDir = System.getProperty("user.dir");
+           
+            localWriteFile = new FileWriter(currentDir+"/src/main/java/MP4/sdfsFile/"+sdfsFileName);
 
             File test = new File(currentDir+"/src/main/java/MP4/sdfsFile/"+sdfsFileName);
             int bufferSize=0;
