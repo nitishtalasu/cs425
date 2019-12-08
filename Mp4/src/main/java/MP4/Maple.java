@@ -47,6 +47,9 @@ public class Maple extends Thread
             String exeFileName = args[1];
             String inputFileName = args[2];
             String intermediatePrefixFileName = args[3];
+            System.out.println("[Maple][run] taskId: " + taskId + " exeFileName: " + exeFileName + " inputFileName: " + inputFileName +
+                " intermediateFileName: " + intermediatePrefixFileName);
+            System.out.println("[Maple][run] processedKeys: " + processedKeys);
             String currentDir = System.getProperty("user.dir");
             String fileDir = currentDir + localFilesDir;
             getFile(exeFileName);
