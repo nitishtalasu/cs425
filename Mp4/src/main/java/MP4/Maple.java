@@ -320,7 +320,10 @@ public class Maple extends Thread {
     {
         System.out.println("[Maple][mergeFiles] Merging file: " + taskFile + " with " + key);
         String userDir = System.getProperty("user.dir");
-        taskFile = userDir + sdfsFileDir + taskFile;
+        //taskFile = userDir + sdfsFileDir + taskFile;
+        System.out.println("[Maple][mergeFiles] User Dir: " + userDir + 
+            " sdfs dir: " + sdfsFileDir + 
+            " localFileDir " + localFilesDir);
         File sdfsFile = new File(userDir + sdfsFileDir + taskFile);
         File localFile = new File(userDir + localFilesDir + taskFile);
         InputStream fin = null;
