@@ -318,7 +318,7 @@ public class Maple extends Thread {
 
     public static void mergeFiles(String taskFile, String key) throws IOException
     {
-        System.out.print("[Maple][mergeFiles] Merging file: " + taskFile + " with " + key);
+        System.out.println("[Maple][mergeFiles] Merging file: " + taskFile + " with " + key);
         String userDir = System.getProperty("user.dir");
         taskFile = userDir + sdfsFileDir + taskFile;
         File sdfsFile = new File(userDir + sdfsFileDir + taskFile);

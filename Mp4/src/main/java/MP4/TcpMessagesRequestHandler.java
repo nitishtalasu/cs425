@@ -699,7 +699,8 @@ public class TcpMessagesRequestHandler extends Thread
         }
         catch(IOException e) 
         {
-            logger.LogException("[TCPMessageRequestHandler] Exception while completing the juice task", e); 
+            System.out.println("[TCPMessageRequestHandler] Exception while completing the juice task");
+            e.printStackTrace(); 
             reply = "NACK";
         }
 

@@ -1016,18 +1016,19 @@ public class TcpClientModule
             String reply = this.inputStream.readUTF();
             if(reply.equals("OK"))
             {
-                logger.LogInfo("[TCPClient] Received OK for merging from server."); 
+                System.out.println("[TCPClient] Received OK for merging from server."); 
                 res = 1;
             }
             else
             {
-                logger.LogInfo("[TCPClient] Received NACK from server. Merge failed for node."); 
+                System.out.println("[TCPClient] Received NACK from server. Merge failed for node."); 
                 
             }
         }
         catch(Exception i) 
         { 
-            logger.LogException("[TCPClient] Unable to receive data.", i); 
+            System.out.println("[TCPClient] Unable to receive data."); 
+            i.printStackTrace();
             
         } 
 
