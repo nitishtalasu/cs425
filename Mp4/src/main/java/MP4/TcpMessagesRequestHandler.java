@@ -688,7 +688,7 @@ public class TcpMessagesRequestHandler extends Thread
         return reply;
     }
 
-    private String MergeTaskFiles() 
+    private synchronized String MergeTaskFiles() 
     {
         String reply = "OK";
         try
