@@ -864,7 +864,7 @@ public class TcpClientModule
             String reply = this.inputStream.readUTF();
             if(reply.equals("OK"))
             {
-                logger.LogInfo("[TCPClient][putProcessedKey] Processed key added successfully : " + sdfsFileName); 
+                System.out.println("[TCPClient][putProcessedKey] Processed key added successfully : " + sdfsFileName); 
             }
             else
             {
@@ -1016,7 +1016,7 @@ public class TcpClientModule
             String reply = this.inputStream.readUTF();
             if(reply.equals("OK"))
             {
-                logger.LogInfo("[TCPClient] Received OK from server."); 
+                logger.LogInfo("[TCPClient] Received OK for merging from server."); 
                 res = 1;
             }
             else
