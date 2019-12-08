@@ -75,7 +75,7 @@ public class MapleJuiceHandler extends Thread
                         {
                             // TODO : Handle to delete intermediate files of this worker role.
                             MapleJuiceList.changeTaskStatus(task.taskId, TaskStatus.NOTSTARTED);
-                            //MapleJuiceList.changeTaskId(task.taskId);
+                            MapleJuiceList.changeTaskId(task.taskId);
                             this.runningWorkers.remove(task.workerIp);
                         }
                         

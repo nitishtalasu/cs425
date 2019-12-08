@@ -135,8 +135,8 @@ public class Maple extends Thread {
         for (String key : keysProcessed) {
             // call Leader and get addresses
             String fileName = intermediatePrefixFileName + "_" + key;
-            if(!processedKeys.contains(fileName))
-            {
+            //if(!processedKeys.contains(fileName))
+            //{
 
                 String sdfsfileName = fileName + "_" + taskId;
                 List<String> addresses = client.getAddressesFromLeader(fileName);
@@ -163,11 +163,11 @@ public class Maple extends Thread {
                         e.printStackTrace();
                         return; 
                     }
-                }
-                else
-                {
-                    logger.LogError("[Maple][putFile] File insertion failed for" + sdfsfileName);
-                }
+                // }
+                // else
+                // {
+                //     logger.LogError("[Maple][putFile] File insertion failed for" + sdfsfileName);
+                // }
             }
         }
     }
