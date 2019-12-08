@@ -14,54 +14,55 @@ import MP4.TcpClientModule;
 /**
  * Class that handles the maple operations.
  */
-public class Maple extends Thread
-{
+public class Maple extends Thread {
     private static GrepLogger logger = GrepLogger.getInstance();
 
     private static TcpClientModule client = new TcpClientModule();
 
     private static String localFilesDir = "/src/main/java/MP4/localFile/";
 
+    private static String sdfsFileDir = "/src/main/java/MP4/sdfsFile/";
+
     private String command;
     private List<String> processedKeys;
 
-    public Maple(String command, String processedKeysJson)
-    {
+    public Maple(String command, String processedKeysJson) {
         this.command = command;
-        this.processedKeys = TcpClientModule.getListObject(processedKeysJson);
+        processedKeys = TcpClientModule.getListObject(processedKeysJson);
+        // List<String> keyFiles = TcpClientModule.getListObject(processedKeysJson);
+        // processedKeys = new ArrayList<String>();
+        // for (String file : keyFiles)
+        // {
+        // processedKeys.add(file.substring(0, file.lastIndexOf("_")));
+        // }
     }
 
     /**
-     * 1) Get the required files from SDFS.
-     * 2) Read lines in batches of 10.
-     * 3) Execute Maple task for each batch of lines.
-     * 4) Create intermediate files for each key and PUT in SDFS.
+     * 1) Get the required files from SDFS. 2) Read lines in batches of 10. 3)
+     * Execute Maple task for each batch of lines. 4) Create intermediate files for
+     * each key and PUT in SDFS.
      */
     @Override
-    public void run()
-    {
-        try
-        {
+    public void run() {
+        try {
             String[] args = this.command.split(" ");
             String taskId = args[0];
             String exeFileName = args[1];
             String inputFileName = args[2];
             String intermediatePrefixFileName = args[3];
-            System.out.println("[Maple][run] taskId: " + taskId + " exeFileName: " + exeFileName + " inputFileName: " + inputFileName +
-                " intermediateFileName: " + intermediatePrefixFileName);
+            System.out.println("[Maple][run] taskId: " + taskId + " exeFileName: " + exeFileName + " inputFileName: "
+                    + inputFileName + " intermediateFileName: " + intermediatePrefixFileName);
             System.out.println("[Maple][run] processedKeys: " + processedKeys);
             String currentDir = System.getProperty("user.dir");
             String fileDir = currentDir + localFilesDir;
             getFile(exeFileName);
             getFile(inputFileName);
-            List<String> res = executeCommand(fileDir , exeFileName, fileDir + inputFileName);
+            List<String> res = executeCommand(fileDir, exeFileName, fileDir + inputFileName);
             Set<String> keysProcessed = createFiles(taskId, res, fileDir + intermediatePrefixFileName);
             putFilesInSdfs(taskId, keysProcessed, intermediatePrefixFileName, processedKeys);
             sendFinishMessage(taskId);
             deleteLocalFiles(fileDir, keysProcessed, intermediatePrefixFileName);
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             logger.LogException("[Maple][runTask] Failed with: ", e);
         }
     }
@@ -72,41 +73,37 @@ public class Maple extends Thread
         client.completeMapleTask(taskId);
     }
 
-    private static List<String> executeCommand(String dir, String exeFileName, String fileName) throws IOException 
-    {
+    private static List<String> executeCommand(String dir, String exeFileName, String fileName) throws IOException {
         List<String> commandArgs = new ArrayList<String>();
         commandArgs.add(exeFileName);
         commandArgs.add(fileName);
-        
+
         // Creating the process with given client command.
         System.out.println("[Maple][executeCommand] Server executing the process with command: " + commandArgs);
         ProcessBuilder processBuilder = new ProcessBuilder(commandArgs);
         Runtime rt = Runtime.getRuntime();
-        //Process process = rt.exec(commandArgs);
-        //Process process = processBuilder.start();
+        // Process process = rt.exec(commandArgs);
+        // Process process = processBuilder.start();
         exeFileName = exeFileName.substring(0, exeFileName.lastIndexOf("."));
-        String[] command2 = {"/bin/sh","-c", "java -classpath " + dir + " "+ exeFileName + " " + fileName};
+        String[] command2 = { "/bin/sh", "-c", "java -classpath " + dir + " " + exeFileName + " " + fileName };
         Process process = rt.exec(command2);
-        
-        // Buffer for reading the ouput from stream. 
-        BufferedReader processOutputReader =
-            new BufferedReader(new InputStreamReader(process.getInputStream())); 
-        
+
+        // Buffer for reading the ouput from stream.
+        BufferedReader processOutputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
         String outputLine;
         List<String> res = new ArrayList<String>();
-        while ((outputLine = processOutputReader.readLine()) != null)
-        {
+        while ((outputLine = processOutputReader.readLine()) != null) {
             res.add(outputLine);
         }
 
         return res;
     }
 
-    private static Set<String> createFiles(String taskId, List<String> res, String intermediatePrefixFileName) throws IOException
-    {
+    private static Set<String> createFiles(String taskId, List<String> res, String intermediatePrefixFileName)
+            throws IOException {
         Set<String> keysProcessed = new HashSet<String>();
-        for (String line : res) 
-        {
+        for (String line : res) {
             String[] words = line.split(" ");
             String fileName = intermediatePrefixFileName + "_" + words[0];
             keysProcessed.add(words[0]);
@@ -118,9 +115,8 @@ public class Maple extends Thread
             fr.close();
         }
 
-        // TODO remove this 
-        for (String string : keysProcessed) 
-        {
+        // TODO remove this
+        for (String string : keysProcessed) {
             System.out.println("[Maple][createFiles] one of the processe key:" + string);
         }
 
@@ -129,33 +125,50 @@ public class Maple extends Thread
 
     /**
      * TODO : Check if the data appends properly without any changes.
-     * @param keysProcessed Keys to be prcoessed
+     * 
+     * @param keysProcessed              Keys to be prcoessed
      * @param intermediatePrefixFileName intermediate prefix file name
      */
-    private static void putFilesInSdfs(
-        String taskId, 
-        Set<String> keysProcessed, 
-        String intermediatePrefixFileName,
-        List<String> processedKeys) 
-    {
+    private static void putFilesInSdfs(String taskId, Set<String> keysProcessed, String intermediatePrefixFileName,
+            List<String> processedKeys) {
         System.out.println("[Maple][putFileInSdfs] processedKeys: " + processedKeys);
-        for (String key : keysProcessed) 
-        {
+        for (String key : keysProcessed) {
             // call Leader and get addresses
             String fileName = intermediatePrefixFileName + "_" + key;
             if(!processedKeys.contains(fileName))
             {
-                System.out.println("[Maple][putFileInSdfs] Putting file in SDFS with name: " + fileName);
-                if (putFile(fileName, fileName) == 1)
+
+                String sdfsfileName = fileName + "_" + taskId;
+                List<String> addresses = client.getAddressesFromLeader(fileName);
+                System.out.println("[Maple][putFileInSdfs] Putting file in SDFS with name: " + sdfsfileName);
+                if (putFile(sdfsfileName, fileName, addresses) == 1) 
                 {
-                    client.putProcessedKey(taskId, fileName);
+                    String curDir = System.getProperty("user.dir");
+                    try 
+                    {
+                        // File tempFile = new File(curDir + localFilesDir + "_temp_" +sdfsfileName);
+                        // BufferedWriter writer = 
+                        //     new BufferedWriter(new FileWriter(tempFile));
+                        // writer.write(taskId + System.getProperty("line.separator"));
+                        // writer.write(TcpClientModule.toJson(addresses) + System.getProperty("line.separator"));
+                        // writer.close();
+                        // System.out.println("[Maple][putFileInSdfs] Writing chunk data in SDFS with name: " + fileName);
+                        // putFile(fileName, tempFile.getName());
+                        // tempFile.delete();
+                        client.putProcessedKey(taskId, fileName);
+                    } 
+                    catch (Exception e) 
+                    {
+                        System.err.println("[Maple][PutFilesInDir] Throw an exception: " + e.getMessage());
+                        e.printStackTrace();
+                        return; 
+                    }
+                }
+                else
+                {
+                    logger.LogError("[Maple][putFile] File insertion failed for" + sdfsfileName);
                 }
             }
-            else
-            {
-                System.out.println("[Maple][putFileInSdfs] Skipping file in SDFS as already processed: " + fileName);
-            }
-            
         }
     }
 
@@ -262,10 +275,15 @@ public class Maple extends Thread
     private static int putFile(String sdfsName, String localName)
     {
         List<String> addresses = client.getAddressesFromLeader(sdfsName);
+        return putFile(sdfsName, localName, addresses);
+        
+    }
+
+    private static int putFile(String sdfsName, String localName, List<String> addresses)
+    {
         if(client.putFilesParallel(sdfsName, localName, addresses, "put"))
         {
             client.putSuccess(sdfsName);
-            //client.putProcessedKey(sdfsName);
             return 1;
         }
         else
@@ -298,4 +316,32 @@ public class Maple extends Thread
         return workerIps;
     }
 
+    public static void mergeFiles(String taskFile, String key) throws IOException
+    {
+        String userDir = System.getProperty("user.dir");
+        taskFile = userDir + sdfsFileDir + taskFile;
+        File sdfsFile = new File(userDir + sdfsFileDir + taskFile);
+        File localFile = new File(userDir + localFilesDir + taskFile);
+        InputStream fin = null;
+        OutputStream fout = null;
+        try 
+        {
+            fin = new FileInputStream(sdfsFile);
+            fout = new FileOutputStream(localFile);
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = fin.read(buffer)) > 0) 
+            {
+                fout.write(buffer, 0, read);
+            }
+
+            putFile(key, localFile.getName());
+            localFile.delete();
+        } 
+        finally 
+        {
+            fin.close();
+            fout.close();
+        }
+	}
 }

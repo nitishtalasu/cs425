@@ -42,7 +42,7 @@ public class MapleJuiceHandler extends Thread
                     List<MembershipNode> nodes = MembershipList.getMembershipNodes();
                     if (task.status.equals(TaskStatus.FINISHED))
                     {
-                        System.out.println("[MapleJuiceHandler] Removing task from the list with Id: " + task.taskId);
+                        System.out.println("[MapleJuiceHandler] Task finished Id: " + task.taskId);
                         this.runningWorkers.remove(task.workerIp);
 
                         if (jobsToFinishedTasks.containsKey(task.exeFileName))
@@ -57,7 +57,7 @@ public class MapleJuiceHandler extends Thread
 
                         MapleJuiceList.removeTask(task.taskId);
                         MapleJuiceList.checkJobCompletion(task.exeFileName, jobsToFinishedTasks.get(task.exeFileName));
-                        continue; 
+                        continue;
                     }
 
                     if(task.status.equals(TaskStatus.STARTED))
@@ -75,6 +75,7 @@ public class MapleJuiceHandler extends Thread
                         {
                             // TODO : Handle to delete intermediate files of this worker role.
                             MapleJuiceList.changeTaskStatus(task.taskId, TaskStatus.NOTSTARTED);
+                            //MapleJuiceList.changeTaskId(task.taskId);
                             this.runningWorkers.remove(task.workerIp);
                         }
                         

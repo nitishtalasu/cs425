@@ -3,9 +3,12 @@ package MP4;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MapleJuiceList
@@ -131,6 +134,29 @@ public class MapleJuiceList
         }
     }
 
+    public static void changeTaskId(String taskId) 
+    {
+        boolean taskExists = false;
+        for (Task task : tasks) 
+        {
+            if (task.taskId.equals(taskId))
+            {
+                int random = ThreadLocalRandom.current().nextInt();
+                String newId = task.exeFileName + "_" + Integer.toString(random);
+                System.out.println("[MapleJuiceList][changeTaskStatus] Changing task Id from: " + task.taskId + 
+                    " to: " + newId);
+                task.taskId = newId;
+                taskExists = true;
+                break;
+            }
+        }
+
+        if (!taskExists)
+        {
+            logger.LogInfo("[MapleJuiceList][changeTaskStatus] Task not found with Id: " + taskId);
+        }
+	}
+
     public static synchronized void updateTaskWorkerIp(String taskId, String newWorkerIp)
     {
         boolean taskExists = false;
@@ -227,15 +253,21 @@ public class MapleJuiceList
         {
             logger.LogInfo("[MapleJuiceList][checkJobCompletion] Deleting all the data of exeName: " + exeName);
             List<Task> tasksToBeRemoved = new ArrayList<Task>();
+            //List<String> taskIds = new ArrayList<String>();
+            //String intermediatePrefixName = "";
             for (Task task : tasks) 
             {
                 if (task.exeFileName.equals(exeName))
                 {
                     assert (task.status == TaskStatus.FINISHED);
+                    //intermediatePrefixName = task.intermediatePrefixName;
                     tasksToBeRemoved.add(task);
+                    //taskIds.add(task.taskId);
                 }             
             }
 
+            //TcpClientModule client = new TcpClientModule();
+            //client.mergeTaskFiles(taskIds);
             tasks.removeAll(tasksToBeRemoved);
             removeJob(exeName);
         }
@@ -269,5 +301,36 @@ public class MapleJuiceList
             }
         }
     }
+
+    public static void FinishTask(String taskId) 
+    {
+        for (Task task : tasks) 
+        {
+            if (task.taskId.equals(taskId))
+            {
+                for (String key : task.finishedKeys) 
+                {
+                    TcpClientModule client = new TcpClientModule();
+                    String taskFile = key + "_" + task.taskId;
+                    List<String> addresses = client.getreplicasFromLeader(taskFile);
+                    for (String ip : addresses) 
+                    {
+                        if (client.MergeFile(key, taskFile, ip) == 1)
+                        {
+                            System.out.println("[MapleJuiceList][FinishTask] Successfully merged key: " +
+                                key + " of " + taskId);
+                            break;
+                        }
+                    }
+
+                    System.out.println("[MapleJuiceList][FinishTask] Deleting taskfile: " + taskFile);
+                    client.deleteFilesParallel(taskFile, addresses);
+                    client.deleteSuccess(taskFile);
+                }
+
+                break;
+            }
+        }
+	}
 
 }

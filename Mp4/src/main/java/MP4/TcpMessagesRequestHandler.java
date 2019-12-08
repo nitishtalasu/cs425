@@ -193,6 +193,10 @@ public class TcpMessagesRequestHandler extends Thread
                 reply = AddProcessedKey();
                 break;
 
+            case MERGETASKFILES:
+                reply = MergeTaskFiles();
+                break;
+
             default:
                 logger.LogWarning("[TcpMessageHandler] Either failed to resolve message type. Or" +
                     "Forgot to add msgType: " + msgType);
@@ -561,6 +565,7 @@ public class TcpMessagesRequestHandler extends Thread
                 reply = "NACK"; 
             }
 
+            MapleJuiceList.FinishTask(taskId);
             MapleJuiceList.changeTaskStatus(taskId, TaskStatus.FINISHED);
         }
         catch(IOException e) 
@@ -673,6 +678,24 @@ public class TcpMessagesRequestHandler extends Thread
             }
 
             MapleJuiceList.addProcessedKeys(taskId, key);
+        }
+        catch(IOException e) 
+        {
+            logger.LogException("[TCPMessageRequestHandler] Exception while completing the juice task", e); 
+            reply = "NACK";
+        }
+
+        return reply;
+    }
+
+    private String MergeTaskFiles() 
+    {
+        String reply = "OK";
+        try
+        {
+            String key = this.socketInputStream.readUTF();
+            String taskFile = this.socketInputStream.readUTF();
+            Maple.mergeFiles(taskFile, key);
         }
         catch(IOException e) 
         {

@@ -498,4 +498,9 @@ public class MembershipList
     {
         workersIpAddress.remove(workerIpAddress);
     }
+
+    public static String getSelfIpAddress() 
+    {
+		return getIpAddress(id);
+	}
 }
