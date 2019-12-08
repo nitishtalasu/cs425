@@ -139,7 +139,7 @@ public class Maple extends Thread {
             //{
 
                 String sdfsfileName = fileName + "_" + taskId;
-                List<String> addresses = client.getAddressesFromLeader(fileName);
+                List<String> addresses = client.getAddressesFromLeader(sdfsfileName);
                 System.out.println("[Maple][putFileInSdfs] Putting file in SDFS with name: " + sdfsfileName);
                 if (putFile(sdfsfileName, fileName, addresses) == 1) 
                 {
