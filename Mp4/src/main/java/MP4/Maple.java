@@ -47,12 +47,15 @@ public class Maple extends Thread
             String exeFileName = args[1];
             String inputFileName = args[2];
             String intermediatePrefixFileName = args[3];
+            System.out.println("[Maple][run] taskId: " + taskId + " exeFileName: " + exeFileName + " inputFileName: " + inputFileName +
+                " intermediateFileName: " + intermediatePrefixFileName);
+            System.out.println("[Maple][run] processedKeys: " + processedKeys);
             String currentDir = System.getProperty("user.dir");
             String fileDir = currentDir + localFilesDir;
             getFile(exeFileName);
             getFile(inputFileName);
             List<String> res = executeCommand(fileDir , exeFileName, fileDir + inputFileName);
-            Set<String> keysProcessed = createFiles(res, fileDir + intermediatePrefixFileName);
+            Set<String> keysProcessed = createFiles(taskId, res, fileDir + intermediatePrefixFileName);
             putFilesInSdfs(taskId, keysProcessed, intermediatePrefixFileName, processedKeys);
             sendFinishMessage(taskId);
             deleteLocalFiles(fileDir, keysProcessed, intermediatePrefixFileName);
@@ -99,7 +102,7 @@ public class Maple extends Thread
         return res;
     }
 
-    private static Set<String> createFiles(List<String> res, String intermediatePrefixFileName) throws IOException
+    private static Set<String> createFiles(String taskId, List<String> res, String intermediatePrefixFileName) throws IOException
     {
         Set<String> keysProcessed = new HashSet<String>();
         for (String line : res) 
@@ -110,7 +113,7 @@ public class Maple extends Thread
             File file = new File(fileName);
             FileWriter fr = new FileWriter(file, true);
             BufferedWriter br = new BufferedWriter(fr);
-            br.write(line + System.getProperty("line.separator"));
+            br.write(taskId + " " +line + System.getProperty("line.separator"));
             br.close();
             fr.close();
         }
