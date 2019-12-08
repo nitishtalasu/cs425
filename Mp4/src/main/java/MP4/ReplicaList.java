@@ -119,7 +119,7 @@ public class ReplicaList
                 logger.LogInfo("Printing replicas in IP: " + node.ipAddress);
                 for (String file : node.sdfsFileNames) 
                 {
-                    System.out.println("FileName: " + file);
+                    // // System.out.println("FileName: " + file);
                 }
             }
         }
@@ -146,10 +146,10 @@ public class ReplicaList
         List<ReplicaNode> possibleReplicas = new ArrayList<ReplicaNode>();
         for (ReplicaNode node : nodes) 
         {
-            System.out.println("Node: "+ node.ipAddress);
+            // // System.out.println("Node: "+ node.ipAddress);
             if (!replicaIps.contains(node.ipAddress))
             {
-                System.out.println("Different replica: "+ node.ipAddress);
+                // // System.out.println("Different replica: "+ node.ipAddress);
                 possibleReplicas.add(node);
             }
         }
@@ -323,38 +323,38 @@ public class ReplicaList
     {
         for (ReplicaFile replicaFile : filesToBeReplicated) 
         {
-            System.out.println("[ReplicaList] [reReplicateDeletedNodeFiles] Files that have to be replicated: " + replicaFile.FileName);   
+            // System.out.println("[ReplicaList] [reReplicateDeletedNodeFiles] Files that have to be replicated: " + replicaFile.FileName);   
         }
 
         for (ReplicaFile replicaFile : filesToBeReplicated) 
         {
             int countOfCurrentReplicas = replicaFile.ReplicaIpAddress.size();
-            System.out.println("[ReplicaList] The current replicas count for file " + replicaFile.FileName + " : " + countOfCurrentReplicas);
+            // System.out.println("[ReplicaList] The current replicas count for file " + replicaFile.FileName + " : " + countOfCurrentReplicas);
             List<ReplicaNode> possibleNewReplicaIpAddress = getPossibleReplicaMachines(replicaFile.ReplicaIpAddress);
             for(int i = countOfCurrentReplicas; i < 4; i++)
             {
                 if (replicaFile.ReplicaIpAddress.isEmpty())
                 {
-                    System.out.println("[ReplicaList] There is no active replicas for this fileName" +
-                        replicaFile.FileName);
+                    // System.out.println("[ReplicaList] There is no active replicas for this fileName" +
+                        // replicaFile.FileName);
                         break;
                 }
 
                 String currentReplicaIp = replicaFile.ReplicaIpAddress.get(0);
                 String newReplicaIp = possibleNewReplicaIpAddress.get(i - countOfCurrentReplicas).ipAddress;
-                System.out.println("[ReplicaList] [reReplicateDeletedNodeFiles] Replicating file " + replicaFile.FileName + " from " +
-                        currentReplicaIp + " to " + newReplicaIp);
+                // System.out.println("[ReplicaList] [reReplicateDeletedNodeFiles] Replicating file " + replicaFile.FileName + " from " +
+                        // currentReplicaIp + " to " + newReplicaIp);
 
                 replicaFile.ReplicaIpAddress.add(newReplicaIp);
                 if(replicateFile(currentReplicaIp, newReplicaIp, replicaFile.FileName))
                 {
-                    System.out.println("[ReplicaList] [reReplicateDeletedNodeFiles] Replicated file " + replicaFile.FileName + " to " +
-                        newReplicaIp); 
+                    // System.out.println("[ReplicaList] [reReplicateDeletedNodeFiles] Replicated file " + replicaFile.FileName + " to " +
+                        // newReplicaIp); 
                 }
                 else
                 {
-                    System.out.println("[ReplicaList] [reReplicateDeletedNodeFiles] Failed to replicate file " + replicaFile.FileName + " to " +
-                        possibleNewReplicaIpAddress.get(i - countOfCurrentReplicas).ipAddress);
+                    // System.out.println("[ReplicaList] [reReplicateDeletedNodeFiles] Failed to replicate file " + replicaFile.FileName + " to " +
+                        // possibleNewReplicaIpAddress.get(i - countOfCurrentReplicas).ipAddress);
                 }
             }
         }
@@ -440,29 +440,29 @@ public class ReplicaList
     
     public static void printReplicaNodes()
     {
-        System.out.println("[ReplicaList] Printing replicaNodes");
+        // System.out.println("[ReplicaList] Printing replicaNodes");
         for (ReplicaNode node : nodes) 
         {
-            System.out.println("[ReplicaList] Printing replicaNode of IP: " + node.ipAddress);
+            // System.out.println("[ReplicaList] Printing replicaNode of IP: " + node.ipAddress);
             for (String file : node.sdfsFileNames) 
             {
-                System.out.println("[ReplicaList] FileName: " + file);
+                // System.out.println("[ReplicaList] FileName: " + file);
             }
         }
     }
 
     public static void printReplicaFiles(String sdfsFileName)
     {
-        System.out.println("[ReplicaList][printReplicaFiles] Printing replicafiles");
+        // System.out.println("[ReplicaList][printReplicaFiles] Printing replicafiles");
         for (ReplicaFile file : files) 
         {
             if(file.FileName.equalsIgnoreCase(sdfsFileName))
             {
-                System.out.println("[ReplicaList][printReplicaFiles] Printing replicafile of fileName: " + file.FileName);
+                // System.out.println("[ReplicaList][printReplicaFiles] Printing replicafile of fileName: " + file.FileName);
         
                 for (String ip : file.ReplicaIpAddress) 
                 {
-                    System.out.println("[ReplicaList][printReplicaFiles] Ip: " + ip);
+                    // System.out.println("[ReplicaList][printReplicaFiles] Ip: " + ip);
                 }
             }
         }
@@ -470,14 +470,14 @@ public class ReplicaList
 
     public static void printReplicaFiles()
     {
-        System.out.println("[ReplicaList][printReplicaFiles] Printing replicafiles");
+        // System.out.println("[ReplicaList][printReplicaFiles] Printing replicafiles");
         for (ReplicaFile file : files) 
         {
-                System.out.println("[ReplicaList][printReplicaFiles] Printing replicafile of fileName: " + file.FileName);
+                // System.out.println("[ReplicaList][printReplicaFiles] Printing replicafile of fileName: " + file.FileName);
         
                 for (String ip : file.ReplicaIpAddress) 
                 {
-                    System.out.println("[ReplicaList][printReplicaFiles] Ip: " + ip);
+                    // System.out.println("[ReplicaList][printReplicaFiles] Ip: " + ip);
                 }
         }
     }

@@ -74,7 +74,7 @@ class LeaderElection extends Thread
         //ReplicaList.clearReplicas();
         MembershipList.setLeaderIpAddress(MembershipList.getSelfNodeDetails().ipAddress);
         SendCoordinationMessage();
-        System.out.println("Checking rerplication");
+        // System.out.println("Checking rerplication");
         Leader.CheckForReReplication();
     }
 

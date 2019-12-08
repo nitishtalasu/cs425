@@ -117,8 +117,8 @@ public class MapleJuiceList
         {
             if (task.taskId.equals(taskId))
             {
-                System.out.println("[MapleJuiceList][changeTaskStatus] Changing task status for Id: " + task.taskId + 
-                " from:" + task.status.toString() + " to: " + status.toString());
+                // System.out.println("[MapleJuiceList][changeTaskStatus] Changing task status for Id: " + task.taskId + 
+                // " from:" + task.status.toString() + " to: " + status.toString());
                 task.status = status;
                 taskExists = true;
                 break;
@@ -138,8 +138,8 @@ public class MapleJuiceList
         {
             if (task.taskId.equals(taskId))
             {
-                System.out.println("[MapleJuiceList][updateTaskWorkerIp] Changing task worker Ip for Id: " + task.taskId + 
-                    " to: " + newWorkerIp);
+                // System.out.println("[MapleJuiceList][updateTaskWorkerIp] Changing task worker Ip for Id: " + task.taskId + 
+                //     " to: " + newWorkerIp);
                 task.workerIp = newWorkerIp;
                 taskExists = true;
                 break;
@@ -158,7 +158,7 @@ public class MapleJuiceList
         {
             if (job.exeName.equals(exeName))
             {
-                System.out.println("[MapleJuiceList][removeJob] Removing job with name: " + job.exeName);
+                // System.out.println("[MapleJuiceList][removeJob] Removing job with name: " + job.exeName);
                 job.deleteIntermediateFiles();
                 jobs.remove(job);
                 jobsToTask.remove(exeName);
@@ -238,21 +238,22 @@ public class MapleJuiceList
 
             tasks.removeAll(tasksToBeRemoved);
             removeJob(exeName);
+            System.out.println("End time: "+ System.currentTimeMillis());
         }
     }
 
     public static void printJobsAndTasks() 
     {
-        System.out.println("printing jobs");
+        // System.out.println("printing jobs");
         for (Job job : jobs) 
         {
-            System.out.println("Job Name:" + job.exeName + "\tStatus: " + job.status.toString());
+            // System.out.println("Job Name:" + job.exeName + "\tStatus: " + job.status.toString());
         }
 
         for (Task task : tasks) 
         {
-            System.out.println("Task job:" + task.exeFileName + "\tStatus: " + task.status.toString() +
-                "\tId: " + task.taskId + "\tWorker Ip: " + task.workerIp);
+            // System.out.println("Task job:" + task.exeFileName + "\tStatus: " + task.status.toString() +
+                // "\tId: " + task.taskId + "\tWorker Ip: " + task.workerIp);
         }
     }
     

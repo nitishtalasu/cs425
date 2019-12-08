@@ -272,7 +272,7 @@ public class TcpMessagesRequestHandler extends Thread
             }
             this.socketOutputStream.flush();  
             in.close();         
-            System.out.println("Finished sending");
+            // System.out.println("Finished sending");
         }
         catch(IOException e)
         {
@@ -358,7 +358,7 @@ public class TcpMessagesRequestHandler extends Thread
             } 
             else
             { 
-                System.out.println("[TCPMessageRequestHandler] Failed to delete the file"); 
+                // System.out.println("[TCPMessageRequestHandler] Failed to delete the file"); 
             } 
             ReplicaList.deleteFileFromNode(sdfsFileName);
         }
@@ -377,8 +377,8 @@ public class TcpMessagesRequestHandler extends Thread
         {
             String sdfsFileName = this.socketInputStream.readUTF();
             String ipAddressToReplicate = this.socketInputStream.readUTF();
-            System.out.println("[TCPMessageRequestHandler] Received rereplication of file: "+ sdfsFileName + 
-                " to the replica " + ipAddressToReplicate);
+            // System.out.println("[TCPMessageRequestHandler] Received rereplication of file: "+ sdfsFileName + 
+                // " to the replica " + ipAddressToReplicate);
             List<String> ipAddresses = new ArrayList<String>();
             ipAddresses.add(ipAddressToReplicate);
             TcpClientModule client = new TcpClientModule();

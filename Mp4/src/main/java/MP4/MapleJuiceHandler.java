@@ -42,7 +42,7 @@ public class MapleJuiceHandler extends Thread
                     List<MembershipNode> nodes = MembershipList.getMembershipNodes();
                     if (task.status.equals(TaskStatus.FINISHED))
                     {
-                        System.out.println("[MapleJuiceHandler] Removing task from the list with Id: " + task.taskId);
+                        // System.out.println("[MapleJuiceHandler] Removing task from the list with Id: " + task.taskId);
                         this.runningWorkers.remove(task.workerIp);
 
                         if (jobsToFinishedTasks.containsKey(task.exeFileName))
@@ -104,8 +104,8 @@ public class MapleJuiceHandler extends Thread
                             if (!assignedWorkers.contains(task.workerIp))
                             {
                                 String newWorkerIp = assignedWorkers.get(0);
-                                System.out.println("[MapleJuiceHandler] Assigning new worker Ip: " + newWorkerIp +
-                                    " for task Id: " + task.taskId + " with olders worker Ip: " + task.workerIp);
+                                // System.out.println("[MapleJuiceHandler] Assigning new worker Ip: " + newWorkerIp +
+                                    // " for task Id: " + task.taskId + " with olders worker Ip: " + task.workerIp);
                                 MapleJuiceList.updateTaskWorkerIp(task.taskId, newWorkerIp);
                                 task.workerIp = newWorkerIp;
                                 if (!runningWorkers.contains(task.workerIp))
@@ -121,8 +121,8 @@ public class MapleJuiceHandler extends Thread
                                 {
                                     assignedWorkers.add(newWorkerIp);
                                     newWorkerIp = assignedWorkers.get(0);
-                                    System.out.println("[MapleJuiceHandler] 1. Assigning new worker Ip: " + newWorkerIp +
-                                        " for task Id: " + task.taskId + " with olders worker Ip: " + task.workerIp);
+                                    // System.out.println("[MapleJuiceHandler] 1. Assigning new worker Ip: " + newWorkerIp +
+                                        // " for task Id: " + task.taskId + " with olders worker Ip: " + task.workerIp);
                                     MapleJuiceList.updateTaskWorkerIp(task.taskId, newWorkerIp);
                                 }
                                 MapleJuiceList.addJobToWorkerPool(task.exeFileName, assignedWorkers);
@@ -137,7 +137,7 @@ public class MapleJuiceHandler extends Thread
                         {
                             task.submit();
                             runningWorkers.add(task.workerIp);
-                            System.out.println("[MapleJuiceHandler] Starting task with Id: " + task.taskId);
+                            // System.out.println("[MapleJuiceHandler] Starting task with Id: " + task.taskId);
                             if(task.status != TaskStatus.FINISHED)
                             {
                                 MapleJuiceList.changeTaskStatus(task.taskId, TaskStatus.STARTED);

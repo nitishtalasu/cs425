@@ -297,7 +297,7 @@ public class TcpClientModule
             this.closeSocket();
         }
             long endTime = System.currentTimeMillis();
-            System.out.println("[TCPClient] Rereplication time for " + sdfsFileName + " : " + (endTime - startTime));
+            // System.out.println("[TCPClient] Rereplication time for " + sdfsFileName + " : " + (endTime - startTime));
     }
 
     public boolean putFilesParallel(
@@ -388,7 +388,7 @@ public class TcpClientModule
             }
             this.outputStream.flush();  
             in.close();         
-            System.out.println("Finished sending");
+            // System.out.println("Finished sending");
 
             String reply = this.inputStream.readUTF();
             if(reply.equals("OK"))
@@ -433,7 +433,7 @@ public class TcpClientModule
                 {
                     // localReadFile = new FileReader(currentDir+"/src/main/java/MP4/sdfsFile/"+localFileName);
                     myFile = new File(currentDir+"/src/main/java/MP4/sdfsFile/"+localFileName);
-                    System.out.println("[TcpClientModule: putfiles] Replicating from sdfsfile : " + localFileName);
+                    // System.out.println("[TcpClientModule: putfiles] Replicating from sdfsfile : " + localFileName);
                 }
                 else
                 {
@@ -451,7 +451,7 @@ public class TcpClientModule
                 }
                 this.outputStream.flush();  
                 in.close();         
-                System.out.println("Finished sending");
+                // System.out.println("Finished sending");
         
                 String reply = this.inputStream.readUTF();   
                 if(reply.equals("OK"))
@@ -471,7 +471,7 @@ public class TcpClientModule
             this.closeSocket();
         }
             long endTime = System.currentTimeMillis();
-            System.out.println("[TCPClient] Rereplication time for " + sdfsFileName + " : " + (endTime - startTime));
+            // System.out.println("[TCPClient] Rereplication time for " + sdfsFileName + " : " + (endTime - startTime));
     }
 
      /**
@@ -495,7 +495,7 @@ public class TcpClientModule
                 logger.LogInfo("[TCPClient] Replica node accepted the request to replicate file " + 
                     sdfsFileName + " to " + ipAddressToReplicate);
                 long endTime = System.currentTimeMillis();
-                System.out.println("[TCPClient] Rereplication time for " + sdfsFileName + " : " + (endTime - startTime));
+                // System.out.println("[TCPClient] Rereplication time for " + sdfsFileName + " : " + (endTime - startTime));
                 return true;
             }
             else
@@ -572,7 +572,7 @@ public class TcpClientModule
         }
 
         long endTime = System.currentTimeMillis();
-        System.out.println("[TCPClient] Rereplication time for " + sdfsFileName + " : " + (endTime - startTime));
+        // System.out.println("[TCPClient] Rereplication time for " + sdfsFileName + " : " + (endTime - startTime));
     }
 
 
