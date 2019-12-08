@@ -110,7 +110,7 @@ public class Maple extends Thread {
             File file = new File(fileName);
             FileWriter fr = new FileWriter(file, true);
             BufferedWriter br = new BufferedWriter(fr);
-            br.write(line + System.getProperty("line.separator"));
+            br.write(taskId + "\t" + line + System.getProperty("line.separator"));
             br.close();
             fr.close();
         }
