@@ -336,13 +336,15 @@ public class Maple extends Thread {
                 fout.write(buffer, 0, read);
             }
 
+            fin.close();
+            fout.close();
             putFile(key, localFile.getName());
             localFile.delete();
         } 
-        finally 
+        catch(Exception e)
         {
-            fin.close();
-            fout.close();
+            System.out.println("[Maple][mergeFiles] merging file Failed with exception: ");
+            e.printStackTrace();
         }
 	}
 }
