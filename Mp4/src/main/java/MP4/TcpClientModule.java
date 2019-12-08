@@ -986,33 +986,15 @@ public class TcpClientModule
         return timeElapsed;
     }
 
-    public void mergeTaskFiles(List<String> taskIds) 
-    {
-        // List<MembershipNode> nodes = MembershipList.getMembershipNodes();
-        // for (MembershipNode node : nodes) 
-        // {
-            
-        // }
-
-        // if (count >= 1)
-        // {
-        //     System.out.println("[TcpClientModule][mergeTaskFiles] Successfully merged task files for key: " + key);
-        // }
-        // else
-        // {
-        //     System.err.println("[TcpClientModule][mergeTaskFiles] Failed in merging task files for key: " + key);
-        // }
-	}
-
-    public int MergeFile(String dest, String source, String ip) 
+    public int MergeTaskFiles(String key, List<String> taskIds, String ip) 
     {
         int res = 0;
         this.initializeStreams(ip);
         try
         {
             this.outputStream.writeUTF(MessageType.MERGETASKFILES.toString());
-            this.outputStream.writeUTF(dest);
-            this.outputStream.writeUTF(source);
+            this.outputStream.writeUTF(key);
+            this.outputStream.writeUTF(toJson(taskIds));
             String reply = this.inputStream.readUTF();
             if(reply.equals("OK"))
             {

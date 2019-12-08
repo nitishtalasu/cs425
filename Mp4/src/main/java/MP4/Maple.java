@@ -19,9 +19,9 @@ public class Maple extends Thread {
 
     private static TcpClientModule client = new TcpClientModule();
 
-    private static String localFilesDir = "/src/main/java/MP4/localFile/";
+    public static String localFilesDir = "/src/main/java/MP4/localFile/";
 
-    private static String sdfsFileDir = "/src/main/java/MP4/sdfsFile/";
+    public static String sdfsFileDir = "/src/main/java/MP4/sdfsFile/";
 
     private String command;
     private List<String> processedKeys;
@@ -100,28 +100,34 @@ public class Maple extends Thread {
         return res;
     }
 
-    private static Set<String> createFiles(String taskId, List<String> res, String intermediatePrefixFileName)
-            throws IOException {
-        Set<String> keysProcessed = new HashSet<String>();
-        for (String line : res) {
-            String[] words = line.split(" ");
-            String fileName = intermediatePrefixFileName + "_" + words[0];
-            keysProcessed.add(words[0]);
-            File file = new File(fileName);
-            FileWriter fr = new FileWriter(file, true);
-            BufferedWriter br = new BufferedWriter(fr);
-            br.write(taskId + "\t" + line + System.getProperty("line.separator"));
-            br.close();
-            fr.close();
-        }
+    private static Set<String> createFiles(
+        String taskId, 
+        List<String> res, 
+        String intermediatePrefixFileName) throws IOException 
+        {
+            Set<String> keysProcessed = new HashSet<String>();
+            for (String line : res) 
+            {
+                String[] words = line.split(" ");
+                String fileName = intermediatePrefixFileName + "_" + words[0];
+                keysProcessed.add(words[0]);
+                File file = new File(fileName);
+                FileWriter fr = new FileWriter(file, true);
+                BufferedWriter br = new BufferedWriter(fr);
+                br.write(taskId + " " + line + System.getProperty("line.separator"));
+                br.close();
+                fr.close();
+            }
+        
 
-        // TODO remove this
-        for (String string : keysProcessed) {
-            System.out.println("[Maple][createFiles] one of the processe key:" + string);
-        }
+            // TODO remove this
+            for (String string : keysProcessed) 
+            {
+                System.out.println("[Maple][createFiles] one of the processe key:" + string);
+            }
 
-        return keysProcessed;
-    }
+            return keysProcessed;
+         }
 
     /**
      * TODO : Check if the data appends properly without any changes.
@@ -129,49 +135,29 @@ public class Maple extends Thread {
      * @param keysProcessed              Keys to be prcoessed
      * @param intermediatePrefixFileName intermediate prefix file name
      */
-    private static void putFilesInSdfs(String taskId, Set<String> keysProcessed, String intermediatePrefixFileName,
-            List<String> processedKeys) {
-        System.out.println("[Maple][putFileInSdfs] processedKeys: " + processedKeys);
-        for (String key : keysProcessed) {
-            // call Leader and get addresses
-            String fileName = intermediatePrefixFileName + "_" + key;
-            //if(!processedKeys.contains(fileName))
-            //{
-
-                String sdfsfileName = fileName + "_" + taskId;
-                List<String> addresses = client.getAddressesFromLeader(sdfsfileName);
-                System.out.println("[Maple][putFileInSdfs] Putting file in SDFS with name: " + sdfsfileName);
-                if (putFile(sdfsfileName, fileName, addresses) == 1) 
-                {
-                    String curDir = System.getProperty("user.dir");
-                    try 
+    private static void putFilesInSdfs(
+        String taskId, 
+        Set<String> keysProcessed, 
+        String intermediatePrefixFileName,
+        List<String> processedKeys) 
+        {
+            System.out.println("[Maple][putFileInSdfs] processedKeys: " + processedKeys);
+            for (String key : keysProcessed) 
+            {
+                // call Leader and get addresses
+                String fileName = intermediatePrefixFileName + "_" + key;
+                    if (putFile(fileName, fileName) == 1) 
                     {
-                        // File tempFile = new File(curDir + localFilesDir + "_temp_" +sdfsfileName);
-                        // BufferedWriter writer = 
-                        //     new BufferedWriter(new FileWriter(tempFile));
-                        // writer.write(taskId + System.getProperty("line.separator"));
-                        // writer.write(TcpClientModule.toJson(addresses) + System.getProperty("line.separator"));
-                        // writer.close();
-                        // System.out.println("[Maple][putFileInSdfs] Writing chunk data in SDFS with name: " + fileName);
-                        // putFile(fileName, tempFile.getName());
-                        // tempFile.delete();
-                        client.putProcessedKey(taskId, fileName);
-                    } 
-                    catch (Exception e) 
-                    {
-                        System.err.println("[Maple][PutFilesInDir] Throw an exception: " + e.getMessage());
-                        e.printStackTrace();
-                        return; 
+                        System.out.println("[Maple][putFilesInSdfs] File insertion failed for" + fileName);
+                    
                     }
-                // }
-                // else
-                // {
-                //     logger.LogError("[Maple][putFile] File insertion failed for" + sdfsfileName);
-                // }
+                    else
+                    {
+                        logger.LogError("[Maple][putFilesInSdfs] File insertion failed for" + fileName);
+                    }
             }
         }
-    }
-
+        
     private void deleteLocalFiles(String dir, Set<String> keysProcessed, String intermediatePrefixFileName) 
     {
         System.out.println("[Maple][deleteLocalFiles] Deleting all local files of the task directory: " + dir);
@@ -272,7 +258,7 @@ public class Maple extends Thread {
     }
     
 
-    private static int putFile(String sdfsName, String localName)
+    public static int putFile(String sdfsName, String localName)
     {
         List<String> addresses = client.getAddressesFromLeader(sdfsName);
         return putFile(sdfsName, localName, addresses);

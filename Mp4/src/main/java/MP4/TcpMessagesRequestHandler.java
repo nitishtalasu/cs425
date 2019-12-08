@@ -565,7 +565,7 @@ public class TcpMessagesRequestHandler extends Thread
                 reply = "NACK"; 
             }
 
-            MapleJuiceList.FinishTask(taskId);
+            //MapleJuiceList.FinishTask(taskId);
             MapleJuiceList.changeTaskStatus(taskId, TaskStatus.FINISHED);
         }
         catch(IOException e) 
@@ -694,8 +694,8 @@ public class TcpMessagesRequestHandler extends Thread
         try
         {
             String key = this.socketInputStream.readUTF();
-            String taskFile = this.socketInputStream.readUTF();
-            Maple.mergeFiles(taskFile, key);
+            String taskIds = this.socketInputStream.readUTF();
+            Task.mergeFiles(key, taskIds);
         }
         catch(IOException e) 
         {

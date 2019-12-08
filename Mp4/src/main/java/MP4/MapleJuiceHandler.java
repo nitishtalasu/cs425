@@ -55,7 +55,7 @@ public class MapleJuiceHandler extends Thread
                             jobsToFinishedTasks.put(task.exeFileName, 1);
                         }
 
-                        MapleJuiceList.removeTask(task.taskId);
+                        //MapleJuiceList.removeTask(task.taskId);
                         MapleJuiceList.checkJobCompletion(task.exeFileName, jobsToFinishedTasks.get(task.exeFileName));
                         continue;
                     }

@@ -48,7 +48,7 @@ public class Juice extends Thread
             getFile(inputFileName);
             List<String> res = executeCommand(fileDir, exeFileName, fileDir + inputFileName);
             logger.LogInfo("[Juice][runTask] Result : " + res.toString() );
-            createFile(res, fileDir + "intermediatePrefixFileName_" + exeFileName);
+            createFile(taskId, res, fileDir + "intermediatePrefixFileName_" + exeFileName);
             putFilesInSdfs(taskId, "intermediatePrefixFileName_" + exeFileName, outputFileName, processedKeys);
             sendFinishMessage(taskId);
             String fileName = "intermediatePrefixFileName_" + exeFileName;
@@ -97,7 +97,7 @@ public class Juice extends Thread
         return res;
     }
 
-    private static void createFile(List<String> res, String intermediatePrefixFileName) throws IOException
+    private static void createFile(String taskId, List<String> res, String intermediatePrefixFileName) throws IOException
     {
         String fileName = intermediatePrefixFileName;
         File file = new File(fileName);
@@ -106,7 +106,7 @@ public class Juice extends Thread
         for (String line : res) 
         {
             
-            br.write(line + System.getProperty("line.separator"));
+            br.write(taskId + " " + line + System.getProperty("line.separator"));
         }
 
         br.close();

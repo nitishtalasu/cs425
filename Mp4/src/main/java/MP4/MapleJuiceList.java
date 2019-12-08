@@ -204,23 +204,51 @@ public class MapleJuiceList {
         return new ArrayList<String>();
     }
 
-    public static synchronized void checkJobCompletion(String exeName, int tasksFinished) {
-        if (tasksFinished == jobsToTask.get(exeName)) {
+    public static synchronized void checkJobCompletion(String exeName, int tasksFinished) 
+    {
+        if (tasksFinished == jobsToTask.get(exeName)) 
+        {
             logger.LogInfo("[MapleJuiceList][checkJobCompletion] Deleting all the data of exeName: " + exeName);
             List<Task> tasksToBeRemoved = new ArrayList<Task>();
-            // List<String> taskIds = new ArrayList<String>();
-            // String intermediatePrefixName = "";
-            for (Task task : tasks) {
-                if (task.exeFileName.equals(exeName)) {
+            List<String> taskIds = new ArrayList<String>();
+            String intermediatePrefixName = "";
+            for (Task task : tasks) 
+            {
+                if (task.exeFileName.equals(exeName)) 
+                {
                     assert (task.status == TaskStatus.FINISHED);
-                    // intermediatePrefixName = task.intermediatePrefixName;
+                    intermediatePrefixName = task.intermediatePrefixName;
                     tasksToBeRemoved.add(task);
-                    // taskIds.add(task.taskId);
+                    taskIds.add(task.taskId);
                 }
             }
 
-            // TcpClientModule client = new TcpClientModule();
-            // client.mergeTaskFiles(taskIds);
+            System.out.println("[MapleJuiceList][checkJobCompletion] Tasks successfully completed in job: " + exeName +
+                " are " + taskIds);
+            TcpClientModule client = new TcpClientModule();
+            List<String> keys = client.getFileNamesFromLeader(intermediatePrefixName, "");
+            System.out.println("[MapleJuiceList][checkJobCompletion] Keys that are created in job: " + exeName +
+                " are " + keys);
+            for (String key : keys) 
+            {
+                List<String> ips = client.getreplicasFromLeader(key);
+                System.out.println("[MapleJuiceList][checkJobCompletion] Got ips for the key : " + key +
+                    " are " + ips);
+                for (String ip : ips) 
+                {
+                    if(client.MergeTaskFiles(key, taskIds, ip) == 1)
+                    {
+                        System.out.println("[MapleJuiceList][checkJobCompletion] Successfully merged for the " + 
+                            "key : " + key);
+                        break;
+                    }
+                    else
+                    {
+                        System.out.println("[MapleJuiceList][checkJobCompletion] Failed in merging for the " + 
+                            "key : " + key);
+                    }
+                }
+            }
             tasks.removeAll(tasksToBeRemoved);
             removeJob(exeName);
         }
@@ -249,40 +277,40 @@ public class MapleJuiceList {
         }
     }
 
-    public static void FinishTask(String taskId) {
-        for (Task task : tasks) {
-            if (task.taskId.equals(taskId)) {
-                for (String key : task.finishedKeys) {
-                    TcpClientModule client = new TcpClientModule();
-                    String taskFile = key + "_" + task.taskId;
-                    List<String> addresses = client.getreplicasFromLeader(taskFile);
-                    System.out.println("[MapleJuiceList][FinishTask] Merging at locations: " + addresses);
-                    try {
-                        Thread.sleep(10000);
-                    } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    for (String ip : addresses) 
-                    {
-                        System.out.println("[MapleJuiceList][FinishTask] Merged key: " +
-                                key + " of " + taskId);
-                        if (client.MergeFile(key, taskFile, ip) == 1)
-                        {
-                            System.out.println("[MapleJuiceList][FinishTask] Successfully merged key: " +
-                                key + " of " + taskId);
-                            break;
-                        }
-                    }
+    // public static void FinishTask(String taskId) {
+    //     for (Task task : tasks) {
+    //         if (task.taskId.equals(taskId)) {
+    //             for (String key : task.finishedKeys) {
+    //                 TcpClientModule client = new TcpClientModule();
+    //                 String taskFile = key + "_" + task.taskId;
+    //                 List<String> addresses = client.getreplicasFromLeader(taskFile);
+    //                 System.out.println("[MapleJuiceList][FinishTask] Merging at locations: " + addresses);
+    //                 try {
+    //                     Thread.sleep(10000);
+    //                 } catch (InterruptedException e) {
+    //                     // TODO Auto-generated catch block
+    //                     e.printStackTrace();
+    //                 }
+    //                 for (String ip : addresses) 
+    //                 {
+    //                     System.out.println("[MapleJuiceList][FinishTask] Merged key: " +
+    //                             key + " of " + taskId);
+    //                     if (client.MergeTaskFiles(key, taskFile, ip) == 1)
+    //                     {
+    //                         System.out.println("[MapleJuiceList][FinishTask] Successfully merged key: " +
+    //                             key + " of " + taskId);
+    //                         break;
+    //                     }
+    //                 }
 
-                    System.out.println("[MapleJuiceList][FinishTask] Deleting taskfile: " + taskFile + addresses);
-                    client.deleteFilesParallel(taskFile, addresses);
-                    client.deleteSuccess(taskFile);
-                }
+    //                 System.out.println("[MapleJuiceList][FinishTask] Deleting taskfile: " + taskFile + addresses);
+    //                 client.deleteFilesParallel(taskFile, addresses);
+    //                 client.deleteSuccess(taskFile);
+    //             }
 
-                break;
-            }
-        }
-	}
+    //             break;
+    //         }
+    //     }
+	// }
 
 }
