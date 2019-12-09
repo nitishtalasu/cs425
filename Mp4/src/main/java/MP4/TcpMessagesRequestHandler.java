@@ -697,7 +697,7 @@ public class TcpMessagesRequestHandler extends Thread
             String key = this.socketInputStream.readUTF();
             String taskIds = this.socketInputStream.readUTF();
             System.out.println("[TCPMessageRequestHandler][MergeTaskFiles] key and taskIds " + key + taskIds);
-            Task.mergeFiles(key, taskIds);
+            MapleJuiceList.mergeFiles(key, taskIds);
         }
         catch(IOException e) 
         {
