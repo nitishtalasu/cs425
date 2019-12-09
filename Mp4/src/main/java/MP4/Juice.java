@@ -53,7 +53,7 @@ public class Juice extends Thread
             sendFinishMessage(taskId);
             String fileName = "intermediatePrefixFileName_" + exeFileName;
             File file = new File(fileDir + fileName);
-            file.delete();
+            //file.delete();
         }
         catch(Exception e)
         {
