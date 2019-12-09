@@ -338,7 +338,7 @@ public class MapleJuiceList {
     //     }
     // }
     
-    public static void mergeFiles(String key, String taskIdsJson) 
+    public synchronized static void mergeFiles(String key, String taskIdsJson) 
     {
         System.out.println("[Task][mergeFiles] Merging file:");
         List<String> taskIds = TcpClientModule.getListObject(taskIdsJson);
@@ -368,7 +368,8 @@ public class MapleJuiceList {
             }
 
             assert(taskIdInFiles.containsAll(new HashSet<String>(taskIds)));
-            System.out.println("[Task][mergeFiles] created a new  temp file locally");
+            System.out.println("[Task][mergeFiles] created a new  temp file locally with taskIds in the files: " + 
+                new ArrayList<String>(taskIdInFiles));
 
             br.close();
             bw.close();
