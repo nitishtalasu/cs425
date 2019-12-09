@@ -45,13 +45,14 @@ public class Maple extends Thread
             String exeFileName = args[1];
             String inputFileName = args[2];
             String intermediatePrefixFileName = args[3];
+            List<String> alreadyProcessedKeys = client.getProcessedKeys(taskId);
             String currentDir = System.getProperty("user.dir");
             String fileDir = currentDir + localFilesDir;
             getFile(exeFileName);
             getFile(inputFileName);
             List<String> res = executeCommand(fileDir , exeFileName, fileDir + inputFileName);
             Set<String> keysProcessed = createFiles(res, fileDir + intermediatePrefixFileName);
-            putFilesInSdfs(keysProcessed, intermediatePrefixFileName);
+            putFilesInSdfs(taskId, keysProcessed, intermediatePrefixFileName, alreadyProcessedKeys);
             sendFinishMessage(taskId);
             deleteLocalFiles(fileDir, keysProcessed, intermediatePrefixFileName);
         }
@@ -127,14 +128,20 @@ public class Maple extends Thread
      * @param keysProcessed Keys to be prcoessed
      * @param intermediatePrefixFileName intermediate prefix file name
      */
-    private static void putFilesInSdfs(Set<String> keysProcessed, String intermediatePrefixFileName) 
+    private static void putFilesInSdfs(String taskId, Set<String> keysProcessed, String intermediatePrefixFileName, List<String> alreadyProcessedKeys) 
     {
+        logger.LogInfo("[Maple][putFileInSdfs] Putting files in SDFS for taskid: " + taskId);
         for (String key : keysProcessed) 
         {
             // call Leader and get addresses
-            String fileName = intermediatePrefixFileName + "_" + key;
-            logger.LogInfo("[Maple][putFileInSdfs] Putting file in SDFS with name: " + fileName);
-            putFile(fileName, fileName);
+            if (!alreadyProcessedKeys.contains(key))
+            {
+                String fileName = intermediatePrefixFileName + "_" + key;
+                logger.LogInfo("[Maple][putFileInSdfs] Putting file in SDFS with name: " + fileName);
+                putFile(fileName, fileName);
+                client.addProcessedKey(taskId, key);
+                logger.LogInfo("[Maple][putFileInSdfs] Successfully added key: " + key);
+            }          
         }
     }
 
@@ -244,14 +251,9 @@ public class Maple extends Thread
     private static void putFile(String sdfsName, String localName)
     {
         List<String> addresses = client.getAddressesFromLeader(sdfsName);
-        if(client.putFilesParallel(sdfsName, localName, addresses, "put"))
-        {
-            client.putSuccess(sdfsName);
-        }
-        else
-        {
-            logger.LogError("[Maple][putFile] File insertion failed for" + sdfsName);
-        }
+        client.putFiles(sdfsName, localName, addresses, "put");
+        client.putSuccess(sdfsName);
+        logger.LogInfo("[Maple][putFile] File insertion successfull for" + sdfsName);
     }
 
     private static List<String> getWorkers(String numOfMaples)

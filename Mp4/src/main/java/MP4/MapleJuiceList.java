@@ -15,6 +15,7 @@ public class MapleJuiceList
     private static volatile ConcurrentLinkedQueue<Task> tasks;
     private static volatile ConcurrentHashMap<String, List<String>> jobsToWorkerPool;
     private static volatile ConcurrentHashMap<String, Integer> jobsToTask;
+    private static volatile ConcurrentHashMap<String, List<String>> tasksToKeys;
     private static GrepLogger logger = GrepLogger.getInstance();
     
     private MapleJuiceList()
@@ -23,6 +24,7 @@ public class MapleJuiceList
         tasks = new ConcurrentLinkedQueue<Task>();
         jobsToWorkerPool = new ConcurrentHashMap<String, List<String>>();
         jobsToTask = new ConcurrentHashMap<String, Integer>();
+        tasksToKeys = new ConcurrentHashMap<String, List<String>>();
     }
 
     public static synchronized void initializeMapleJuiceList() 
@@ -60,6 +62,7 @@ public class MapleJuiceList
 
         logger.LogInfo("[MapleJuiceList][addTasks] Adding taskId: " + newTask.taskId);
         tasks.add(newTask);
+        tasksToKeys.put(newTask.taskId, new ArrayList<String>());
     }
 
     private static synchronized void addTasks(List<Task> newTasks)
@@ -253,6 +256,37 @@ public class MapleJuiceList
         {
             System.out.println("Task job:" + task.exeFileName + "\tStatus: " + task.status.toString() +
                 "\tId: " + task.taskId + "\tWorker Ip: " + task.workerIp);
+        }
+	}
+
+    public static List<String> GetProcessedKeys(String taskId) 
+    {
+        List<String> keys = new ArrayList<String>();
+		if (tasksToKeys.contains(taskId))
+        {
+            keys = tasksToKeys.get(taskId);
+            System.out.println("Existing keys: " + keys);
+        }
+        else
+        {
+            System.out.println("Task Id:" + taskId + " not found");
+        }
+
+        return keys;
+	}
+
+    public static void AddProcessedKeys(String taskId, String key) 
+    {
+        if (tasksToKeys.contains(taskId))
+        {
+            List<String> keys = tasksToKeys.get(taskId);
+            System.out.println("Existing keys: " + keys);
+            keys.add(key);
+            tasksToKeys.put(taskId, keys);
+        }
+        else
+        {
+            System.out.println("Task Id:" + taskId + " not found");
         }
 	}
 

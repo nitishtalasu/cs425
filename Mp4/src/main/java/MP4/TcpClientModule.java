@@ -942,5 +942,58 @@ public class TcpClientModule
 
         return timeElapsed;
 	}
+
+    public List<String> getProcessedKeys(String taskId) 
+    {
+        List<String> processedKeys = new ArrayList<String>();
+        this.initializeStreams(Introducer.IPADDRESS.getValue());
+        try
+        {
+            logger.LogInfo("[TCPClient][getProcessedKeys] Connected to "+ Introducer.IPADDRESS.getValue() + ".");
+            
+            this.outputStream.writeUTF(MessageType.GETPROCESSEDKEYS.toString());
+            this.outputStream.writeUTF(taskId);
+            String json = this.inputStream.readUTF();
+            logger.LogInfo("[TCPClient][getProcessedKeys] reply: "+ json + ".");
+            processedKeys = TcpClientModule.getListObject(json);
+            System.out.println("[TCPClient][getProcessedKeys] keys: "+ processedKeys);
+            String reply = this.inputStream.readUTF();
+            if(reply.equals("OK"))
+            {
+                logger.LogInfo("[TCPClient][getProcessedKeys] getProcessedKeys completion message."); 
+            }
+        } 
+        catch(Exception e) 
+        { 
+            logger.LogException("[TCPClient][completeJuiceTask] getProcessedKeys message failed: ", e); 
+        } 
+        this.closeSocket();
+
+        return processedKeys;
+	}
+
+    public void addProcessedKey(String taskId, String key) 
+    {
+        this.initializeStreams(Introducer.IPADDRESS.getValue());
+        try
+        {
+            logger.LogInfo("[TCPClient][addProcessedKey] Connected to "+ Introducer.IPADDRESS.getValue() + ".");
+            logger.LogInfo("[TCPClient][addProcessedKey] addProcessedKey " + key); 
+            this.outputStream.writeUTF(MessageType.ADDPROCESSEDKEYS.toString());
+            this.outputStream.writeUTF(taskId);
+            this.outputStream.writeUTF(key);
+            String reply = this.inputStream.readUTF();
+            if(reply.equals("OK"))
+            {
+                logger.LogInfo("[TCPClient][addProcessedKey] addProcessedKey completion message."); 
+            }
+        } 
+        catch(Exception e) 
+        { 
+            logger.LogException("[TCPClient][addProcessedKey] addProcessedKey message failed: ", e); 
+        } 
+        this.closeSocket();
+
+	}
 }
 
