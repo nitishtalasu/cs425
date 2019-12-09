@@ -45,7 +45,7 @@ public class Juice extends Thread
             String currentDir = System.getProperty("user.dir");
             String fileDir = currentDir + localFilesDir;
             getFile(exeFileName);
-            getFile(inputFileName);
+            getInputFile(inputFileName);
             List<String> res = executeCommand(fileDir, exeFileName, fileDir + inputFileName);
             logger.LogInfo("[Juice][runTask] Result : " + res.toString() );
             createFile(res, fileDir + "intermediatePrefixFileName_" + exeFileName);
@@ -135,13 +135,7 @@ public class Juice extends Thread
         }
     }
 
-    /**
-     * TODO : Assuming the getFile always works.
-     * 
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    private static void getFile(String fileName) throws IOException, InterruptedException
+    private static void getInputFile(String fileName) throws IOException, InterruptedException
     {
         String sdfsFileName = fileName;
         String localFileName = fileName;
@@ -151,7 +145,7 @@ public class Juice extends Thread
 
         String dir = System.getProperty("user.dir") + Maple.localFilesDir + localFileName;
         System.out.println("Juice localfilename : " + dir);
-        BufferedReader br = new BufferedReader(new FileReader(localFileName));
+        BufferedReader br = new BufferedReader(new FileReader(dir));
         String taskIdsJson = br.readLine();
         br.close();
         List<String> taskIds = TcpClientModule.getListObject(taskIdsJson);
@@ -171,6 +165,20 @@ public class Juice extends Thread
         Runtime runtime = Runtime.getRuntime();
         Process process2 = runtime.exec(commandLine2);
         int exitCode = process2.waitFor();
+    }
+    /**
+     * TODO : Assuming the getFile always works.
+     * 
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    private static void getFile(String fileName) throws IOException, InterruptedException
+    {
+        String sdfsFileName = fileName;
+        String localFileName = fileName;
+        // call Leader and get addresses
+        List<String> addresses = client.getreplicasFromLeader(sdfsFileName);        
+        client.getFiles(sdfsFileName, localFileName, addresses);
     }
 
     private static List<String> readBatch(BufferedReader reader, int batchSize) throws IOException 
