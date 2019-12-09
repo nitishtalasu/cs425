@@ -165,12 +165,29 @@ public class Juice extends Thread
             client.getFiles(sdfsFileName, taskIdFile, addresses);
         }
         
-        String command = "cat "+ taskIdFiles + " > " + dir;
-        System.out.println("merging command: " + command);
-        String[] commandLine2 = {"/bin/sh","-c",command};
-        Runtime runtime = Runtime.getRuntime();
-        Process process2 = runtime.exec(commandLine2);
-        int exitCode = process2.waitFor();
+        // String command = "cat "+ taskIdFiles + " > " + dir;
+        // System.out.println("merging command: " + command);
+        // String[] commandLine2 = {"/bin/sh","-c",command};
+        // Runtime runtime = Runtime.getRuntime();
+        // Process process2 = runtime.exec(commandLine2);
+        // int exitCode = process2.waitFor();
+
+        System.out.println("Combining juice files for key : " + fileName + taskIds);
+        String curdir = System.getProperty("user.dir") + localFilesDir;
+        BufferedWriter bw =  new BufferedWriter(new FileWriter( curdir + fileName));
+        for (String taskId : taskIds) 
+        {
+            String taskIdFile = fileName + "_" + taskId + "_temp";
+            System.out.println("Combining juice task for key : " + curdir + taskIdFile);
+            BufferedReader read = new BufferedReader(new FileReader(curdir + taskIdFile));
+            String rline;
+            while((rline = read.readLine()) != null)
+            {
+                bw.write(rline + System.getProperty("line.separator"));
+            }
+            read.close();
+        }
+        bw.close();
     }
     /**
      * TODO : Assuming the getFile always works.
