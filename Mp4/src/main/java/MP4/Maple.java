@@ -216,11 +216,9 @@ public class Maple extends Thread
     public static boolean createJob(String mapleExeName, String intermediatePrefix, String numOfMaples) 
     {
         List<String> inputFiles = client.getFileNamesFromLeader(mapleExeName, "txt");
+        System.out.println("[Maple][createJob] Input files " + inputFiles);
         List<String> workersIpAddress = getWorkers(numOfMaples);
-        for (String workerIp : workersIpAddress) 
-        {
-            System.out.println("[Maple][createJob] One of the worker is " + workerIp);
-        }
+        System.out.println("[Maple][createJob] One of the worker is " + workersIpAddress);
         
         List<MapleTask> tasks = new ArrayList<MapleTask>();
         int count = 0;
