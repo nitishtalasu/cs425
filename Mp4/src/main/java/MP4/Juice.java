@@ -106,7 +106,7 @@ public class Juice extends Thread
         for (String line : res) 
         {
             
-            br.write(taskId + " " + line + System.getProperty("line.separator"));
+            br.write(line + System.getProperty("line.separator"));
         }
 
         br.close();

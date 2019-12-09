@@ -8,7 +8,7 @@ public class MapleJob extends Job
 
     public MapleJob(String mapleExeName, List<MapleTask> tasks) 
     {
-        super(mapleExeName);
+        super(mapleExeName, JobType.MAPLE);
         this.tasks = tasks;
 	}
 

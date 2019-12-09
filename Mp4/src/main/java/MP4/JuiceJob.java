@@ -9,7 +9,7 @@ public class JuiceJob extends Job
     public boolean deleteIntermediateFiles;
     public JuiceJob(String juiceExe, List<JuiceTask> tasks, String intermediatePrefix, String deleteIntermediateFilesOption) 
     {
-        super(juiceExe);
+        super(juiceExe, JobType.JUICE);
         this.tasks = tasks;
         this.intermediatePrefix = intermediatePrefix;
         if (deleteIntermediateFilesOption.equals("1"))
