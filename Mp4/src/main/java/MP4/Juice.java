@@ -197,8 +197,8 @@ public class Juice extends Thread
         String deleteIntermediateFilesOption) 
     {
         List<String> inputFiles = client.getFileNamesFromLeader(intermediatePrefixName, "");
-        System.out.println("Input Files to Juice");
-        System.out.println(inputFiles);
+        // System.out.println("Input Files to Juice");
+        // System.out.println(inputFiles);
         
         // TODO : check for range partitioning.
         List<String> workersIpAddress = getWorkers(numOfJuiceTasks);
