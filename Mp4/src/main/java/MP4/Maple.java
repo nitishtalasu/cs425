@@ -145,7 +145,7 @@ public class Maple extends Thread
             String intermediateKey = intermediatePrefixFileName + "_" + key;
             String fileName = intermediateKey + "_" + taskId;
             System.out.println("[Maple][putFileInSdfs] Putting file in SDFS with name: " + fileName);
-            if (putFile(fileName, fileName) == 1)
+            if (putFile(fileName, intermediateKey) == 1)
             {
                 System.out.println("[Maple][putFileInSdfs] Put successful in SDFS with name: " + fileName);
                 client.putProcessedKey(taskId, intermediateKey);
