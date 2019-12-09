@@ -992,9 +992,11 @@ public class TcpClientModule
         this.initializeStreams(ip);
         try
         {
+            System.out.println("[TCPClient] Sending msg." + key + taskIds); 
             this.outputStream.writeUTF(MessageType.MERGETASKFILES.toString());
             this.outputStream.writeUTF(key);
             this.outputStream.writeUTF(toJson(taskIds));
+            System.out.println("[TCPClient] Sent merge message."); 
             String reply = this.inputStream.readUTF();
             if(reply.equals("OK"))
             {

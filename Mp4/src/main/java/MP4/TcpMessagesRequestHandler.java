@@ -693,8 +693,10 @@ public class TcpMessagesRequestHandler extends Thread
         String reply = "OK";
         try
         {
+            System.out.println("[TCPMessageRequestHandler][MergeTaskFiles] Merge task file");
             String key = this.socketInputStream.readUTF();
             String taskIds = this.socketInputStream.readUTF();
+            System.out.println("[TCPMessageRequestHandler][MergeTaskFiles] key and taskIds " + key + taskIds);
             Task.mergeFiles(key, taskIds);
         }
         catch(IOException e) 
