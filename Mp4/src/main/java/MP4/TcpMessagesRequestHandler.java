@@ -275,7 +275,7 @@ public class TcpMessagesRequestHandler extends Thread
             }
             this.socketOutputStream.flush();  
             in.close();         
-            System.out.println("Finished sending");
+            // System.out.println("Finished sending");
         }
         catch(IOException e)
         {

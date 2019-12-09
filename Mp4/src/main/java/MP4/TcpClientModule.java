@@ -388,7 +388,7 @@ public class TcpClientModule
             }
             this.outputStream.flush();  
             in.close();         
-            System.out.println("Finished sending");
+            // System.out.println("Finished sending");
 
             String reply = this.inputStream.readUTF();
             if(reply.equals("OK"))
@@ -448,7 +448,7 @@ public class TcpClientModule
                 }
                 this.outputStream.flush();  
                 in.close();         
-                System.out.println("Finished sending");
+                // System.out.println("Finished sending");
         
                 String reply = this.inputStream.readUTF();   
                 if(reply.equals("OK"))

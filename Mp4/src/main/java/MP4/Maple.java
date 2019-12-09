@@ -121,10 +121,10 @@ public class Maple extends Thread {
         
 
             // TODO remove this
-            for (String string : keysProcessed) 
-            {
-                System.out.println("[Maple][createFiles] one of the processe key:" + string);
-            }
+            // for (String string : keysProcessed) 
+            // {
+            //     System.out.println("[Maple][createFiles] one of the processe key:" + string);
+            // }
 
             return keysProcessed;
          }
@@ -148,7 +148,7 @@ public class Maple extends Thread {
                 String fileName = intermediatePrefixFileName + "_" + key;
                     if (putFile(fileName, fileName) == 1) 
                     {
-                        System.out.println("[Maple][putFilesInSdfs] File insertion success for" + fileName);
+                        // System.out.println("[Maple][putFilesInSdfs] File insertion success for" + fileName);
                     
                     }
                     else
