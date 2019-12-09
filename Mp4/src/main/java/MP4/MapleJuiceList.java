@@ -246,33 +246,33 @@ public class MapleJuiceList {
                 " are " + taskIds);
 
             JobType jobType = getJobType(exeName);
-            if (jobType == JobType.MAPLE)
-            {
-                TcpClientModule client = new TcpClientModule();
-                List<String> keys = client.getFileNamesFromLeader(intermediatePrefixName, "");
-                System.out.println("[MapleJuiceList][checkJobCompletion] Keys that are created in job: " + exeName +
-                    " are " + keys);
-                for (String key : keys) 
-                {
-                    List<String> ips = client.getreplicasFromLeader(key);
-                    System.out.println("[MapleJuiceList][checkJobCompletion] Got ips for the key : " + key +
-                        " are " + ips);
-                    for (String ip : ips) 
-                    {
-                        if(client.MergeTaskFiles(key, taskIds, ip) == 1)
-                        {
-                            System.out.println("[MapleJuiceList][checkJobCompletion] Successfully merged for the " + 
-                                "key : " + key);
-                            break;
-                        }
-                        else
-                        {
-                            System.out.println("[MapleJuiceList][checkJobCompletion] Failed in merging for the " + 
-                                "key : " + key);
-                        }
-                    }
-                }
-            }
+            // if (jobType == JobType.MAPLE)
+            // {
+            //     TcpClientModule client = new TcpClientModule();
+            //     List<String> keys = client.getFileNamesFromLeader(intermediatePrefixName, "");
+            //     System.out.println("[MapleJuiceList][checkJobCompletion] Keys that are created in job: " + exeName +
+            //         " are " + keys);
+            //     for (String key : keys) 
+            //     {
+            //         List<String> ips = client.getreplicasFromLeader(key);
+            //         System.out.println("[MapleJuiceList][checkJobCompletion] Got ips for the key : " + key +
+            //             " are " + ips);
+            //         for (String ip : ips) 
+            //         {
+            //             if(client.MergeTaskFiles(key, taskIds, ip) == 1)
+            //             {
+            //                 System.out.println("[MapleJuiceList][checkJobCompletion] Successfully merged for the " + 
+            //                     "key : " + key);
+            //                 break;
+            //             }
+            //             else
+            //             {
+            //                 System.out.println("[MapleJuiceList][checkJobCompletion] Failed in merging for the " + 
+            //                     "key : " + key);
+            //             }
+            //         }
+            //     }
+            // }
            
             tasks.removeAll(tasksToBeRemoved);
             removeJob(exeName);
