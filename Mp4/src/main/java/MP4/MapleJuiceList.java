@@ -355,8 +355,10 @@ public class MapleJuiceList {
             BufferedWriter bw = new BufferedWriter(new FileWriter(localFile));
             String line;
             Set<String> taskIdInFiles = new HashSet<String>();
+            int lineCount = 0;
             while ((line = br.readLine()) != null) 
             {
+                lineCount += 1;
                 int taskIdEndingIndex = line.indexOf(" ");
                 String taskId = line.substring(0, taskIdEndingIndex);
                 if (taskIds.contains(taskId))
@@ -366,6 +368,8 @@ public class MapleJuiceList {
                 }
 
             }
+
+            System.out.println("[Task][mergeFiles] linecount: " + lineCount);
 
             assert(taskIdInFiles.containsAll(new HashSet<String>(taskIds)));
             System.out.println("[Task][mergeFiles] created a new  temp file locally with taskIds in the files: " + 
