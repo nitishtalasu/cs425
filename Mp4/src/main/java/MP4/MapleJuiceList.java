@@ -318,8 +318,9 @@ public class MapleJuiceList {
     //     }
     // }
     
-    public static void mergeFiles(String taskIdsJson, String key) 
+    public static void mergeFiles(String key, String taskIdsJson) 
     {
+        System.out.println("[Task][mergeFiles] Merging file:");
         List<String> taskIds = TcpClientModule.getListObject(taskIdsJson);
         System.out.println("[Task][mergeFiles] Merging file: " + key + " having taskIds " + taskIds);
         String userDir = System.getProperty("user.dir");
