@@ -40,7 +40,7 @@ class Leader
 
     public static void CheckForReReplication() 
     {   
-        ReplicaList.CheckForReReplication();
+        //ReplicaList.CheckForReReplication();
 	}
 }
 
