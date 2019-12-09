@@ -232,7 +232,7 @@ public class MapleJuiceList
 
     public static synchronized void checkJobCompletion(String exeName, int tasksFinished)
     {
-        System.out.println("[MapleJuiceList][checkJobCompletion] Deleting all the data of exeName: " + 
+        System.out.println("[MapleJuiceList][checkJobCompletion] entered checkjob completion all the data of exeName: " + 
             exeName + " " + jobsToTask.get(exeName));
         //if (tasksFinished == jobsToTask.get(exeName))
         //{
@@ -259,6 +259,7 @@ public class MapleJuiceList
                 String curDir = System.getProperty("user.dir");
                 String localDir = curDir + Maple.localFilesDir;
                 String taskIdsJson = TcpClientModule.toJson(taskIds);
+                logger.LogInfo("Creating temporary files: " + taskIdsJson + " " + localDir);
                 // TODO make it parallel.
                 for (String key : keys) 
                 {
@@ -273,7 +274,7 @@ public class MapleJuiceList
             }
             catch(Exception e)
             {   
-                System.out.println("Failed in creating temp key file");
+                logger.LogException("Failed in creating temp key file", e);
             }
             
             tasks.removeAll(tasksToBeRemoved);
