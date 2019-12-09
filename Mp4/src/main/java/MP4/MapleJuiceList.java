@@ -342,7 +342,7 @@ public class MapleJuiceList {
                 if (taskIds.contains(taskId))
                 {
                     taskIdInFiles.add(taskId);
-                    bw.write(line.substring(taskIdEndingIndex));
+                    bw.write(line.substring(taskIdEndingIndex) + System.getProperty("line.separator"));
                 }
 
             }

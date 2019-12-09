@@ -148,7 +148,7 @@ public class Maple extends Thread {
                 String fileName = intermediatePrefixFileName + "_" + key;
                     if (putFile(fileName, fileName) == 1) 
                     {
-                        System.out.println("[Maple][putFilesInSdfs] File insertion failed for" + fileName);
+                        System.out.println("[Maple][putFilesInSdfs] File insertion success for" + fileName);
                     
                     }
                     else
