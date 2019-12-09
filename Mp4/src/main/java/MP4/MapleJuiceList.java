@@ -232,6 +232,8 @@ public class MapleJuiceList
 
     public static synchronized void checkJobCompletion(String exeName, int tasksFinished)
     {
+        System.out.println("[MapleJuiceList][checkJobCompletion] Deleting all the data of exeName: " + 
+            exeName + " " + jobsToTask.get(exeName));
         if (tasksFinished == jobsToTask.get(exeName))
         {
             logger.LogInfo("[MapleJuiceList][checkJobCompletion] Deleting all the data of exeName: " + exeName);
@@ -260,8 +262,9 @@ public class MapleJuiceList
                     FileWriter tempKeyFile = new FileWriter(keyTempFile); 
                     BufferedWriter bw = new BufferedWriter(tempKeyFile);
                     bw.write(taskIdsJson);
+                    bw.close();
                     Maple.putFile(key, keyTempFile.getName());
-                    //keyTempFile.delete();
+                    //keyTempFile.delete();                  
                 }
             }
             catch(Exception e)

@@ -134,9 +134,9 @@ public class TcpMessagesRequestHandler extends Thread
                 break;
   
 
-            case DELETE:
-                reply = DeleteFile();
-                break;
+            // case DELETE:
+            //     reply = DeleteFile();
+            //     break;
 
             case REREPLICATE:
                 reply = ReReplicateFile("replicate");
@@ -154,9 +154,9 @@ public class TcpMessagesRequestHandler extends Thread
                 reply = PutFilesSuccess();
                 break;
 
-            case DELETE_SUCCESS:
-                reply = DeleteFilesSuccess();
-                break;
+            // case DELETE_SUCCESS:
+            //     reply = DeleteFilesSuccess();
+            //     break;
             
             case FILEELAPSED:
                 reply = FileTimeElapsed();

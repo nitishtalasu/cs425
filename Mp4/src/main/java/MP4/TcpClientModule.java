@@ -340,9 +340,9 @@ public class TcpClientModule
             }
             else if(amount <= 2)
             {
-                logger.LogInfo("[TcpClient: PutFileParallel] Deleting files as quorum not met for the file: "+ sdfsFileName);
+                System.out.println("[TcpClient: PutFileParallel] Deleting files as quorum not met for the file: "+ sdfsFileName);
                 List<String> addr = getreplicasFromLeader(sdfsFileName);
-                deleteFilesParallel(sdfsFileName, addr);
+                //deleteFilesParallel(sdfsFileName, addr);
                 return false;
             }
         }

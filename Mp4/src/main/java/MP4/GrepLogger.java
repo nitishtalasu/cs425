@@ -91,7 +91,7 @@ public class GrepLogger {
      */
     public void LogInfo(String message)
     {
-        //logger.info(message);
+        logger.info(message);
     }
 
     /**
@@ -100,7 +100,7 @@ public class GrepLogger {
      */
     public void LogWarning(String message)
     {
-        // logger.warning(message);
+        logger.warning(message);
     }
 
     /**
@@ -109,7 +109,7 @@ public class GrepLogger {
      */
     public void LogError(String message)
     {
-        // logger.log(Level.SEVERE, message);
+        logger.log(Level.SEVERE, message);
     }
 
     /**
@@ -119,9 +119,9 @@ public class GrepLogger {
      */
     public void LogException(String message, Exception exp)
     {
-        // String errorMessage = message + "Failed with exception:" + exp.getMessage();
-        // logger.log(Level.SEVERE, errorMessage);
-        // exp.printStackTrace();
+        String errorMessage = message + "Failed with exception:" + exp.getMessage();
+        logger.log(Level.SEVERE, errorMessage);
+        exp.printStackTrace();
     }
 
 
