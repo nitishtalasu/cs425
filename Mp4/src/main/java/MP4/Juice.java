@@ -158,10 +158,11 @@ public class Juice extends Thread
         String taskIdFiles = "";
         for (String taskId : taskIds) 
         {
+            sdfsFileName = fileName + "_" + taskId;
             addresses = client.getreplicasFromLeader(sdfsFileName);
             String taskIdFile = fileName + "_" + taskId + "_temp";
             taskIdFiles += taskIdFile + " ";
-            client.getFiles(taskIdFile, taskIdFile, addresses);
+            client.getFiles(sdfsFileName, taskIdFile, addresses);
         }
         
         String command = "cat "+ taskIdFiles + " > " + dir;
