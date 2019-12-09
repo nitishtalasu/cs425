@@ -20,7 +20,7 @@ public class Maple extends Thread
 
     private static TcpClientModule client = new TcpClientModule();
 
-    private static String localFilesDir = "/src/main/java/MP4/localFile/";
+    public static String localFilesDir = "/src/main/java/MP4/localFile/";
 
     private String command;
     private List<String> processedKeys;
@@ -142,20 +142,14 @@ public class Maple extends Thread
         for (String key : keysProcessed) 
         {
             // call Leader and get addresses
-            String fileName = intermediatePrefixFileName + "_" + key;
-            if(!processedKeys.contains(fileName))
+            String intermediateKey = intermediatePrefixFileName + "_" + key;
+            String fileName = intermediateKey + "_" + taskId;
+            System.out.println("[Maple][putFileInSdfs] Putting file in SDFS with name: " + fileName);
+            if (putFile(fileName, fileName) == 1)
             {
-                System.out.println("[Maple][putFileInSdfs] Putting file in SDFS with name: " + fileName);
-                if (putFile(fileName, fileName) == 1)
-                {
-                    client.putProcessedKey(taskId, fileName);
-                }
+                System.out.println("[Maple][putFileInSdfs] Put successful in SDFS with name: " + fileName);
+                client.putProcessedKey(taskId, intermediateKey);
             }
-            else
-            {
-                System.out.println("[Maple][putFileInSdfs] Skipping file in SDFS as already processed: " + fileName);
-            }
-            
         }
     }
 
@@ -259,7 +253,7 @@ public class Maple extends Thread
     }
     
 
-    private static int putFile(String sdfsName, String localName)
+    public static int putFile(String sdfsName, String localName)
     {
         List<String> addresses = client.getAddressesFromLeader(sdfsName);
         if(client.putFilesParallel(sdfsName, localName, addresses, "put"))

@@ -122,26 +122,55 @@ public class Juice extends Thread
     {
         // call Leader and get addresses
         List<String> addresses = client.getAddressesFromLeader(outputFileName);
-        if(client.putFilesParallel(outputFileName, intermediatePrefixFileName, addresses, "put"))
+        String sdfsFileName = outputFileName + "_" + taskId;
+        System.out.println("[juice][putFilesInSdfs] Inserting file with fileName: " + sdfsFileName);
+        if(client.putFilesParallel(sdfsFileName, intermediatePrefixFileName, addresses, "put"))
         {
-            client.putSuccess(outputFileName);
+            client.putSuccess(sdfsFileName);
+            client.putProcessedKey(taskId, outputFileName);
         }
         else
         {
-            logger.LogError("[Juice][putFile] File insertion failed for" + outputFileName);
+            logger.LogError("[Juice][putFilesInSdfs] File insertion failed for" + outputFileName);
         }
     }
 
     /**
      * TODO : Assuming the getFile always works.
+     * 
+     * @throws IOException
+     * @throws InterruptedException
      */
-    private static void getFile(String fileName)
+    private static void getFile(String fileName) throws IOException, InterruptedException
     {
         String sdfsFileName = fileName;
         String localFileName = fileName;
         // call Leader and get addresses
         List<String> addresses = client.getreplicasFromLeader(sdfsFileName);        
         client.getFiles(sdfsFileName, localFileName, addresses);
+
+        String dir = System.getProperty("user.dir") + Maple.localFilesDir + localFileName;
+        System.out.println("Juice localfilename : " + dir);
+        BufferedReader br = new BufferedReader(new FileReader(localFileName));
+        String taskIdsJson = br.readLine();
+        br.close();
+        List<String> taskIds = TcpClientModule.getListObject(taskIdsJson);
+        System.out.println("Juice taskids to be fetched : " + taskIds);
+        String taskIdFiles = "";
+        for (String taskId : taskIds) 
+        {
+            addresses = client.getreplicasFromLeader(sdfsFileName);
+            String taskIdFile = fileName + "_" + taskId + "_temp";
+            taskIdFiles += taskIdFile + " ";
+            client.getFiles(taskIdFile, taskIdFile, addresses);
+        }
+        
+        String command = "cat "+ taskIdFiles + " > " + dir;
+        System.out.println("merging command: " + command);
+        String[] commandLine2 = {"/bin/sh","-c",command};
+        Runtime runtime = Runtime.getRuntime();
+        Process process2 = runtime.exec(commandLine2);
+        int exitCode = process2.waitFor();
     }
 
     private static List<String> readBatch(BufferedReader reader, int batchSize) throws IOException 

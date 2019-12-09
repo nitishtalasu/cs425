@@ -853,7 +853,7 @@ public class TcpClientModule
         return ret;
     }
 
-    public int putProcessedKey(String taskId, String sdfsFileName)
+    public int putProcessedKey(String taskId, String key)
     {
         int ret = 1;
         this.initializeStreams(Introducer.IPADDRESS.getValue());
@@ -863,11 +863,11 @@ public class TcpClientModule
             
             this.outputStream.writeUTF(MessageType.ADDPROCESSEDKEY.toString());
             this.outputStream.writeUTF(taskId);
-            this.outputStream.writeUTF(sdfsFileName);
+            this.outputStream.writeUTF(key);
             String reply = this.inputStream.readUTF();
             if(reply.equals("OK"))
             {
-                logger.LogInfo("[TCPClient][putProcessedKey] Processed key added successfully : " + sdfsFileName); 
+                logger.LogInfo("[TCPClient][putProcessedKey] Processed key added successfully : " + key); 
             }
             else
             {

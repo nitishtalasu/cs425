@@ -15,8 +15,7 @@ abstract class Task
 
     public Task(String exeName, String intermediatePrefixName, String workerIpAddress)
     {
-        int random = ThreadLocalRandom.current().nextInt();
-        this.taskId = exeName + "_" + Integer.toString(random);
+        this.taskId = exeName + Long.toString(System.currentTimeMillis());
         this.exeFileName = exeName;
         this.intermediatePrefixName = intermediatePrefixName;
         this.workerIp = workerIpAddress;

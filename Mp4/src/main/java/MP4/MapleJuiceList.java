@@ -1,10 +1,15 @@
 package MP4;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -15,6 +20,7 @@ public class MapleJuiceList
     private static volatile ConcurrentLinkedQueue<Task> tasks;
     private static volatile ConcurrentHashMap<String, List<String>> jobsToWorkerPool;
     private static volatile ConcurrentHashMap<String, Integer> jobsToTask;
+    private static volatile ConcurrentHashMap<String, Set<String>> jobsToKeys;
     private static GrepLogger logger = GrepLogger.getInstance();
     
     private MapleJuiceList()
@@ -23,6 +29,7 @@ public class MapleJuiceList
         tasks = new ConcurrentLinkedQueue<Task>();
         jobsToWorkerPool = new ConcurrentHashMap<String, List<String>>();
         jobsToTask = new ConcurrentHashMap<String, Integer>();
+        jobsToKeys = new ConcurrentHashMap<String, Set<String>>();
     }
 
     public static synchronized void initializeMapleJuiceList() 
@@ -163,6 +170,7 @@ public class MapleJuiceList
                 jobs.remove(job);
                 jobsToTask.remove(exeName);
                 jobsToWorkerPool.remove(exeName);
+                jobsToKeys.remove(exeName);
                 return;
             }
         }
@@ -199,6 +207,7 @@ public class MapleJuiceList
         addTasks(baseClassTasksList);
         jobsToWorkerPool.put(newJob.exeName, workerpool);
         jobsToTask.put(newJob.exeName, newTasks.size());
+        jobsToKeys.put(newJob.exeName, new HashSet<String>());
     }
 
     public static synchronized ConcurrentLinkedQueue<Job> getJobs() 
@@ -227,15 +236,39 @@ public class MapleJuiceList
         {
             logger.LogInfo("[MapleJuiceList][checkJobCompletion] Deleting all the data of exeName: " + exeName);
             List<Task> tasksToBeRemoved = new ArrayList<Task>();
+            List<String> taskIds = new ArrayList<String>();
             for (Task task : tasks) 
             {
                 if (task.exeFileName.equals(exeName))
                 {
                     assert (task.status == TaskStatus.FINISHED);
                     tasksToBeRemoved.add(task);
+                    taskIds.add(task.taskId);
                 }             
             }
 
+            try
+            {
+                Set<String> keys = jobsToKeys.get(exeName);
+                String curDir = System.getProperty("user.dir");
+                String localDir = curDir + Maple.localFilesDir;
+                String taskIdsJson = TcpClientModule.toJson(taskIds);
+                // TODO make it parallel.
+                for (String key : keys) 
+                {
+                    File keyTempFile = new File(localDir + key +  "_temp");
+                    FileWriter tempKeyFile = new FileWriter(keyTempFile); 
+                    BufferedWriter bw = new BufferedWriter(tempKeyFile);
+                    bw.write(taskIdsJson);
+                    Maple.putFile(key, keyTempFile.getName());
+                    //keyTempFile.delete();
+                }
+            }
+            catch(Exception e)
+            {   
+                System.out.println("Failed in creating temp key file");
+            }
+            
             tasks.removeAll(tasksToBeRemoved);
             removeJob(exeName);
         }
@@ -260,11 +293,15 @@ public class MapleJuiceList
     {
         for (Task task : tasks) 
         {
-            if (task.taskId.equals(taskId) && !task.finishedKeys.contains(key))
+            if (task.taskId.equals(taskId))
             {
-                logger.LogInfo("[MapleJuiceList][addProcessedKeys] Adding key " + key +
-                    " to task with Id: " + task.taskId);
-                task.finishedKeys.add(key);
+                if (jobsToKeys.containsKey(task.exeFileName)) 
+                {
+                    jobsToKeys.get(task.exeFileName).add(key);
+                    System.out.println("MApleJuiceLIst: addProcessedKeys -- key added to the map "+ 
+                        jobsToKeys.get(task.exeFileName));
+                }
+                
                 return;
             }
         }
