@@ -146,7 +146,12 @@ public class Juice extends Thread
         String dir = System.getProperty("user.dir") + Maple.localFilesDir + localFileName;
         System.out.println("Juice localfilename : " + dir);
         BufferedReader br = new BufferedReader(new FileReader(dir));
-        String taskIdsJson = br.readLine();
+        String taskIdsJson = "";
+        String line; 
+        while((line = br.readLine()) != null)
+        {
+            taskIdsJson += line;
+        }
         br.close();
         List<String> taskIds = TcpClientModule.getListObject(taskIdsJson);
         System.out.println("Juice taskids to be fetched : " + taskIds);
