@@ -234,8 +234,8 @@ public class MapleJuiceList
     {
         System.out.println("[MapleJuiceList][checkJobCompletion] Deleting all the data of exeName: " + 
             exeName + " " + jobsToTask.get(exeName));
-        if (tasksFinished == jobsToTask.get(exeName))
-        {
+        //if (tasksFinished == jobsToTask.get(exeName))
+        //{
             logger.LogInfo("[MapleJuiceList][checkJobCompletion] Deleting all the data of exeName: " + exeName);
             List<Task> tasksToBeRemoved = new ArrayList<Task>();
             List<String> taskIds = new ArrayList<String>();
@@ -244,6 +244,10 @@ public class MapleJuiceList
                 if (task.exeFileName.equals(exeName))
                 {
                     assert (task.status == TaskStatus.FINISHED);
+                    if (task.status != TaskStatus.FINISHED)
+                    {
+                        return;
+                    }
                     tasksToBeRemoved.add(task);
                     taskIds.add(task.taskId);
                 }             
@@ -274,7 +278,7 @@ public class MapleJuiceList
             
             tasks.removeAll(tasksToBeRemoved);
             removeJob(exeName);
-        }
+        //}
     }
 
     public static void printJobsAndTasks() 
