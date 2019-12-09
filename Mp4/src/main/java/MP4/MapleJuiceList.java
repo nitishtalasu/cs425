@@ -273,9 +273,10 @@ public class MapleJuiceList {
                     }
                 }
             }
-            
+           
             tasks.removeAll(tasksToBeRemoved);
             removeJob(exeName);
+            System.out.println("END Task: "+ System.currentTimeMillis());
         }
     }
 

@@ -142,6 +142,7 @@ class ClientModule extends Thread
                             int numOfMapleJobs = Integer.parseInt(command[2]);
                             String intermediatePrefixName = command[3];
                             String localFileDir = command[4];
+                            System.out.println("START Maple: "+ System.currentTimeMillis());
                             Maple.submitJob(mapleExe, numOfMapleJobs, intermediatePrefixName, localFileDir);
                             continue;
                         }
@@ -152,6 +153,7 @@ class ClientModule extends Thread
                             String intermediatePrefixName = command[3];
                             String fileOutput = command[4];
                             String deleteIntermediateFilesOption = command[5];
+                            System.out.println("START Juice: "+ System.currentTimeMillis());
                             Juice.submitJob(
                                 juiceExe, 
                                 numOfJuiceJobs, 
